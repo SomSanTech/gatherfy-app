@@ -1,1 +1,0 @@
-# gatherfy-app
