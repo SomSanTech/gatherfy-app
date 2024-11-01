@@ -1,17 +1,28 @@
-import { ScrollView, View, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  ScrollView,
+  View,
+  Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Text,
+  Keyboard,
+} from "react-native";
 import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import SearchInput from "@/components/SearchInput";
 
-const Search = () => {
+const search = () => {
   return (
-    <SafeAreaView className="h-full">
-      <ScrollView contentContainerStyle={{ height: "100%" }}>
-        <View>
-          <Text>Search</Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView className="px-2">
+          <SearchInput />
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
-export default Search;
+export default search;
