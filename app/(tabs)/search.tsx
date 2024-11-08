@@ -7,22 +7,27 @@ import {
   Text,
   Keyboard,
 } from "react-native";
-import React from "react";
+import React, { Fragment } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchInput from "@/components/SearchInput";
+import EventCard from "@/components/EventCard";
+import { AppProvider } from "@/components/AppContext";
 
-const search = () => {
+const Search = () => {
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView className="px-2">
+    <AppProvider> 
+      <Fragment>
+        <SafeAreaView
+          edges={["top"]}
+          className="p-3 pb-0 bg-white shadow"
+          style={{ flex: 0 }}
+        >
           <SearchInput />
         </SafeAreaView>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+        <EventCard />
+      </Fragment>
+    </AppProvider>
   );
 };
 
-export default search;
+export default Search;
