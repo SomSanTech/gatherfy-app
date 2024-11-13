@@ -2,6 +2,8 @@ import { StyleSheet, Text, View } from "react-native";
 import { Slot, SplashScreen, Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
+import App from ".";
+import { AppProvider } from "@/components/AppContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,10 +24,20 @@ const RootLayout = () => {
   if (!fontsLoaded && !error) return null;
 
   return (
+    <AppProvider>
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen 
+        name="(tabs)" 
+        options={{
+          headerShown: false,
+          gestureEnabled: false,  // Disable swipe back gesture
+          animation: "none",  // Optional: Disable transition animation
+          headerLeft: () => null,  // Hide the back button on iOS
+        }} 
+      />
     </Stack>
+    </AppProvider>
   );
 };
 

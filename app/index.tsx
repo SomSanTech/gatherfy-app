@@ -37,7 +37,6 @@ export default function App() {
               textStyle="text-white"
               isLoading={!isLoading}
              />
-            
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -49,5 +48,4 @@ export default function App() {
 const styles = StyleSheet.create({
 
 });
-
 

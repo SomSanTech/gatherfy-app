@@ -7,6 +7,8 @@ interface AppContextType {
     setSearch: React.Dispatch<React.SetStateAction<string>>;
     isLoading: boolean;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    page: String;
+    setPage: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // สร้าง context และตัวให้ค่าเริ่มต้น
@@ -15,9 +17,10 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [search, setSearch] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
+    const [page, setPage] = useState<string>('');
 
     return (
-        <AppContext.Provider value={{ search, setSearch , isLoading, setIsLoading}}>
+        <AppContext.Provider value={{ search, setSearch , isLoading, setIsLoading , page , setPage}}>
             {children}
         </AppContext.Provider>
     );

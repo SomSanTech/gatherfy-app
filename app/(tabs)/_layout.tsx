@@ -1,4 +1,4 @@
-import { View, Text, Image, ImageSourcePropType } from "react-native";
+import { View, Text, Image, ImageSourcePropType, Dimensions } from "react-native";
 import { Tabs, Redirect } from "expo-router";
 import { createStackNavigator } from "@react-navigation/stack";
 import icons from "../../constants/icons"; // Adjust the path according to your folder structure
@@ -24,6 +24,10 @@ const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
   );
 };
 
+// Calculate height based on screen height
+const screenHeight = Dimensions.get("window").height;
+const tabBarHeight = screenHeight * 0.1; // 10% of screen height
+
 const TabsLayout = () => {
   return (
     <>
@@ -36,7 +40,7 @@ const TabsLayout = () => {
             backgroundColor: "rgba(255,255,255,0.8)",
             borderTopWidth: 1,
             borderTopColor: "transparent",
-            height: 87,
+            height: tabBarHeight, // Set to 10% of screen height
           },
         }}
       >
