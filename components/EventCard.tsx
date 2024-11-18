@@ -50,7 +50,7 @@ const EventCard: React.FC<EventCardProps> = ({ page, search }) => {
       }
 
       if (page === "search" && search) {
- 
+        url+=`?keyword=${search}`;
         const response = await fetch(url);
         const data = await response.json();
         setEvents(data);
