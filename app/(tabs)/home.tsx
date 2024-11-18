@@ -75,22 +75,8 @@ import { useAppContext } from "@/components/AppContext";
 import images from "../../constants/icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const Home: React.FC = () => {
+const Home = () => {
   const { search } = useAppContext();
-
-  useEffect(() => {
-    const backAction = () => {
-      // Prevent going back to the search page
-      return true;
-    };
-  
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-  
-    return () => backHandler.remove();
-  }, []);
 
   return (
     <Fragment>

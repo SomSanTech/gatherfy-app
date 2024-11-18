@@ -15,7 +15,6 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
 
-
 import Home from "./home";
 import Liked from "./liked";
 import Profile from "./profile";
@@ -30,7 +29,6 @@ type TabIconProps = {
   name: string;
   focused: boolean;
 };
-
 
 const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
   return (
@@ -52,9 +50,9 @@ const tabBarHeight = screenHeight * 0.11; // 10% of screen height
 const Tab = createBottomTabNavigator();
 
 function TabNav() {
-
   return (
     <Tab.Navigator
+      backBehavior="history"
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
@@ -68,7 +66,6 @@ function TabNav() {
           height: tabBarHeight, // Set to 10% of screen height
         },
       }}
-      
     >
       <Tab.Screen
         name="Search"
@@ -175,7 +172,7 @@ const StackSearch = () => {
       <Stack.Screen
         name="SearchScreen"
         component={Search}
-        options={{ headerShown: false, }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="EventDetail"
@@ -185,6 +182,5 @@ const StackSearch = () => {
     </Stack.Navigator>
   );
 };
-
 
 export default TabNav;
