@@ -3,7 +3,7 @@ import React from "react";
 import { SearchBar } from "@rneui/themed";
 import { useAppContext } from "@/components/AppContext";
 
-const SearchInput: React.FC<{ onSearch: () => void }> = ({ onSearch }) => {
+const SearchInput: React.FC = () => {
   const { search, setSearch } = useAppContext();
   const { isLoading, setIsLoading } = useAppContext();
 
@@ -17,7 +17,6 @@ const SearchInput: React.FC<{ onSearch: () => void }> = ({ onSearch }) => {
 
   const handleSearchPress = () => {
     updateLoading(true); // Set loading to true
-    onSearch(); // Call the onSearch function to proceed with the search
   };
 
   const isIOS = Platform.OS === "ios";

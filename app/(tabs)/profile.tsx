@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView,Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
 
@@ -16,4 +16,4 @@ const Profile = () => {
 
 export default Profile;
 
-const styles = StyleSheet.create({});
+

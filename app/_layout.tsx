@@ -31,9 +31,6 @@ const RootLayout = () => {
         name="(tabs)" 
         options={{
           headerShown: false,
-          gestureEnabled: false,  // Disable swipe back gesture
-          animation: "none",  // Optional: Disable transition animation
-          headerLeft: () => null,  // Hide the back button on iOS
         }} 
       />
     </Stack>
