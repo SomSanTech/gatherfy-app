@@ -4,6 +4,7 @@ import {
   Image,
   ImageSourcePropType,
   Dimensions,
+  Platform,
 } from "react-native";
 import { Tabs, Redirect } from "expo-router";
 import icons from "../../constants/icons"; // Adjust the path according to your folder structure
@@ -33,19 +34,29 @@ type TabIconProps = {
 const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
   return (
     <View className="items-center justify-center gap-1">
+      { Platform.OS === 'android' ? (
+      <Image
+        source={icon}
+        resizeMode="contain"
+        tintColor={color}
+        className="w-[26px] h-[26px]"
+      /> // for android
+      ) : (   
       <Image
         source={icon}
         resizeMode="contain"
         tintColor={color}
         className="w-6 h-6"
-      />
+      /> // for ios
+      )}
     </View>
   );
 };
 
 // Calculate height based on screen height
 const screenHeight = Dimensions.get("window").height;
-const tabBarHeight = screenHeight * 0.11; // 10% of screen height
+const tabBarHeight =
+  Platform.OS === "ios" ? screenHeight * 0.11 : screenHeight * 0.09; // 10% of screen height
 
 const Tab = createBottomTabNavigator();
 
@@ -64,6 +75,8 @@ function TabNav() {
           borderTopWidth: 1,
           borderTopColor: "transparent",
           height: tabBarHeight, // Set to 10% of screen height
+          shadowColor: "transparent", // Ensure no shadow appears
+          paddingBottom: Platform.OS === "ios" ? 30 : 10, // Extra padding for iOS
         },
       }}
     >

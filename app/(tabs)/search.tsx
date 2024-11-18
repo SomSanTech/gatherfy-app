@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from "react";
-import { View } from "react-native";
+import { View , Platform } from "react-native";
 import SearchInput from "@/components/SearchInput";
 import EventCard from "@/components/EventCard";
 import { useAppContext } from "@/components/AppContext";
@@ -12,12 +12,15 @@ const Search = () => {
     <Fragment>
       <SafeAreaView
         edges={["top"]}
-        className="p-3 pb-0 bg-white shadow"
-        style={{ flex: 0 }}
+        className="bg-white shadow"
+        style={{
+          flex: 0,
+          
+        }}
       >
         <SearchInput />
       </SafeAreaView>
-      <View className="m-0 p-0" style={{ flex: 1 }}>
+      <View className="m-0 p-0">
         <EventCard page="search" search={search} />
       </View>
     </Fragment>

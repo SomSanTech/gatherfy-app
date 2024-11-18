@@ -2,6 +2,7 @@ import { View, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, Text, K
 import React from "react";
 import { SearchBar } from "@rneui/themed";
 import { useAppContext } from "@/components/AppContext";
+import { formatDuration } from "date-fns";
 
 const SearchInput: React.FC = () => {
   const { search, setSearch } = useAppContext();
@@ -26,8 +27,8 @@ const SearchInput: React.FC = () => {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View>
-          <View className="mb-6 h-9">
+      <View className={Platform.OS === "android" ? "py-1" : "p-3"}>
+          <View className={Platform.OS === "android" ? "mb-6 h-9 px-3 flex justify-center items-center" : "mb-6 h-9 "}>
             <SearchBar
               placeholder="Search"
               onChangeText={updateSearch}
@@ -37,11 +38,13 @@ const SearchInput: React.FC = () => {
               clearIcon={Platform.OS === "ios" ? { name: "close-circle" } : { name: "close" }}
               returnKeyType="search"
               inputStyle={{ color: "#D71515" }}
-              inputContainerStyle={{ height: 20 }}
+              inputContainerStyle={Platform.OS === "ios" ? { height: 20 } : { height: 60 }}
+             
               containerStyle={{
                 backgroundColor: "transparent",
                 borderBottomWidth: 0,
                 borderTopWidth: 0,
+                height: Platform.OS === "android" ? 60 : "auto",
               }}
               cancelButtonProps={{
                 color: "#D71515",
