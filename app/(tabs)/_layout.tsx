@@ -10,9 +10,7 @@ import { Tabs, Redirect } from "expo-router";
 import icons from "../../constants/icons"; // Adjust the path according to your folder structure
 
 import "react-native-gesture-handler";
-import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
 
@@ -76,7 +74,7 @@ function TabNav() {
           borderTopColor: "transparent",
           height: tabBarHeight, // Set to 10% of screen height
           shadowColor: "transparent", // Ensure no shadow appears
-          paddingBottom: Platform.OS === "ios" ? 30 : 10, // Extra padding for iOS
+          paddingTop: Platform.OS === "ios" ? 15 : 10, // Extra padding for iOS
         },
       }}
     >

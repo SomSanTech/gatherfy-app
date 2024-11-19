@@ -65,7 +65,6 @@
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 
 import TabNav from './(tabs)/_layout';
 
@@ -78,8 +77,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../components/CustomButton";
 import images from "../constants/images";
 
-
-const Tab = createMaterialBottomTabNavigator();
 
 
 export default function App() {
@@ -98,10 +95,7 @@ export default function App() {
 
   if (isLoading) {
     return (
-  
-      <NavigationContainer independent={true}>
         <TabNav />
-      </NavigationContainer>
     );
   }
 }

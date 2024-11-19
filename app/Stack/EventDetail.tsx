@@ -8,13 +8,10 @@ import {
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { API_HOST_IOS, API_HOST_ANDROID } from "@env";
 import { RouteProp } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 
-
 type EventDetailRouteProp = RouteProp<RootStackParamList, "EventDetail">;
-
 
 type EventDetailProps = {
   route: EventDetailRouteProp; // Expect the `route` prop
@@ -38,6 +35,10 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     {} as EventDetail
   );
   const fetchData = async () => {
+    // const API_HOST_IOS = "http://localhost:8080";
+    // const API_HOST_ANDROID = "http://10.0.2.2:8080";
+    const API_HOST_IOS = "http://cp24us1.sit.kmutt.ac.th:8080";
+    const API_HOST_ANDROID = "http://cp24us1.sit.kmutt.ac.th:8080";
     const apiURL = Platform.OS === "ios" ? API_HOST_IOS : API_HOST_ANDROID;
 
     let url = `${apiURL}/api/v1/events`;
@@ -85,7 +86,9 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
       const hours = date.getHours();
       const minutes = date.getMinutes();
 
-      const formattedTime = `${hours.toString().padStart(2,"0")}:${minutes.toString().padStart(2, "0")}`;
+      const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}`;
 
       return { date: formattedDate, time: formattedTime };
     } catch (error) {

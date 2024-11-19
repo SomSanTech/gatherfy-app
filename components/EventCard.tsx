@@ -10,7 +10,6 @@ import {
 import { useAppContext } from "./AppContext";
 import { useNavigation } from "@react-navigation/native";
 import EventDetail from "@/app/Stack/EventDetail";
-import { API_HOST_IOS, API_HOST_ANDROID } from "@env";
 import { set } from "date-fns";
 
 interface Event {
@@ -39,6 +38,10 @@ const EventCard: React.FC<EventCardProps> = ({ page, search }) => {
   };
 
   const fetchData = async () => {
+    // const API_HOST_IOS = "http://localhost:8080";
+    // const API_HOST_ANDROID = "http://10.0.2.2:8080";
+    const API_HOST_IOS = "http://cp24us1.sit.kmutt.ac.th:8080";
+    const API_HOST_ANDROID = "http://cp24us1.sit.kmutt.ac.th:8080";
     const apiURL = Platform.OS === "ios" ? API_HOST_IOS : API_HOST_ANDROID;
     console.log(apiURL);
     let url = `${apiURL}/api/v1/events`;
