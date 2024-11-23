@@ -13,13 +13,14 @@ import "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { RouteProp } from "@react-navigation/native";
+import  RootStackParamList  from "@/rootStack/RootStackParamList";
 
 import Home from "./home";
 import Liked from "./liked";
 import Profile from "./profile";
 import Search from "./search";
 import Tag from "./tag";
-import EventDetail from "../Stack/EventDetail";
+import EventDetail from "../stack/EventDetail";
 
 // Define prop types
 type TabIconProps = {
@@ -158,7 +159,7 @@ function TabNav() {
   );
 }
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator<typeof RootStackParamList>();
 
 const StackNavigator = () => {
   return (

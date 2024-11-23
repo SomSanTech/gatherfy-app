@@ -9,8 +9,7 @@ import {
 } from "react-native";
 import { useAppContext } from "./AppContext";
 import { useNavigation } from "@react-navigation/native";
-import EventDetail from "@/app/Stack/EventDetail";
-import { set } from "date-fns";
+import EventDetail from "@/app/stack/EventDetail";
 
 interface Event {
   slug: string;
@@ -43,7 +42,6 @@ const EventCard: React.FC<EventCardProps> = ({ page, search }) => {
     const API_HOST_IOS = "http://cp24us1.sit.kmutt.ac.th:8080";
     const API_HOST_ANDROID = "http://cp24us1.sit.kmutt.ac.th:8080";
     const apiURL = Platform.OS === "ios" ? API_HOST_IOS : API_HOST_ANDROID;
-    console.log(apiURL);
     let url = `${apiURL}/api/v1/events`;
     try {
       if (page === "home") {

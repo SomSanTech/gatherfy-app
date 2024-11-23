@@ -10,8 +10,9 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
+import RootStackParamList from "@/rootStack/RootStackParamList";
 
-type EventDetailRouteProp = RouteProp<RootStackParamList, "EventDetail">;
+type EventDetailRouteProp = RouteProp<typeof RootStackParamList, "EventDetail">;
 
 type EventDetailProps = {
   route: EventDetailRouteProp; // Expect the `route` prop

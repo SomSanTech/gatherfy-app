@@ -2,7 +2,6 @@ import { View, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, Text, K
 import React from "react";
 import { SearchBar } from "@rneui/themed";
 import { useAppContext } from "@/components/AppContext";
-import { formatDuration } from "date-fns";
 
 const SearchInput: React.FC = () => {
   const { search, setSearch } = useAppContext();
@@ -39,7 +38,8 @@ const SearchInput: React.FC = () => {
               returnKeyType="search"
               inputStyle={{ color: "#D71515" }}
               inputContainerStyle={Platform.OS === "ios" ? { height: 20 } : { height: 60 }}
-             
+              showCancel={true} 
+              onCancel={() => console.log('Cancel pressed')} 
               containerStyle={{
                 backgroundColor: "transparent",
                 borderBottomWidth: 0,
