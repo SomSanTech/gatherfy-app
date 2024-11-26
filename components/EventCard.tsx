@@ -6,10 +6,13 @@ import {
   TouchableOpacity,
   Platform,
   Image,
+  Dimensions,
 } from "react-native";
 import { useAppContext } from "./AppContext";
-import { useNavigation } from "@react-navigation/native";
 import EventDetail from "@/app/stack/EventDetail";
+import Constants from "expo-constants";
+import { fetchData } from "@/composables/getEvent";
+import useNavigateToEventDetail from "@/composables/navigateToEventDetail";
 
 interface Event {
   slug: string;
@@ -22,55 +25,42 @@ interface Event {
 
 interface EventCardProps {
   page: string;
-  search: string;
+  search?: string;
+  event?: Event;
 }
 
-const EventCard: React.FC<EventCardProps> = ({ page, search }) => {
+const EventCard: React.FC<EventCardProps> = ({ page, search, event }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const { isLoading, setIsLoading } = useAppContext();
   const { countResult, setCountResult } = useAppContext();
+  const screenWidth = Dimensions.get("window").width;
 
-  const navigation = useNavigation<any>();
+  const fetchDataAsync = async () => {
+    if (page === "home") {
+      const data = await fetchData(page);
+      setEvents(data);
+    }
+    if (page === "search" && search) {
+      const data = await fetchData(page, search);
+      console.log(search);
 
-  const navigateToEventDetail = (value: string) => {
-    navigation.navigate("EventDetail", { slug: value });
-  };
-
-  const fetchData = async () => {
-    // const API_HOST_IOS = "http://localhost:8080";
-    // const API_HOST_ANDROID = "http://10.0.2.2:8080";
-    const API_HOST_IOS = "http://cp24us1.sit.kmutt.ac.th:8080";
-    const API_HOST_ANDROID = "http://cp24us1.sit.kmutt.ac.th:8080";
-    const apiURL = Platform.OS === "ios" ? API_HOST_IOS : API_HOST_ANDROID;
-    let url = `${apiURL}/api/v1/events`;
-    try {
-      if (page === "home") {
-        const response = await fetch(`${apiURL}/api/v1/events`);
-        const data = await response.json();
-        setEvents(data);
-      }
-
-      if (page === "search" && search) {
-        url+=`?keyword=${search}`;
-        const response = await fetch(url);
-        const data = await response.json();
-        setEvents(data);
-        setIsLoading(false);
-        setCountResult(data.length);
-      } else if (page === "search" && !search) {
-        setEvents([]);
-        setCountResult(0);
-        return;
-      }
-    } catch (error) {
-      console.error("Error fetching events:", error);
-    } finally {
+      setEvents(data);
       setIsLoading(false);
+      setCountResult(data.length);
+    } else if (page === "search" && !search) {
+      console.log(search);
+      setEvents([]);
+      setCountResult(0);
+      setIsLoading(false);
+      return;
     }
   };
 
+  const { navigateToEventDetail } = useNavigateToEventDetail();
+
   useEffect(() => {
-    fetchData();
+    fetchDataAsync();
+    console.log("EventCard useEffect");
   }, [isLoading]);
 
   return (
@@ -86,20 +76,25 @@ const EventCard: React.FC<EventCardProps> = ({ page, search }) => {
         keyExtractor={(item) => item.slug}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
+        horizontal={page === "home"}
+        pagingEnabled={page === "home"}
         contentContainerStyle={{
           paddingBottom: 20,
-          paddingTop: page === "search" ? 0 : 30,
+          paddingTop: 0,
         }}
         renderItem={({ item }) => (
           <TouchableOpacity
             key={item.slug}
             onPress={() => navigateToEventDetail(item.slug)}
           >
-            <View className="mx-4 mb-5 bg-white p-4 rounded-lg w-100 flex-row  items-center ">
-              <View className="w-32 , mr-5">
+            <View
+              className="mx-4 mb-5 bg-white p-4 rounded-lg flex-row  items-center "
+              style={{ width: screenWidth - 40 }}
+            >
+              <View className="w-32 mr-5">
                 <Image
                   source={{ uri: item.image }}
-                  className="w-100 h-40 rounded-lg"
+                  className="w-full h-40 rounded-lg"
                   resizeMode="cover"
                 />
               </View>

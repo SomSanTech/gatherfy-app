@@ -24,7 +24,7 @@ const SearchInput: React.FC = () => {
   
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View className={Platform.OS === "android" ? "py-1" : "p-3"}>
           <View className={Platform.OS === "android" ? "mb-6 h-9 px-3 flex justify-center items-center" : "mb-6 h-9 "}>

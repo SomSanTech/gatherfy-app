@@ -38,7 +38,7 @@ const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
         source={icon}
         resizeMode="contain"
         tintColor={color}
-        className="w-[26px] h-[26px]"
+        className="w-[22px] h-[22px]"
       /> // for android
       ) : (   
       <Image

@@ -12,6 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    
     "ios": {
       "supportsTablet": true
     },
@@ -19,7 +20,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": ["INTERNET"],
+      "useCleartextTraffic": true,
+      "package": "com.sedtabodee.gatherfy",
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "bundler": "metro",
@@ -38,6 +43,15 @@
       "android",
       "web"
     ],
-    "newArchEnabled": true
+    "newArchEnabled": true,
+    "extra": {
+      "apiBaseUrl": "http://cp24us1.sit.kmutt.ac.th:8080",
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "bfa809f4-13dd-4c4a-bf54-175cde940b3b"
+      }
+    }
   }
 }
