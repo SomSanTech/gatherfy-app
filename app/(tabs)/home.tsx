@@ -171,6 +171,7 @@ const Home: React.FC = () => {
                     }
                   >
                     {slideshow.map((item, index) => (
+                      <TouchableOpacity onPress={() => navigateToEventDetail(item.slug)}>
                       <ParallaxCarouselCard
                         item={item}
                         key={index}
@@ -178,6 +179,7 @@ const Home: React.FC = () => {
                         scrollX={scrollX}
                         total={slideshow.length}
                       />
+                      </TouchableOpacity>
                     ))}
                   </Animated.ScrollView>
                   <ParallaxCarouselPagination
