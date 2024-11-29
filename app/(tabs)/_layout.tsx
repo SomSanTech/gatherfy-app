@@ -1,3 +1,4 @@
+import React from "react";
 import {
   View,
   Text,
@@ -5,15 +6,15 @@ import {
   ImageSourcePropType,
   Dimensions,
   Platform,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  TouchableHighlight,
 } from "react-native";
-import { Tabs, Redirect } from "expo-router";
-import icons from "../../constants/icons"; // Adjust the path according to your folder structure
-
-import "react-native-gesture-handler";
-import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { RouteProp } from "@react-navigation/native";
-import  RootStackParamList  from "@/rootStack/RootStackParamList";
+import { createStackNavigator } from "@react-navigation/stack";
+import icons from "../../constants/icons"; // Adjust the path according to your folder structure
 
 import Home from "./home";
 import Liked from "./liked";
@@ -21,6 +22,8 @@ import Profile from "./profile";
 import Search from "./search";
 import Tag from "./tag";
 import EventDetail from "../stack/EventDetail";
+import RootStackParamList from "@/rootStack/RootStackParamList";
+import CustomTabBarButton from "@/components/CustomTabBarButton";
 
 // Define prop types
 type TabIconProps = {
@@ -30,36 +33,24 @@ type TabIconProps = {
   focused: boolean;
 };
 
+// Calculate height based on screen height
+const screenHeight = Dimensions.get("window").height;
+
 const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
   return (
-    <View className="items-center justify-center gap-1">
-      { Platform.OS === 'android' ? (
+    <View style={{ alignItems: "center", justifyContent: "center" }}>
       <Image
         source={icon}
         resizeMode="contain"
-        tintColor={color}
-        className="w-[22px] h-[22px]"
-      /> // for android
-      ) : (   
-      <Image
-        source={icon}
-        resizeMode="contain"
-        tintColor={color}
-        className="w-6 h-6"
-      /> // for ios
-      )}
+        style={{ tintColor: color, width: 24, height: 24 }}
+      />
     </View>
   );
 };
 
-// Calculate height based on screen height
-const screenHeight = Dimensions.get("window").height;
-const tabBarHeight =
-  Platform.OS === "ios" ? screenHeight * 0.11 : screenHeight * 0.09; // 10% of screen height
-
 const Tab = createBottomTabNavigator();
 
-function TabNav() {
+const TabNav = () => {
   return (
     <Tab.Navigator
       backBehavior="history"
@@ -70,18 +61,21 @@ function TabNav() {
         tabBarActiveTintColor: "#D71515",
         tabBarInactiveTintColor: "#CDCDE0",
         tabBarStyle: {
-          backgroundColor: "rgba(255,255,255,0.8)",
+          backgroundColor: "white",
           borderTopWidth: 1,
           borderTopColor: "transparent",
-          height: tabBarHeight, // Set to 10% of screen height
-          shadowColor: "transparent", // Ensure no shadow appears
-          paddingTop: Platform.OS === "ios" ? 15 : 10, // Extra padding for iOS
+          paddingHorizontal: 5,
+          elevation: 0,  // ลดหรือปิดเงาของ tabBar
+          shadowColor: 'transparent',  // ไม่มีเงาที่ tabBar
+          ...(Platform.OS === "android" ? { height: 65 } : {}),
+          
         },
+        tabBarButton: (props) => <CustomTabBarButton {...props} />
       }}
     >
       <Tab.Screen
         name="Search"
-        component={StackSearch}
+        component={StackSearchNavigation}
         options={{
           title: "Search",
           tabBarIcon: ({ color, focused }) => (
@@ -103,7 +97,7 @@ function TabNav() {
             <TabIcon
               icon={icons.tag}
               color={color}
-              name="Tag"
+              name="Home"
               focused={focused}
             />
           ),
@@ -111,7 +105,7 @@ function TabNav() {
       />
       <Tab.Screen
         name="Home"
-        component={StackNavigator}
+        component={StackHomeNavigator}
         options={{
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
@@ -139,10 +133,9 @@ function TabNav() {
           ),
         }}
       />
-
       <Tab.Screen
         name="Profile"
-        component={Profile}
+        component={StackProfileNavigation}
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (
@@ -157,11 +150,12 @@ function TabNav() {
       />
     </Tab.Navigator>
   );
-}
+};
 
 const Stack = createStackNavigator<typeof RootStackParamList>();
 
-const StackNavigator = () => {
+
+const StackHomeNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -178,7 +172,7 @@ const StackNavigator = () => {
   );
 };
 
-const StackSearch = () => {
+const StackSearchNavigation = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -194,5 +188,34 @@ const StackSearch = () => {
     </Stack.Navigator>
   );
 };
+
+const StackProfileNavigation = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="ProfileScreen"
+        component={Profile}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const styles = StyleSheet.create({
+  iconContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  shadow: {
+    shadowColor: "#7F5DF0",
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
+    elevation: 5,
+  },
+});
 
 export default TabNav;

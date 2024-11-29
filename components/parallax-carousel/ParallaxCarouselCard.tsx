@@ -17,9 +17,10 @@ import Animated, {
   Extrapolation,
 } from "react-native-reanimated";
 
+
 const OFFSET = 45; // Define OFFSET with an appropriate value
 const Item_width = Dimensions.get("window").width - OFFSET * 2;
-const Item_height = 420;
+const Item_height = 200;
 
 interface ParallaxCarouselCardProps {
   item: any; // Replace 'any' with the appropriate type if known

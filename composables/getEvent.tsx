@@ -1,18 +1,18 @@
-import React, { Fragment, useEffect, useState } from "react";
 import Constants from "expo-constants";
-import { Platform } from "react-native";
-import { useAppContext } from "../components/AppContext";
+
 
 const API_BASE_URL =
   Constants.expoConfig?.extra?.apiBaseUrl ||
-  'http://cp24us1.sit.kmutt.ac.th:8080'
+  "https://capstone24.sit.kmutt.ac.th";
 
-const API_HOST_IOS = "http://cp24us1.sit.kmutt.ac.th:8080";
-const API_HOST_ANDROID = "http://cp24us1.sit.kmutt.ac.th:8080";
-const apiURL = Platform.OS === "ios" ? API_HOST_IOS : API_HOST_ANDROID;
-
-
-export const fetchData = async (page: string, search?: string) => {
+export const getEvent = async (
+  page: string,
+  search?: string,
+  slug?: string,
+  tag?: string,
+  date?: string,
+  sort?: string
+) => {
   try {
     if (!API_BASE_URL) {
       console.error("API_BASE_URL is not defined in the app's configuration.");
@@ -20,49 +20,69 @@ export const fetchData = async (page: string, search?: string) => {
     }
 
     let url = `${API_BASE_URL}/api/v1/events`;
-    
+
     if (page === "home") {
-        console.log("Fetching from URL:", url);
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        });
+      console.log("Fetching from URL Home:", url);
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
 
-        if (!response.ok) {
-          console.error(`Error: ${response.status} - ${response.statusText}`);
-          return [];
-        }
+      if (!response.ok) {
+        console.error(`Error: ${response.status} - ${response.statusText}`);
+        return [];
+      }
 
-        const data = await response.json(); // Await here to resolve the promise
-        return  data; // Return the resolved data
-      
+      const data = await response.json(); // Await here to resolve the promise
+      return data; // Return the resolved data
     }
 
     if (page === "search" && search) {
-      url = `${url}?keyword=${encodeURIComponent(search)}`;
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        });
+      // Set default values if undefined
+      const searchParam = search || "";
+      const sortParam = sort || "";
+      const dateParam = date || "";
+      const tagParam = tag || "";
 
-        if (!response.ok) {
-          console.error(`Error: ${response.status} - ${response.statusText}`);
-          return [];
-        }
+      url = `${url}?keyword=${encodeURIComponent(
+        searchParam
+      )}&sort=${sortParam}&date=${dateParam}&tags=${tagParam}`;
+      console.log("url:", url);
 
-        console.log("Search Fetching from URL:", url);
-        const data = await response.json(); // Await here to resolve the promise
-        return data; // Return the resolved data
-    }else if (page === "search" && !search) {
-        console.log("No search keyword provided.");
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        console.error(`Error: ${response.status} - ${response.statusText}`);
         return [];
       }
+
+      console.log("Search Fetching from URL:", url);
+      const data = await response.json(); // Await here to resolve the promise
+      return data; // Return the resolved data
+    } else if (page === "search" && !search) {
+      console.log("No search keyword provided.");
+      return [];
+    }
+
+    if (page === "detail") {
+      console.log("Fetching detail with slug:", slug);
+
+      url += `/${slug}`;
+      const response = await fetch(url);
+      console.log("Fetching detail from URL:", url);
+
+      const data = await response.json();
+      return data;
+    }
   } catch (error) {
     console.error("Error fetching events:", error);
   } finally {

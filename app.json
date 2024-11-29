@@ -8,7 +8,7 @@
     "scheme": "gatherfy",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/logo.png",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -45,7 +45,7 @@
     ],
     "newArchEnabled": true,
     "extra": {
-      "apiBaseUrl": "http://cp24us1.sit.kmutt.ac.th:8080",
+      "apiBaseUrl": "http://cp24us1.sit.kmutt.ac.th:543",
       "router": {
         "origin": false
       },

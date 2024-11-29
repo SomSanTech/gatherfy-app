@@ -11,6 +11,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 import RootStackParamList from "@/rootStack/RootStackParamList";
+import Constants from "expo-constants";
+import { getEvent } from "@/composables/getEvent";
+import formatDate from "@/utils/formatDate";
 
 type EventDetailRouteProp = RouteProp<typeof RootStackParamList, "EventDetail">;
 
@@ -30,78 +33,31 @@ interface EventDetail {
   location: string;
 }
 
+const API_BASE_URL =
+  Constants.expoConfig?.extra?.apiBaseUrl ||
+  'https://capstone24.sit.kmutt.ac.th'
+
+
 const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const { slug } = route.params;
   const [eventDetail, setEventDetail] = useState<EventDetail>(
     {} as EventDetail
   );
-  const fetchData = async () => {
-    // const API_HOST_IOS = "http://localhost:8080";
-    // const API_HOST_ANDROID = "http://10.0.2.2:8080";
-    const API_HOST_IOS = "http://cp24us1.sit.kmutt.ac.th:8080";
-    const API_HOST_ANDROID = "http://cp24us1.sit.kmutt.ac.th:8080";
-    const apiURL = Platform.OS === "ios" ? API_HOST_IOS : API_HOST_ANDROID;
 
-    let url = `${apiURL}/api/v1/events`;
 
-    try {
-      url += `/${slug}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      setEventDetail(data);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-    }
+  const fetchDataDetailAsync = async () => {
+    const response = await getEvent('detail', undefined ,slug);
+    setEventDetail(response);
   };
 
   useEffect(() => {
-    fetchData();
+    fetchDataDetailAsync();
   }, []);
 
-  const formatDate = (dateString: string): { date: string; time: string } => {
-    try {
-      const date = new Date(dateString);
-
-      // Custom formatted date
-      const day = date.getDate(); // Day of the month
-      const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ];
-      const month = monthNames[date.getMonth()]; // Get full month name
-      const year = date.getFullYear(); // Full year
-
-      const formattedDate = `${day} ${month} ${year}`;
-
-      // Time in HH:MM AM/PM format
-      const hours = date.getHours();
-      const minutes = date.getMinutes();
-
-      const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
-        .toString()
-        .padStart(2, "0")}`;
-
-      return { date: formattedDate, time: formattedTime };
-    } catch (error) {
-      console.error("Error formatting date:", error);
-      return { date: "Invalid date", time: "" };
-    }
-  };
-
-  const startDate = formatDate(eventDetail.start_date).date;
-  const endDate = formatDate(eventDetail.end_date).date;
-  const startTime = formatDate(eventDetail.start_date).time;
-  const endTime = formatDate(eventDetail.end_date).time;
+  const startDate = formatDate(eventDetail.start_date,false).date;
+  const endDate = formatDate(eventDetail.end_date,false).date;
+  const startTime = formatDate(eventDetail.start_date,false).time;
+  const endTime = formatDate(eventDetail.end_date,false).time;
 
   return (
     <Fragment>
@@ -110,11 +66,11 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
       </SafeAreaView>
 
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <View className="w-full">
+        <View className="w-full h-80">
           <Image
             source={{ uri: eventDetail.image }}
-            className="w-full h-60"
-            resizeMode="cover"
+            className="w-full h-full rounded-lg"
+            resizeMode="contain"
           />
         </View>
         <View className="p-3 pb-0">
@@ -136,7 +92,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
           <Text>{eventDetail.location}</Text>
         </View>
         <View className="p-3 pb-0">
-          <Text className="text-lg font-bold ">Event etail</Text>
+          <Text className="text-lg font-bold ">Event Detail</Text>
           <Text className="">{eventDetail.detail}</Text>
         </View>
       </ScrollView>

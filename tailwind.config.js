@@ -4,7 +4,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#D71515'
+        primary: '#D71515',
+        searchText: '#78716c '
       },
       fontFamily: {
         'Somjit': ['SomJitItalic-Regular', 'sans-serif'],

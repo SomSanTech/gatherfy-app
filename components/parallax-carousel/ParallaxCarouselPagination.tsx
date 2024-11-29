@@ -25,7 +25,7 @@ const PaginationDot = ({ index, scrollX }: PaginationDotProps) => {
     const widthAnimation = interpolate(
       scrollX.value,
       inputRange,
-      [10, 20, 10],
+      [5, 20, 5],
       Extrapolation.CLAMP
     );
     const opacityAnimaton = interpolate(
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   dots: {
-    height: 10,
+    height: 5,
     marginHorizontal: 8,
     borderRadius: 5,
   },

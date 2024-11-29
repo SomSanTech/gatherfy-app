@@ -1,45 +1,54 @@
-import { View, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, Text, Keyboard, Button } from "react-native";
+// SearchInput.tsx
 import React from "react";
+import {
+  View,
+  Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import { SearchBar } from "@rneui/themed";
-import { useAppContext } from "@/components/AppContext";
 
-const SearchInput: React.FC = () => {
-  const { search, setSearch } = useAppContext();
-  const { isLoading, setIsLoading } = useAppContext();
-
-  const updateSearch = (value: string) => {
-    setSearch(value);
-  };
-
-  const updateLoading = (value: boolean) => {
-    setIsLoading(value);
-  }
-
-  const handleSearchPress = () => {
-    updateLoading(true); // Set loading to true
-  };
-
+const SearchInput: React.FC<{
+  value: string;
+  onSearchSubmit: () => void; // ส่งฟังก์ชันที่ทำการ fetch ข้อมูลเมื่อกด submit
+  onChangeText: (value: string) => void;
+}> = ({ value, onSearchSubmit, onChangeText }) => {
   const isIOS = Platform.OS === "ios";
   const isAndroid = Platform.OS === "android";
-  
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View className={Platform.OS === "android" ? "py-1" : "p-3"}>
-          <View className={Platform.OS === "android" ? "mb-6 h-9 px-3 flex justify-center items-center" : "mb-6 h-9 "}>
+        <View className={Platform.OS === "android" ? "py-1" : "p-3"}>
+          <View
+            className={
+              Platform.OS === "android"
+                ? "mb-6 h-9 px-3 flex justify-center items-center"
+                : "mb-6 h-9 "
+            }
+          >
             <SearchBar
               placeholder="Search"
-              onChangeText={updateSearch}
-              value={search} // ใช้ search จาก Context
+              onChangeText={onChangeText}
+              value={value} // ใช้ค่า value ที่ส่งมาจาก props
               platform={isIOS ? "ios" : isAndroid ? "android" : "default"}
-              searchIcon={Platform.OS === "ios" ? { name: "search" } : { name: "search" }}
-              clearIcon={Platform.OS === "ios" ? { name: "close-circle" } : { name: "close" }}
+              searchIcon={
+                Platform.OS === "ios" ? { name: "search" } : { name: "search" }
+              }
+              clearIcon={
+                Platform.OS === "ios"
+                  ? { name: "close-circle" }
+                  : { name: "close" }
+              }
               returnKeyType="search"
               inputStyle={{ color: "#D71515" }}
-              inputContainerStyle={Platform.OS === "ios" ? { height: 20 } : { height: 60 }}
-              showCancel={true} 
-              onCancel={() => console.log('Cancel pressed')} 
+              inputContainerStyle={
+                Platform.OS === "ios" ? { height: 20 } : { height: 60 }
+              }
+              showCancel={true}
               containerStyle={{
                 backgroundColor: "transparent",
                 borderBottomWidth: 0,
@@ -49,7 +58,7 @@ const SearchInput: React.FC = () => {
               cancelButtonProps={{
                 color: "#D71515",
               }}
-              onSubmitEditing={handleSearchPress} 
+              onSubmitEditing={onSearchSubmit} // เรียกใช้ onSearchSubmit เมื่อผู้ใช้กดปุ่ม search
             />
           </View>
         </View>

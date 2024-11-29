@@ -1,17 +1,25 @@
-import { ScrollView, View, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import React from "react";
+import * as React from 'react';
+import { Text } from 'react-native';
+import { Drawer } from 'react-native-drawer-layout';
+import { Button } from '@react-navigation/elements';
 
-const Liked = () => {
+export default function DrawerExample() {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <SafeAreaView className="h-full">
-      <ScrollView contentContainerStyle={{ height: "100%" }}>
-        <View>
-          <Text>Liked</Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <Drawer
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+      renderDrawerContent={() => {
+        return <Text>Drawer content</Text>;
+      }}
+    >
+      <Button
+        onPress={() => setOpen((prevOpen) => !prevOpen)}
+      >
+        {`${open ? 'Close' : 'Open'} drawer`}
+      </Button>
+    </Drawer>
   );
-};
-
-export default Liked;
+}
