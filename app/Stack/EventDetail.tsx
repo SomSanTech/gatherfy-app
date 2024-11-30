@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Platform,
   Image,
+  TextInput,
+  StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp } from "@react-navigation/native";
@@ -14,6 +16,7 @@ import RootStackParamList from "@/rootStack/RootStackParamList";
 import Constants from "expo-constants";
 import { getEvent } from "@/composables/getEvent";
 import formatDate from "@/utils/formatDate";
+import RegisterForm from "@/components/RegisterForm";
 
 type EventDetailRouteProp = RouteProp<typeof RootStackParamList, "EventDetail">;
 
@@ -35,8 +38,7 @@ interface EventDetail {
 
 const API_BASE_URL =
   Constants.expoConfig?.extra?.apiBaseUrl ||
-  'https://capstone24.sit.kmutt.ac.th'
-
+  "https://capstone24.sit.kmutt.ac.th";
 
 const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const { slug } = route.params;
@@ -44,9 +46,8 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     {} as EventDetail
   );
 
-
   const fetchDataDetailAsync = async () => {
-    const response = await getEvent('detail', undefined ,slug);
+    const response = await getEvent("detail", undefined, slug);
     setEventDetail(response);
   };
 
@@ -54,10 +55,10 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     fetchDataDetailAsync();
   }, []);
 
-  const startDate = formatDate(eventDetail.start_date,false).date;
-  const endDate = formatDate(eventDetail.end_date,false).date;
-  const startTime = formatDate(eventDetail.start_date,false).time;
-  const endTime = formatDate(eventDetail.end_date,false).time;
+  const startDate = formatDate(eventDetail.start_date, true).date;
+  const endDate = formatDate(eventDetail.end_date, true).date;
+  const startTime = formatDate(eventDetail.start_date, true).time;
+  const endTime = formatDate(eventDetail.end_date, true).time;
 
   return (
     <Fragment>
@@ -66,6 +67,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
       </SafeAreaView>
 
       <ScrollView contentContainerStyle={{ padding: 16 }}>
+        <View className="w-full mb-5">
         <View className="w-full h-80">
           <Image
             source={{ uri: eventDetail.image }}
@@ -80,12 +82,15 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
             <Text>No tags available</Text>
           )}
           <Text className="text-xl font-bold">{eventDetail.name}</Text>
-          <Text>{startDate}</Text>
-          {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
-            <Text>{endDate}</Text>
-          ) : (
-            <Text>No end date</Text>
-          )}
+          <Text>
+            {startDate}{" "}
+            {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
+              <Text>- {endDate}</Text>
+            ) : (
+              <Text>No end date</Text>
+            )}
+          </Text>
+
           <Text>
             {startTime} - {endTime}
           </Text>
@@ -94,6 +99,10 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
         <View className="p-3 pb-0">
           <Text className="text-lg font-bold ">Event Detail</Text>
           <Text className="">{eventDetail.detail}</Text>
+        </View>
+        </View>
+        <View>
+          <RegisterForm start_date={eventDetail.start_date} end_date={eventDetail.end_date}/>
         </View>
       </ScrollView>
     </Fragment>

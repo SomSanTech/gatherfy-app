@@ -49,15 +49,8 @@ const Search = () => {
 
   const fetchEventData = async () => {
     console.log(date);
-    
-    const data = await getEvent(
-      "search",
-      search,
-      undefined,
-      tag,
-      date,
-      sortBy
-    );
+
+    const data = await getEvent("search", search, undefined, tag, date, sortBy);
 
     setEvents(data); // อัปเดต events ที่กรองแล้ว
     setIsLoading(false);
@@ -81,7 +74,6 @@ const Search = () => {
     fetchTagData();
   }, []);
 
-
   return (
     <Fragment>
       <SafeAreaView
@@ -103,28 +95,42 @@ const Search = () => {
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <View>
-            {countResult > 0 && (
-              <Text className="px-5 pt-4 pb-3 text-sm text-searchText">
-                {countResult === 0 ? "" : `${countResult} `}
-                {countResult > 1 ? "Results" : "Result"}
+            <View className="p-5 mt-5 pt-0 rounded-lg">
+              <Datepicker date={date} setDate={setDate} />
+            </View>
+            <Text className="text-center text-lg text-primary font-bold">
+                Sort By
               </Text>
-            )}
-            <View className="mb-8">
-              <TouchableOpacity onPress={() => sorting("date_desc")}>
-                <Text className="text-center mt-5 text-searchText">Newest</Text>
+            <View className="mb-4" style={styles.sortingWrapper}>
+              <TouchableOpacity
+                onPress={() => sorting("date_desc")}
+                style={styles.sortingContainer}
+              >
+                <Text className="text-center  text-searchText">Newest</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => sorting("date_asc")}>
-                <Text className="text-center mt-5 text-searchText">Oldest</Text>
+              <TouchableOpacity
+                onPress={() => sorting("date_asc")}
+                style={styles.sortingContainer}
+              >
+                <Text className="text-center text-searchText">Oldest</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => sorting("name_asc")}>
-                <Text className="text-center mt-5 text-searchText">A-Z</Text>
+              <TouchableOpacity
+                onPress={() => sorting("name_asc")}
+                style={styles.sortingContainer}
+              >
+                <Text className="text-center text-searchText">A-Z</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => sorting("name_desc")}>
-                <Text className="text-center mt-5 text-searchText">Z-A</Text>
+              <TouchableOpacity
+                onPress={() => sorting("name_desc")}
+                style={styles.sortingContainer}
+              >
+                <Text className="text-center text-searchText">Z-A</Text>
               </TouchableOpacity>
             </View>
-            <View className="mb-8">
-              <Text className="text-center mt-5 text-searchText">Tags</Text>
+            <View className="mb-5">
+              <Text className="text-center text-lg text-primary font-bold">
+                Tags
+              </Text>
               <View style={styles.checkboxWrapper}>
                 {tags.map((tag, index) => (
                   <CheckBox
@@ -151,18 +157,23 @@ const Search = () => {
                 ))}
               </View>
             </View>
-           <View className="p-5 pt-0 rounded-lg">
-              <Datepicker date={date} setDate={setDate} />
-            </View>
             <View className="mb-8">
               <TouchableOpacity onPress={() => handleSearchSubmit()}>
-                <Text className="text-center mt-5 text-black text-2xl border mx-5 p-4 rounded-lg">Search</Text>
+                <Text className="text-center mt-5 text-black text-2xl border mx-5 p-4 rounded-lg">
+                  Search
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         }
         renderItem={({}) => (
           <View className="m-0 p-0" style={{ flex: 1 }}>
+            {countResult > 0 && (
+              <Text className="px-5 pt-4 pb-3 text-sm text-searchText">
+                {countResult === 0 ? "" : `${countResult} `}
+                {countResult > 1 ? "Results" : "Result"}
+              </Text>
+            )}
             <EventCard
               page="search"
               search={search}
@@ -213,6 +224,20 @@ const styles = StyleSheet.create({
   },
   lastRow: {
     marginBottom: 0, // ไม่มี margin สำหรับแถวสุดท้าย
+  },
+  sortingWrapper: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginTop: 10,
+    marginHorizontal: 10,
+  },
+  sortingContainer: {
+    width: "48%",
+    backgroundColor: "#e0e0e0",
+    borderRadius: 10,
+    marginBottom: 10,
+    padding: 10,
   },
 });
 
