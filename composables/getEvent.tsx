@@ -37,6 +37,8 @@ export const getEvent = async (
       }
 
       const data = await response.json(); // Await here to resolve the promise
+      console.log("Data Home:", data);
+      
       return data; // Return the resolved data
     }
 

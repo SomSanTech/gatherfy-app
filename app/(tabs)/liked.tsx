@@ -17,6 +17,7 @@ export default function DrawerExample() {
     >
       <Button
         onPress={() => setOpen((prevOpen) => !prevOpen)}
+        className='mt-48'
       >
         {`${open ? 'Close' : 'Open'} drawer`}
       </Button>

@@ -15,7 +15,8 @@ import { useAppContext } from "@/components/AppContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CheckBox } from "@rneui/themed";
 import Datepicker from "@/components/Datepicker";
-import dayjs from "dayjs";
+import SortingDropdown from "@/components/Dropdown";
+
 
 const Search = () => {
   const [search, setSearch] = useState<string>(""); // ใช้ useState สำหรับ search
@@ -102,30 +103,7 @@ const Search = () => {
                 Sort By
               </Text>
             <View className="mb-4" style={styles.sortingWrapper}>
-              <TouchableOpacity
-                onPress={() => sorting("date_desc")}
-                style={styles.sortingContainer}
-              >
-                <Text className="text-center  text-searchText">Newest</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => sorting("date_asc")}
-                style={styles.sortingContainer}
-              >
-                <Text className="text-center text-searchText">Oldest</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => sorting("name_asc")}
-                style={styles.sortingContainer}
-              >
-                <Text className="text-center text-searchText">A-Z</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => sorting("name_desc")}
-                style={styles.sortingContainer}
-              >
-                <Text className="text-center text-searchText">Z-A</Text>
-              </TouchableOpacity>
+              <SortingDropdown sorting={sorting} />
             </View>
             <View className="mb-5">
               <Text className="text-center text-lg text-primary font-bold">
@@ -159,7 +137,7 @@ const Search = () => {
             </View>
             <View className="mb-8">
               <TouchableOpacity onPress={() => handleSearchSubmit()}>
-                <Text className="text-center mt-5 text-black text-2xl border mx-5 p-4 rounded-lg">
+                <Text className="text-center mt-5 text-black text-2xl border mx-5 p-3 rounded-lg">
                   Search
                 </Text>
               </TouchableOpacity>
@@ -198,7 +176,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   checkboxContainer: {
-    width: "45%", // ทำให้มี 2 อันต่อแถว (แบ่งพื้นที่ 48% ของแต่ละอัน)
+    width: "44%", // ทำให้มี 2 อันต่อแถว (แบ่งพื้นที่ 48% ของแต่ละอัน)
     borderRadius: 10,
     marginBottom: 10,
     borderWidth: 0,
@@ -218,17 +196,16 @@ const styles = StyleSheet.create({
   },
   selectedText: {
     color: "#000000", // สีข้อความเมื่อเลือก
+    textOverflow: "ellipsis",
   },
   unselectedText: {
     color: "#000000", // สีข้อความเมื่อไม่เลือก
+    textOverflow: "ellipsis",
   },
   lastRow: {
     marginBottom: 0, // ไม่มี margin สำหรับแถวสุดท้าย
   },
   sortingWrapper: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
     marginTop: 10,
     marginHorizontal: 10,
   },

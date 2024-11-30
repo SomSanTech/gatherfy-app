@@ -26,7 +26,6 @@ import Animated, {
 import ParallaxCarouselPagination from "@/components/parallax-carousel/ParallaxCarouselPagination";
 import { useNavigation } from "@react-navigation/native";
 
-
 interface SlideshowData {
   id: string;
   name: string;
@@ -36,7 +35,6 @@ interface SlideshowData {
 
 const OFFSET = 45; // Define OFFSET with an appropriate value
 const Item_width = Dimensions.get("window").width - OFFSET * 2;
-
 
 const Home: React.FC = () => {
   const [slideshow, setSlideshow] = useState<SlideshowData[]>([]);
@@ -50,7 +48,7 @@ const Home: React.FC = () => {
 
   const fetchData = async () => {
     const data = await getEvent("home");
-    
+
     setEvents(data);
   };
 
@@ -72,7 +70,6 @@ const Home: React.FC = () => {
   const handleNavigateToProfile = () => {
     navigation.navigate("Profile"); // ชื่อหน้าของ Tab Profile ที่ตั้งไว้
   };
-
 
   const scrollX = useSharedValue(0);
   const scrollViewRef = useAnimatedRef<Animated.ScrollView>();
@@ -123,18 +120,20 @@ const Home: React.FC = () => {
       <StatusBar backgroundColor="#ffffff" style="dark" />
       <SafeAreaView edges={["top"]} className="px-3 mt-4 pb-0 bg-white shadow">
         <View className="mb-5 px-4 space-y-6 h-9">
-          <View className="item-center justify-center items-start flex-row mb-4">
-            <View className="flex-1"></View>
+          <View className="items-center justify-between flex-row">
+            <View className="w-9"></View>
             <Text className="text-4xl font-OoohBaby-Regular text-black">
               Gatherfy
             </Text>
-            <TouchableOpacity onPress={handleNavigateToProfile} className="flex-1">
-              <Image
-                source={images.user}
-                className="w-8 h-10 ml-auto"
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
+            <View className="">
+              <TouchableOpacity onPress={handleNavigateToProfile}>
+                <Image
+                  source={require("@/assets/profile.png")}
+                  className="w-9 h-10 object-bottom rounded-full"
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </SafeAreaView>
@@ -190,8 +189,7 @@ const Home: React.FC = () => {
                 </View>
               </View>
             );
-          } 
-          else if (item.type === "events") {
+          } else if (item.type === "events") {
             return <EventCard page="home" events={events} />;
           }
           return null;

@@ -114,7 +114,7 @@ const EventCard: React.FC<EventCardProps> = ({
         </TouchableOpacity>
       )}
       ListEmptyComponent={
-        isSearched && events.length === 0 ? (
+        isSearched && events ? (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           >

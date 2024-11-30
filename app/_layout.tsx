@@ -33,10 +33,6 @@ const RootLayout = () => {
   
     configureNavigationBar();
   }, []);
-
-  useEffect(() => {
-    
-  }, []);
   
 
   useEffect(() => {
