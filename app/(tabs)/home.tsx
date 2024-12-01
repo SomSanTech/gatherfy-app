@@ -118,8 +118,8 @@ const Home: React.FC = () => {
   return (
     <Fragment>
       <StatusBar backgroundColor="#ffffff" style="dark" />
-      <SafeAreaView edges={["top"]} className="px-3 mt-4 pb-0 bg-white shadow">
-        <View className="mb-5 px-4 space-y-6 h-9">
+      <SafeAreaView edges={["top"]} className="px-3  pb-0 bg-white shadow">
+        <View className="mb-5 px-4 mt-4 space-y-6 h-9">
           <View className="items-center justify-between flex-row">
             <View className="w-9"></View>
             <Text className="text-4xl font-OoohBaby-Regular text-black">

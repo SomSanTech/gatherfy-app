@@ -42,14 +42,14 @@ export const getEvent = async (
       return data; // Return the resolved data
     }
 
-    if (page === "search" && search) {
+    if (page === "search") {
       // Set default values if undefined
       const searchParam = search || "";
       const sortParam = sort || "";
       const dateParam = date || "";
       const tagParam = tag || "";
 
-      url = `${url}?keyword=${encodeURIComponent(
+      url = `${url}?keywords=${encodeURIComponent(
         searchParam
       )}&sort=${sortParam}&date=${dateParam}&tags=${tagParam}`;
       console.log("url:", url);
@@ -70,9 +70,9 @@ export const getEvent = async (
       console.log("Search Fetching from URL:", url);
       const data = await response.json(); // Await here to resolve the promise
       return data; // Return the resolved data
+
     } else if (page === "search" && !search) {
-      console.log("No search keyword provided.");
-      return [];
+      console.log("No search keywords provided.");
     }
 
     if (page === "detail") {

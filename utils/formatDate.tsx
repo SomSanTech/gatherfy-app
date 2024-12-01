@@ -1,4 +1,4 @@
-const formatDate = (dateString: string , shortMonth: boolean = false , shortDay: boolean = true): { date: string; time: string } => {
+const formatDate = (dateString: string , shortMonth: boolean = false , days: boolean = false ,shortDay: boolean = true): { date: string; time: string } => {
     try {
       const date = new Date(dateString);
 
@@ -19,7 +19,8 @@ const formatDate = (dateString: string , shortMonth: boolean = false , shortDay:
       const month = shortMonth ? shortMonthNames[date.getMonth()] : monthNames[date.getMonth()];
       const year = date.getFullYear(); // Full year
 
-      const formattedDate = `${dayOfWeek} ${day} ${month} ${year}`;
+      const formattedDate =  days ? `${dayOfWeek}, ${day} ${month} ${year}` : `${day} ${month} ${year}`;
+     
 
       // Time in HH:MM AM/PM format
       const hours = date.getHours();

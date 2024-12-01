@@ -56,6 +56,7 @@ const TabNav = () => {
       backBehavior="history"
       initialRouteName="Home"
       screenOptions={{
+        tabBarHideOnKeyboard: true,
         headerShown: false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: "#D71515",
@@ -65,13 +66,13 @@ const TabNav = () => {
           borderTopWidth: 1,
           borderTopColor: "transparent",
           paddingHorizontal: 5,
-          elevation: 0,  // ลดหรือปิดเงาของ tabBar
-          shadowColor: 'transparent',  // ไม่มีเงาที่ tabBar
+          elevation: 0, // ลดหรือปิดเงาของ tabBar
+          shadowColor: "transparent", // ไม่มีเงาที่ tabBar
           ...(Platform.OS === "android" ? { height: 65 } : {}),
-          
         },
-        tabBarButton: (props) => <CustomTabBarButton {...props} />
+        tabBarButton: (props) => <CustomTabBarButton {...props} />,
       }}
+ 
     >
       <Tab.Screen
         name="Search"
@@ -153,7 +154,6 @@ const TabNav = () => {
 };
 
 const Stack = createStackNavigator<typeof RootStackParamList>();
-
 
 const StackHomeNavigator = () => {
   return (

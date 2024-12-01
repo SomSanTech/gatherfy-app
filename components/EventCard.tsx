@@ -85,7 +85,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 <Text
                   className="text-xl w-full font-bold text-primary"
                   style={{ maxWidth: "100%" }}
-                  numberOfLines={3}
+                  numberOfLines={2}
                   ellipsizeMode="tail"
                 >
                   {item.name}

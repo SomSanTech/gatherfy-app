@@ -5,6 +5,7 @@ import home from "../assets/icons/home-icon.png";
 import search from "../assets/icons/search-icon.png";
 import liked from "../assets/icons/liked-icon.png";
 import tag from "../assets/icons/tag-icon.png";
+import backArrow from "../assets/icons/back-icon.png";
 
 // Export it as part of an object
 export default {
@@ -13,5 +14,6 @@ export default {
     home,
     search,
     liked,
-    tag
+    tag,
+    backArrow,
 };

@@ -13,5 +13,5 @@ export default {
     home,
     search,
     liked,
-    tag
+    tag,
 };

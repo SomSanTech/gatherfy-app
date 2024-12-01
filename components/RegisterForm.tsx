@@ -8,8 +8,9 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { RadioButton } from "react-native-paper";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, Fragment } from "react";
 import formatDate from "@/utils/formatDate";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const CustomRadioButton = ({
   label,
@@ -62,7 +63,13 @@ const RegisterForm = ({ start_date, end_date }: RegisterFormProps) => {
 
   const handleSubmit = () => {
     // ตรวจสอบความถูกต้องของฟอร์ม
-    if (!form.date ||!form.firstname || !form.lastname || !form.phone || !form.email) {
+    if (
+      !form.date ||
+      !form.firstname ||
+      !form.lastname ||
+      !form.phone ||
+      !form.email
+    ) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
     }
@@ -96,19 +103,19 @@ const RegisterForm = ({ start_date, end_date }: RegisterFormProps) => {
 
   const checkboxPress = (index: number, date: Date) => {
     setIndex(index);
-    setForm({ ...form, date: date.toISOString()});
-  }
+    setForm({ ...form, date: date.toISOString() });
+  };
 
   const dateArray = betweenDate(start_date, end_date);
 
   const [selectedIndex, setIndex] = useState<number | null>(null);
 
   return (
-    <View className="border mt-5 p-3 rounded-lg">
+    <Fragment>
       <View>
         <Text style={styles.header}>Register Event</Text>
       </View>
-      <View className="mb-5" style={styles.checkboxWrapper}>
+      {/* <View className="mb-5" style={styles.checkboxWrapper}>
         {dateArray.map((date, index) => (
           <CustomRadioButton
             key={index}
@@ -118,8 +125,8 @@ const RegisterForm = ({ start_date, end_date }: RegisterFormProps) => {
             onPress={() => checkboxPress(index , date)}
           />
         ))}
-      </View>
-      <View>
+      </View> */}
+      <View style={styles.container}>
         <TextInput
           placeholder="Firstname"
           style={styles.input}
@@ -131,7 +138,7 @@ const RegisterForm = ({ start_date, end_date }: RegisterFormProps) => {
         <TextInput
           ref={lastnameRef} // Reference สำหรับ Lastname
           placeholder="Lastname"
-          style={[styles.input, { marginTop: 10 }]}
+          style={[styles.input]}
           value={form.lastname}
           onChangeText={(value) => handleInputChange("lastname", value)}
           returnKeyType="next"
@@ -161,12 +168,18 @@ const RegisterForm = ({ start_date, end_date }: RegisterFormProps) => {
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
-    </View>
+    </Fragment>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
   input: {
+    width: "48%",
     height: 40,
     borderColor: "gray",
     borderRadius: 5,
