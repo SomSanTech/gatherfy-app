@@ -15,7 +15,6 @@ import images from "../../constants/icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getEvent } from "@/composables/getEvent";
 import useNavigateToEventDetail from "@/composables/navigateToEventDetail";
-import { Button } from "@rneui/themed";
 import { ScrollView } from "react-native-gesture-handler";
 import ParallaxCarouselCard from "@/components/parallax-carousel/ParallaxCarouselCard";
 import Animated, {
@@ -55,7 +54,7 @@ const Home: React.FC = () => {
   };
 
   const fetchSlideshow = async () => {
-    const response = await getEvent("home");
+    const response = await getEvent("homeSlide");
 
     const slideshowData = response.map((item: any) => ({
       slug: item.slug,
@@ -217,6 +216,7 @@ const Home: React.FC = () => {
 
               return (
                 <Fragment key={item.type}>
+                  <Text className="font-Poppins-Regular text-2xl p-4 pt-0 text-primary">Explore by date</Text>
                   {Object.entries(groupedEvents).map(([date, eventsOnDate]) => {
                     const eventsArray = Array.isArray(eventsOnDate)
                       ? eventsOnDate

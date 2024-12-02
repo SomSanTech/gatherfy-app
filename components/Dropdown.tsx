@@ -90,7 +90,7 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
 
 const styles = StyleSheet.create({
   sortingWrapper: {
-    marginBottom: 16,
+    marginBottom: 0,
   },
   dropdown: {
     height: 50,

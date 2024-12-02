@@ -15,7 +15,7 @@ const Datepicker: React.FC<DatepickerProps> = ({ date, setDate }) => {
       <DateTimePicker
         mode="single"
         date={date ? dayjs(date).toDate() : undefined}
-        height={280}
+        height={290}
         onChange={(params) => setDate(dayjs(params.date).format("YYYY-MM-DD"))}
         timePickerContainerStyle={{ backgroundColor: "white" }}
         selectedItemColor="#D71515"
@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     justifyContent: "center",
-    padding: 15,
     paddingBottom: 20,
     borderRadius: 20,
   },

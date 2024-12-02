@@ -43,8 +43,6 @@ const EventCard: React.FC<EventCardProps> = ({
   const screenWidth = Dimensions.get("window").width;
   const { navigateToEventDetail } = useNavigateToEventDetail();
 
-  
-
   useEffect(() => {
 
     if (page === "search") {
@@ -62,9 +60,10 @@ const EventCard: React.FC<EventCardProps> = ({
       keyExtractor={(item) => item.slug}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled" // สำคัญ!
       contentContainerStyle={{
         paddingBottom: 20,
-        marginTop: 20,
+        marginTop: 0,
         flexGrow: 1, // ทำให้ข้อความอยู่ตรงกลาง
       }}
       renderItem={({ item }) => (

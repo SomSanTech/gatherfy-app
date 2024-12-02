@@ -40,6 +40,27 @@ export const getEvent = async (
 
       return data; // Return the resolved data
     }
+    if (page === "homeSlide") {
+      url = `${url}/recommended`;
+      console.log("Fetching from URL Home:", url);
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        console.error(`Error: ${response.status} - ${response.statusText}`);
+        return [];
+      }
+
+      const data = await response.json(); // Await here to resolve the promise
+
+      return data; // Return the resolved data
+    }
+
 
     if (page === "search") {
       // Set default values if undefined
@@ -51,7 +72,6 @@ export const getEvent = async (
       url = `${url}?keyword=${encodeURIComponent(
         searchParam
       )}&sort=${sortParam}&date=${dateParam}&tags=${tagParam}`;
-      console.log("url:", url);
 
       const response = await fetch(url, {
         method: "GET",

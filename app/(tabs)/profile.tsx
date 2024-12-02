@@ -3,8 +3,19 @@ import React, { Fragment } from "react";
 import { View, StyleSheet, Text, Image } from "react-native";
 import UnderConstruction from "@/components/UnderConstruction";
 import { Button } from "react-native-elements";
+import { useNavigation } from "@react-navigation/native"; // ใช้สำหรับการนำทาง
 
 const Profile = () => {
+  const navigation = useNavigation(); // Hook สำหรับการนำทาง
+
+  const handleLogout = () => {
+    // Reset navigation ไปยัง tab แรก
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "Home" as never }], // เปลี่ยน "Home" เป็นชื่อ tab แรกของคุณ
+    });
+  };
+
   return (
     <Fragment>
       <SafeAreaView className="bg-white"></SafeAreaView>
@@ -29,6 +40,7 @@ const Profile = () => {
             alignSelf: "center",
           }}
           titleStyle={{ color: "red" }}
+          onPress={handleLogout}
         />
       </View>
     </Fragment>

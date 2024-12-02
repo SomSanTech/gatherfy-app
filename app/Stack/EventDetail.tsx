@@ -109,7 +109,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
             </View>
             <View className="mb-2 flex-row">
               <Icon name="map-outline" size={20} color="#000000" />
-              <Text className="ml-2 font-Poppins-Regular">{eventDetail.location}</Text>
+              <Text className="ml-2 font-Poppins-Regular items-center">{eventDetail.location}</Text>
             </View>
             <View className="mt-3 mb-2">
               <RegisterForm

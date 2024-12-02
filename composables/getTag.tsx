@@ -19,7 +19,6 @@ export const getTag = async () => {
   }
 
   const data = await response.json();
-  console.log("Data Tag:", data);
   
   return data;
 };
