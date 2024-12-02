@@ -44,7 +44,13 @@ const SearchInput: React.FC<{
                   : { name: "close" }
               }
               returnKeyType="search"
-              inputStyle={{ color: "#D71515" }}
+              inputStyle={{
+                color: "#D71515", // สีของข้อความใน input
+                fontSize: 20,
+                fontFamily: "Poppins-Regular",
+                lineHeight: 30,
+                marginTop: 4,
+              }}
               inputContainerStyle={
                 Platform.OS === "ios" ? { height: 20 } : { height: 60 }
               }
@@ -59,6 +65,7 @@ const SearchInput: React.FC<{
                 color: "#D71515",
               }}
               onSubmitEditing={onSearchSubmit} // เรียกใช้ onSearchSubmit เมื่อผู้ใช้กดปุ่ม search
+
             />
           </View>
         </View>

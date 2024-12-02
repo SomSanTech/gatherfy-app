@@ -17,16 +17,16 @@ import { CheckBox } from "@rneui/themed";
 import Datepicker from "@/components/Datepicker";
 import SortingDropdown from "@/components/Dropdown";
 
-
 const Search = () => {
   const [search, setSearch] = useState<string>(""); // ใช้ useState สำหรับ search
-  const { isLoading, setIsLoading } = useAppContext();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [countResult, setCountResult] = useState(Number);
   const [sortBy, setSortBy] = useState<string>("");
   const [events, setEvents] = useState([]);
   const [tags, setTags] = useState<{ tag_id: string; tag_title: string }[]>([]);
   const [tag, setTag] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isSearched, setIsSearched] = useState(false);
   const [date, setDate] = useState<string | undefined>(undefined); // เริ่มต้นเป็น undefined
 
   const sorting = (type: string) => {
@@ -54,6 +54,7 @@ const Search = () => {
     const data = await getEvent("search", search, undefined, tag, date, sortBy);
 
     setEvents(data); // อัปเดต events ที่กรองแล้ว
+    setIsSearched(true)
     setIsLoading(false);
     setCountResult(data.length); // อัปเดต count ให้ตรงกับข้อมูลที่กรองแล้ว
   };
@@ -99,14 +100,14 @@ const Search = () => {
             <View className="p-5 mt-5 pt-0 rounded-lg">
               <Datepicker date={date} setDate={setDate} />
             </View>
-            <Text className="text-center text-lg text-primary font-bold">
-                Sort By
-              </Text>
+            <Text className="text-center text-lg text-primary font-Poppins-SemiBold">
+              Sort By
+            </Text>
             <View className="mb-4" style={styles.sortingWrapper}>
               <SortingDropdown sorting={sorting} />
             </View>
             <View className="mb-5">
-              <Text className="text-center text-lg text-primary font-bold">
+              <Text className="text-center text-lg text-primary font-Poppins-SemiBold">
                 Tags
               </Text>
               <View style={styles.checkboxWrapper}>
@@ -115,6 +116,7 @@ const Search = () => {
                     key={tag.tag_id}
                     title={tag.tag_title}
                     checkedColor="#D71515"
+                    fontFamily="@/assets/fonts/Poppins-Regular.ttf"
                     checked={selectedTags.includes(tag.tag_title)}
                     onPress={() => handleTagPress(tag.tag_title)}
                     containerStyle={[
@@ -137,7 +139,7 @@ const Search = () => {
             </View>
             <View className="mb-8">
               <TouchableOpacity onPress={() => handleSearchSubmit()}>
-                <Text className="text-center mt-5 text-black text-2xl border mx-5 p-3 rounded-lg">
+                <Text className="text-center mt-5 text-black text-[20px] border mx-5 p-3 rounded-lg font-Poppins-Regular">
                   Search
                 </Text>
               </TouchableOpacity>
@@ -147,7 +149,7 @@ const Search = () => {
         renderItem={({}) => (
           <View className="m-0 p-0" style={{ flex: 1 }}>
             {countResult > 0 && (
-              <Text className="px-5 pt-4 pb-3 text-sm text-searchText">
+              <Text className="px-5 pt-4 pb-3 text-sm text-searchText font-Poppins-Regular">
                 {countResult === 0 ? "" : `${countResult} `}
                 {countResult > 1 ? "Results" : "Result"}
               </Text>
@@ -155,6 +157,8 @@ const Search = () => {
             <EventCard
               page="search"
               search={search}
+              isSearched = {isSearched}
+              setIsSearched={setIsSearched}
               events={events}
               isLoading={isLoading}
             />
@@ -173,6 +177,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     paddingBottom: 0,
     paddingHorizontal: 0,
+
     marginTop: 10,
   },
   checkboxContainer: {
@@ -193,21 +198,24 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontWeight: "bold",
+    fontFamily: "Poppins-SemiBold",
   },
   selectedText: {
     color: "#000000", // สีข้อความเมื่อเลือก
     textOverflow: "ellipsis",
+    fontFamily: "Poppins-SemiBold",
   },
   unselectedText: {
     color: "#000000", // สีข้อความเมื่อไม่เลือก
     textOverflow: "ellipsis",
+    fontFamily: "Poppins-SemiBold",
   },
   lastRow: {
     marginBottom: 0, // ไม่มี margin สำหรับแถวสุดท้าย
   },
   sortingWrapper: {
     marginTop: 10,
-    marginHorizontal: 10,
+    marginHorizontal: 20,
   },
   sortingContainer: {
     width: "48%",

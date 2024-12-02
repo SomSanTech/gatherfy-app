@@ -19,7 +19,7 @@ const formatDate = (dateString: string , shortMonth: boolean = false , days: boo
       const month = shortMonth ? shortMonthNames[date.getMonth()] : monthNames[date.getMonth()];
       const year = date.getFullYear(); // Full year
 
-      const formattedDate =  days ? `${dayOfWeek}, ${day} ${month} ${year}` : `${day} ${month} ${year}`;
+      const formattedDate =  days ? `${dayOfWeek} ${day} ${month} ${year}` : `${day} ${month} ${year}`;
      
 
       // Time in HH:MM AM/PM format

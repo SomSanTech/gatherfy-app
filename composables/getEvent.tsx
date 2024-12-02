@@ -1,6 +1,5 @@
 import Constants from "expo-constants";
 
-
 const API_BASE_URL =
   Constants.expoConfig?.extra?.apiBaseUrl ||
   "https://capstone24.sit.kmutt.ac.th";
@@ -22,6 +21,7 @@ export const getEvent = async (
     let url = `${API_BASE_URL}/api/v1/events`;
 
     if (page === "home") {
+      url = `${url}?sort=date_desc`;
       console.log("Fetching from URL Home:", url);
       const response = await fetch(url, {
         method: "GET",
@@ -37,8 +37,7 @@ export const getEvent = async (
       }
 
       const data = await response.json(); // Await here to resolve the promise
-      console.log("Data Home:", data);
-      
+
       return data; // Return the resolved data
     }
 
@@ -49,7 +48,7 @@ export const getEvent = async (
       const dateParam = date || "";
       const tagParam = tag || "";
 
-      url = `${url}?keywords=${encodeURIComponent(
+      url = `${url}?keyword=${encodeURIComponent(
         searchParam
       )}&sort=${sortParam}&date=${dateParam}&tags=${tagParam}`;
       console.log("url:", url);
@@ -70,7 +69,6 @@ export const getEvent = async (
       console.log("Search Fetching from URL:", url);
       const data = await response.json(); // Await here to resolve the promise
       return data; // Return the resolved data
-
     } else if (page === "search" && !search) {
       console.log("No search keywords provided.");
     }

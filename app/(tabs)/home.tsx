@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import EventCard from "../../components/EventCard";
-import { useAppContext } from "@/components/AppContext";
 import images from "../../constants/icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getEvent } from "@/composables/getEvent";
@@ -25,6 +24,8 @@ import Animated, {
 } from "react-native-reanimated";
 import ParallaxCarouselPagination from "@/components/parallax-carousel/ParallaxCarouselPagination";
 import { useNavigation } from "@react-navigation/native";
+import groupEventsByDate from "@/utils/groupEventsByDate";
+import formatDate from "@/utils/formatDate";
 
 interface SlideshowData {
   id: string;
@@ -41,6 +42,7 @@ const Home: React.FC = () => {
   const screenWidth = Dimensions.get("window").width;
   const [activityIndex, setActivityIndex] = useState(0);
   const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [isAutoPlay, setIsAutoPlay] = useState(true); // Autoplay state
   const [scrolling, setScrolling] = useState(false); // Detect if scrolling manually
@@ -48,7 +50,7 @@ const Home: React.FC = () => {
 
   const fetchData = async () => {
     const data = await getEvent("home");
-
+    setIsLoading(false);
     setEvents(data);
   };
 
@@ -122,8 +124,11 @@ const Home: React.FC = () => {
         <View className="mb-5 px-4 mt-4 space-y-6 h-9">
           <View className="items-center justify-between flex-row">
             <View className="w-9"></View>
-            <Text className="text-4xl font-OoohBaby-Regular text-black">
-              Gatherfy
+            <Text
+              className="text-[40px] font-OoohBaby-Regular text-black"
+              style={{ lineHeight: 40 }}
+            >
+              <Text className="text-primary">Ga</Text>therfy
             </Text>
             <View className="">
               <TouchableOpacity onPress={handleNavigateToProfile}>
@@ -137,64 +142,107 @@ const Home: React.FC = () => {
           </View>
         </View>
       </SafeAreaView>
-      <FlatList
-        data={[{ type: "slideshow" }, { type: "events" }]}
-        keyExtractor={(item, index) => index.toString()}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => {
-          if (item.type === "slideshow") {
-            return (
-              <View className="mb-5 mt-7">
-                <Text
-                  className={`text-center ${
-                    Platform.OS === "android"
-                      ? "text-[33px] leading-9"
-                      : "text-3xl"
-                  } font-semibold`}
-                >
-                  Recommend
-                </Text>
-                <View style={styles.parallaxCarouselView}>
-                  <Animated.ScrollView
-                    ref={scrollViewRef}
-                    horizontal={true}
-                    decelerationRate={0.6}
-                    contentOffset={{ x: 0, y: 0 }}
-                    snapToInterval={Item_width}
-                    showsHorizontalScrollIndicator={false}
-                    bounces={false}
-                    disableIntervalMomentum
-                    scrollEventThrottle={16}
-                    onScroll={handleUserScroll}
+      {isLoading ? (
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-3xl font-Poppins-Regular text-black mx-4 my-5 text-center ">
+            Loading events...
+          </Text>
+        </View>
+      ) : Object.entries(groupEventsByDate(events)).length === 0 ? (
+        <View className="flex-1 justify-center items-center">
+          <Image
+            source={require("@/assets/noEvent.jpg")}
+            className="w-72 h-72 rounded-2xl"
+            resizeMode="contain"
+          />
+          <Text className="text-3xl font-Poppins-SemiBold text-black mx-4 my-10 text-center">
+            No Events
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={[{ type: "slideshow" }, { type: "events" }]}
+          keyExtractor={(item, index) => index.toString()}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => {
+            if (item.type === "slideshow") {
+              return (
+                <View className="mb-5 mt-7">
+                  <Text
+                    className={`text-center ${
+                      Platform.OS === "android"
+                        ? "text-[33px] leading-9"
+                        : "text-3xl"
+                    } font-Poppins-Regular my-4`}
                   >
-                    {slideshow.map((item, index) => (
-                      <TouchableOpacity
-                        key={item.slug}
-                        onPress={() => navigateToEventDetail(item.slug)}
-                      >
-                        <ParallaxCarouselCard
-                          item={item}
-                          key={index}
-                          id={index}
-                          scrollX={scrollX}
-                          total={slideshow.length}
-                        />
-                      </TouchableOpacity>
-                    ))}
-                  </Animated.ScrollView>
-                  <ParallaxCarouselPagination
-                    data={slideshow}
-                    scrollX={scrollX}
-                  />
+                    Recommended
+                  </Text>
+                  <View style={styles.parallaxCarouselView}>
+                    <Animated.ScrollView
+                      ref={scrollViewRef}
+                      horizontal={true}
+                      decelerationRate={0.6}
+                      contentOffset={{ x: 0, y: 0 }}
+                      snapToInterval={Item_width}
+                      showsHorizontalScrollIndicator={false}
+                      bounces={false}
+                      disableIntervalMomentum
+                      scrollEventThrottle={16}
+                      onScroll={handleUserScroll}
+                    >
+                      {slideshow.map((item, index) => (
+                        <TouchableOpacity
+                          key={item.slug}
+                          onPress={() => navigateToEventDetail(item.slug)}
+                        >
+                          <ParallaxCarouselCard
+                            item={item}
+                            key={index}
+                            id={index}
+                            scrollX={scrollX}
+                            total={slideshow.length}
+                          />
+                        </TouchableOpacity>
+                      ))}
+                    </Animated.ScrollView>
+                    <ParallaxCarouselPagination
+                      data={slideshow}
+                      scrollX={scrollX}
+                    />
+                  </View>
                 </View>
-              </View>
-            );
-          } else if (item.type === "events") {
-            return <EventCard page="home" events={events} />;
-          }
-          return null;
-        }}
-      />
+              );
+            } else if (item.type === "events") {
+              const groupedEvents = groupEventsByDate(events); // Group events by date
+
+              return (
+                <Fragment key={item.type}>
+                  {Object.entries(groupedEvents).map(([date, eventsOnDate]) => {
+                    const eventsArray = Array.isArray(eventsOnDate)
+                      ? eventsOnDate
+                      : [];
+
+                    return (
+                      <View key={date}>
+                        <Text className="text-lg font-Poppins-Regular text-black mb-5 mx-4">
+                          {formatDate(date, false, false, true).date}
+                        </Text>
+                        <EventCard
+                          key={date}
+                          events={eventsArray}
+                          page="home"
+                        />
+                      </View>
+                    );
+                  })}
+                </Fragment>
+              );
+            }
+
+            return null;
+          }}
+        />
+      )}
     </Fragment>
   );
 };

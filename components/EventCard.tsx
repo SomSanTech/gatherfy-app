@@ -9,11 +9,9 @@ import {
   Dimensions,
   StyleSheet,
 } from "react-native";
-import { useAppContext } from "./AppContext";
 import useNavigateToEventDetail from "@/composables/navigateToEventDetail";
 import formatDate from "@/utils/formatDate";
-import truncateText from "@/utils/truncateText";
-import { isLoading } from "expo-font";
+import Icon from "react-native-vector-icons/Ionicons";
 
 interface Event {
   slug: string;
@@ -29,6 +27,8 @@ interface EventCardProps {
   page: string;
   events: Event[];
   search?: string;
+  isSearched? : boolean;
+  setIsSearched?: (value: boolean) => void;
   isLoading?: boolean;
 }
 
@@ -36,18 +36,22 @@ const EventCard: React.FC<EventCardProps> = ({
   page,
   events,
   search,
+  isSearched,
+  setIsSearched,
   isLoading,
 }) => {
   const screenWidth = Dimensions.get("window").width;
   const { navigateToEventDetail } = useNavigateToEventDetail();
-  const [isSearched, setIsSearched] = useState(false);
+
+  
 
   useEffect(() => {
+
     if (page === "search") {
-      if (search) {
-        setIsSearched(true);
+      if (search && isSearched) {
+        setIsSearched && setIsSearched(true);
       } else {
-        setIsSearched(false);
+        
       }
     }
   }, [isLoading]);
@@ -83,7 +87,7 @@ const EventCard: React.FC<EventCardProps> = ({
             <View className="flex-1 justify-between pb-5 overflow-hidden">
               <View>
                 <Text
-                  className="text-xl w-full font-bold text-primary"
+                  className="text-xl w-full text-primary font-Poppins-SemiBold"
                   style={{ maxWidth: "100%" }}
                   numberOfLines={2}
                   ellipsizeMode="tail"
@@ -92,22 +96,31 @@ const EventCard: React.FC<EventCardProps> = ({
                 </Text>
               </View>
               <View>
-                <Text style={[styles.detail]}>{item.tags.join(", ")}</Text>
-                <Text style={[styles.detail]}>
-                  {formatDate(item.start_date, true).date} -{" "}
-                  {formatDate(item.end_date, true).date}
-                </Text>
-                <Text style={[styles.detail]}>
-                  {formatDate(item.start_date, true).time} -{" "}
-                  {formatDate(item.end_date, true).time}
-                </Text>
-                <Text
-                  style={[styles.detail]}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {item.location}
-                </Text>
+                <Text style={[styles.detailTag]}>{item.tags.join(", ")}</Text>
+                <View style={[styles.detailContainer]}>
+                  <Icon name="calendar-outline" size={18} color="#000000" />
+                  <Text style={[styles.detail]}>
+                    {formatDate(item.start_date, true).date} -{" "}
+                    {formatDate(item.end_date, true).date}
+                  </Text>
+                </View>
+                <View style={[styles.detailContainer]}>
+                  <Icon name="time-outline" size={20} color="#000000" />
+                  <Text style={[styles.detail]}>
+                    {formatDate(item.start_date, true).time} -{" "}
+                    {formatDate(item.end_date, true).time}
+                  </Text>
+                </View>
+                <View style={[styles.detailContainer]}>
+                  <Icon name="map-outline" size={20} color="#000000"/>
+                  <Text
+                    style={[styles.detail]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {item.location}
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
@@ -116,10 +129,15 @@ const EventCard: React.FC<EventCardProps> = ({
       ListEmptyComponent={
         isSearched && events ? (
           <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: 20,
+            }}
           >
             <Text style={{ fontSize: 16, color: "gray" }}>
-              No results found
+              Can't Find Events You're Looking For
             </Text>
           </View>
         ) : null
@@ -129,10 +147,24 @@ const EventCard: React.FC<EventCardProps> = ({
 };
 
 const styles = StyleSheet.create({
-  detail: {
-    fontSize: 14,
+  detailContainer: {
+    flexDirection: "row",
+    width: "98%",
+    alignItems: "center",
+    marginTop: 2,
+  },
+  detailTag: {
+    fontSize: 15,
     lineHeight: 20,
     color: "#4B5563",
+    fontFamily: "Poppins-Regular",
+  },
+  detail: {
+    fontSize: 13,
+    lineHeight: 20,
+    color: "#4B5563",
+    marginLeft: 5,
+    fontFamily: "Poppins-Regular",
   },
 });
 

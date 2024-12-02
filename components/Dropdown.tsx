@@ -1,7 +1,8 @@
-import React, { useState , useEffect} from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import * as NavigationBar from 'expo-navigation-bar';
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableWithoutFeedback, TouchableOpacity } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import * as NavigationBar from "expo-navigation-bar";
+import { Button } from "@rneui/base";
 
 interface SortingDropdownProps {
   sorting: (value: string) => void;
@@ -15,26 +16,31 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
     sorting(value); // Trigger sorting function
   };
 
+  const handleClear = () => {
+    setSelectedSort(null); // Clear the selected value
+    sorting(""); // Pass an empty value to the sorting function
+  };
+
   const sortingOptions = [
-    { label: 'Newest', value: 'date_desc' },
-    { label: 'Oldest', value: 'date_asc' },
-    { label: 'A-Z', value: 'name_asc' },
-    { label: 'Z-A', value: 'name_desc' },
+    { label: "Newest", value: "date_desc" },
+    { label: "Oldest", value: "date_asc" },
+    { label: "A-Z", value: "name_asc" },
+    { label: "Z-A", value: "name_desc" },
   ];
 
   useEffect(() => {
     async function configureNavigationBar() {
       try {
         // ตั้งค่าพื้นหลังโปร่งใส
-        await NavigationBar.setBackgroundColorAsync('#ffffffcc');
+        await NavigationBar.setBackgroundColorAsync("#ffffffcc");
         // ตั้งค่าให้ปุ่มใน Navigation Bar เป็นสีอ่อน (หากพื้นหลังเป็นสีเข้ม)
-        await NavigationBar.setButtonStyleAsync('dark');
+        await NavigationBar.setButtonStyleAsync("dark");
         NavigationBar.setBorderColorAsync("#ffffff");
       } catch (error) {
-        console.error('Error configuring Navigation Bar:', error);
+        console.error("Error configuring Navigation Bar:", error);
       }
     }
-  
+
     configureNavigationBar();
   }, []);
 
@@ -46,13 +52,38 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
         labelField="label"
         valueField="value"
         placeholder="Select Sorting"
-        activeColor='rgba(215, 21, 21, 0.5)'
-        selectedTextStyle={{ color: 'black' }}
-        itemTextStyle={{ color: 'black' }}
-        itemContainerStyle={{ backgroundColor: 'white' }}
+        activeColor="rgba(215, 21, 21, 0.5)"
+        placeholderStyle={{
+          color: "gray",
+          fontFamily: "Poppins-Regular",
+          fontSize: 16,
+          lineHeight: 30,
+          marginTop: 2,
+        }} // เปลี่ยนฟอนต์ของ placeholder
+        selectedTextStyle={{
+          color: "black",
+          fontFamily: "Poppins-Regular",
+          lineHeight: 24,
+          marginTop: 2,
+        }}
+        itemTextStyle={{
+          color: "black",
+          fontFamily: "Poppins-Regular",
+          lineHeight: 24,
+          marginTop: 2,
+        }}
+        itemContainerStyle={{ backgroundColor: "white" }}
         value={selectedSort}
-        onChange={item => handleSortChange(item.value)}
+        onChange={(item) => handleSortChange(item.value)}
       />
+      <View className="items-end">
+        <TouchableOpacity
+          onPress={handleClear}
+          style={styles.buttonClearContainer}
+        >
+          <Text style={styles.buttonText}>Clear</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -63,11 +94,25 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     height: 50,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 10,
     paddingHorizontal: 10,
-    backgroundColor: 'white',
+    backgroundColor: "white",
+  },
+  buttonClearContainer: {
+    width: 70,
+    backgroundColor: "transparent",
+    marginTop: 15,
+    borderRadius: 10,
+    padding: 2,
+  },
+  buttonText: {
+    fontFamily: "Poppins-SemiBold",
+    textAlign: "center",
+    fontSize: 16,
+    lineHeight: 24,
+    color: "black",
   },
 });
 

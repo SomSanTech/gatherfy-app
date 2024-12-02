@@ -12,7 +12,6 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    
     "ios": {
       "supportsTablet": true
     },
@@ -21,7 +20,9 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["INTERNET"],
+      "permissions": [
+        "INTERNET"
+      ],
       "useCleartextTraffic": true,
       "package": "com.sedtabodee.gatherfy",
       "softwareKeyboardLayoutMode": "pan"
@@ -32,7 +33,8 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
@@ -45,7 +47,7 @@
     ],
     "newArchEnabled": true,
     "extra": {
-      "apiBaseUrl": "http://cp24us1.sit.kmutt.ac.th:543",
+      "apiBaseUrl": "https://capstone24.sit.kmutt.ac.th/us1",
       "router": {
         "origin": false
       },

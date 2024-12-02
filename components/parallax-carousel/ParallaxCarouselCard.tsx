@@ -17,7 +17,6 @@ import Animated, {
   Extrapolation,
 } from "react-native-reanimated";
 
-
 const OFFSET = 45; // Define OFFSET with an appropriate value
 const Item_width = Dimensions.get("window").width - OFFSET * 2;
 const Item_height = 200;
@@ -117,15 +116,22 @@ const ParallaxCarouselCard: React.FC<ParallaxCarouselCardProps> = ({
             style={[styles.imageBackgroundView, translateTextStyle]}
           >
             <View style={styles.titleCardView}>
-              <Text style={styles.titleStyle}>{item.name}</Text>
+              <Text
+                style={styles.titleStyle}
+                className="font-Poppins-SemiBold"
+                numberOfLines={2}
+                ellipsizeMode="tail"
+              >
+                {item.name}
+              </Text>
             </View>
             <View>
               <Button
-                title="Register"
+                title="Register Now"
                 titleStyle={{
-                  fontWeight: "700",
                   fontSize: 14,
                   color: "#D71515",
+                  fontFamily: "Poppins-SemiBold",
                 }}
                 buttonStyle={{
                   backgroundColor: "rgba(255, 255, 255, 0.8)",
@@ -134,7 +140,7 @@ const ParallaxCarouselCard: React.FC<ParallaxCarouselCardProps> = ({
                   borderRadius: 10,
                 }}
                 containerStyle={{
-                  width: 100,
+                  width: 120,
                 }}
                 onPress={() => navigateToEventDetail(item.slug)}
               />
@@ -168,7 +174,6 @@ const styles = StyleSheet.create({
   },
   titleStyle: {
     fontSize: 24,
-    fontWeight: "bold",
     color: "white",
   },
 });

@@ -55,25 +55,12 @@ const RegisterForm = ({ start_date, end_date }: RegisterFormProps) => {
   const lastnameRef = useRef<TextInput>(null); // Reference สำหรับ Lastname
   const phoneRef = useRef<TextInput>(null); // Reference สำหรับ Phone
   const emailRef = useRef<TextInput>(null); // Reference สำหรับ Email
-  const [checked, setChecked] = React.useState(false);
 
   const handleInputChange = (name: string, value: string) => {
     setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = () => {
-    // ตรวจสอบความถูกต้องของฟอร์ม
-    if (
-      !form.date ||
-      !form.firstname ||
-      !form.lastname ||
-      !form.phone ||
-      !form.email
-    ) {
-      Alert.alert("Error", "Please fill in all fields.");
-      return;
-    }
-    // ส่งข้อมูลฟอร์มหรือดำเนินการอื่น ๆ
+  const handleSubmit = () => {  
     console.log("Form submitted:", form);
     Alert.alert("Success", "You have registered successfully!");
   };
@@ -112,9 +99,6 @@ const RegisterForm = ({ start_date, end_date }: RegisterFormProps) => {
 
   return (
     <Fragment>
-      <View>
-        <Text style={styles.header}>Register Event</Text>
-      </View>
       {/* <View className="mb-5" style={styles.checkboxWrapper}>
         {dateArray.map((date, index) => (
           <CustomRadioButton
@@ -126,58 +110,14 @@ const RegisterForm = ({ start_date, end_date }: RegisterFormProps) => {
           />
         ))}
       </View> */}
-      <View style={styles.container}>
-        <TextInput
-          placeholder="Firstname"
-          style={styles.input}
-          value={form.firstname}
-          onChangeText={(value) => handleInputChange("firstname", value)}
-          returnKeyType="next"
-          onSubmitEditing={() => lastnameRef.current?.focus()} // ย้ายไปที่ Lastname
-        />
-        <TextInput
-          ref={lastnameRef} // Reference สำหรับ Lastname
-          placeholder="Lastname"
-          style={[styles.input]}
-          value={form.lastname}
-          onChangeText={(value) => handleInputChange("lastname", value)}
-          returnKeyType="next"
-          onSubmitEditing={() => phoneRef.current?.focus()} // ย้ายไปที่ Phone
-        />
-        <TextInput
-          ref={phoneRef} // Reference สำหรับ Phone
-          placeholder="Phone"
-          style={[styles.input, { marginTop: 10 }]}
-          value={form.phone}
-          onChangeText={(value) => handleInputChange("phone", value)}
-          keyboardType="phone-pad"
-          returnKeyType="next"
-          onSubmitEditing={() => emailRef.current?.focus()} // ย้ายไปที่ Email
-        />
-        <TextInput
-          ref={emailRef} // Reference สำหรับ Email
-          placeholder="Email"
-          style={[styles.input, { marginTop: 10 }]}
-          value={form.email}
-          onChangeText={(value) => handleInputChange("email", value)}
-          keyboardType="email-address"
-          returnKeyType="done"
-          onSubmitEditing={handleSubmit} // กด Done แล้วส่งฟอร์ม
-        />
-      </View>
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Submit</Text>
+        <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
     </Fragment>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
   input: {
     width: "48%",
     height: 40,
@@ -192,7 +132,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    marginTop: 20,
     backgroundColor: "#D71515",
     padding: 10,
     borderRadius: 5,
@@ -200,7 +139,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#FFFFFF",
-    fontWeight: "bold",
+    fontFamily: "Poppins-SemiBold",
   },
   checkboxWrapper: {
     flexDirection: "row",

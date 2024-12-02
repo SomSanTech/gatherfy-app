@@ -24,6 +24,7 @@ import Tag from "./tag";
 import EventDetail from "../stack/EventDetail";
 import RootStackParamList from "@/rootStack/RootStackParamList";
 import CustomTabBarButton from "@/components/CustomTabBarButton";
+import { createDrawerNavigator, DrawerContentScrollView } from "@react-navigation/drawer";
 
 // Define prop types
 type TabIconProps = {
@@ -49,6 +50,32 @@ const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
 };
 
 const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
+
+const ProfileScreenWithDrawer = () => {
+  return (
+    <Drawer.Navigator
+      initialRouteName="SearchScreen" // Ensure this matches your screen name
+      screenOptions={{
+        headerShown: false, // Hide the header for all screens in the drawer navigator
+        drawerPosition: 'right',
+        drawerStyle: {
+          // You can add any custom styles here for the drawer itself
+        },
+      }}
+      drawerContent={() => (
+        <DrawerContentScrollView>
+          <Text>Custom Drawer Content</Text>
+          {/* Add custom buttons here */}
+        </DrawerContentScrollView>
+      )}
+    >
+      <Drawer.Screen name="SearchScreen" component={StackSearchNavigation} />
+    </Drawer.Navigator>
+  );
+};
+
+
 
 const TabNav = () => {
   return (
@@ -72,11 +99,25 @@ const TabNav = () => {
         },
         tabBarButton: (props) => <CustomTabBarButton {...props} />,
       }}
- 
     >
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Search"
         component={StackSearchNavigation}
+        options={{
+          title: "Search",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              icon={icons.search}
+              color={color}
+              name="Search"
+              focused={focused}
+            />
+          ),
+        }}
+      /> */}
+      <Tab.Screen
+        name="SearchScreen"
+        component={ProfileScreenWithDrawer}
         options={{
           title: "Search",
           tabBarIcon: ({ color, focused }) => (

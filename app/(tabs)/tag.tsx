@@ -1,17 +1,26 @@
-import { ScrollView, View, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React from "react";
+import React, { Fragment } from "react";
+import { View, StyleSheet ,Text} from "react-native";
+import UnderConstruction from "@/components/UnderConstruction";
 
 const Tag = () => {
   return (
-    <SafeAreaView className="h-full">
-      <ScrollView contentContainerStyle={{ height: "100%" }}>
-        <View>
-          <Text>Tag</Text>
+    <Fragment>
+      <SafeAreaView className="bg-white" >
+      </SafeAreaView>
+      <View style={styles.container}>
+          <UnderConstruction />
         </View>
-      </ScrollView>
-    </SafeAreaView>
+    </Fragment>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center", // จัดตำแหน่งแนวตั้ง
+    backgroundColor: "#ffffff", // สีพื้นหลัง (ปรับได้ตามต้องการ)
+  },
+});
 
 export default Tag;

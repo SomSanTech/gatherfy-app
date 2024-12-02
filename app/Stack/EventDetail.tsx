@@ -57,8 +57,8 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     fetchDataDetailAsync();
   }, []);
 
-  const startDate = formatDate(eventDetail.start_date, true).date;
-  const endDate = formatDate(eventDetail.end_date, true).date;
+  const startDate = formatDate(eventDetail.start_date, true , true , true).date;
+  const endDate = formatDate(eventDetail.end_date, true,true , true).date;
   const startTime = formatDate(eventDetail.start_date, true).time;
   const endTime = formatDate(eventDetail.end_date, true).time;
 
@@ -69,7 +69,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
           <TouchableOpacity onPress={() => navigation.goBack()} className="">
             <Icon name="arrow-back" size={24} color="#000000" />
           </TouchableOpacity>
-          <Text className="text-xl font-bold ml-2">Event Detail</Text>
+          <Text className="text-xl ml-2 font-Poppins-Bold">Event Detail</Text>
         </View>
       </SafeAreaView>
       <KeyboardAwareScrollView>
@@ -81,48 +81,56 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
               resizeMode="contain"
             />
           </View>
-          <View className="p-4 px-5 bg-slate-400">
+          <View className="p-4 px-5 pb-6 bg-grayBackground">
             <View className="mb-1">
               {eventDetail.tags && eventDetail.tags.length > 0 ? (
-                <Text>{eventDetail.tags.join(", ")}</Text>
+                <Text className="font-Poppins-Light">{eventDetail.tags.join(", ")}</Text>
               ) : (
-                <Text>No tags available</Text>
+                <Text className="font-Poppins-Light">No tags available</Text>
               )}
             </View>
-            <Text className="text-2xl font-bold mb-3">{eventDetail.name}</Text>
-            <View className="mb-2 flex-row items-center">
+            <Text className="text-2xl mb-3 font-Poppins-Bold">{eventDetail.name}</Text>
+            <View className="mb-2 flex-row">
               <Icon name="calendar-outline" size={20} color="#000000" />
-              <Text className="ml-2">
+              <Text className="ml-2 font-Poppins-Regular">
                 {startDate}{" "}
                 {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
                   <Text>- {endDate}</Text>
                 ) : (
-                  <Text>No end date</Text>
+                  <Text className="font-Poppins-Regular">No end date</Text>
                 )}
               </Text>
             </View>
-            <View className="mb-2 flex-row items-center">
+            <View className="mb-2 flex-row">
               <Icon name="time-outline" size={20} color="#000000" />
-              <Text className="ml-2">
+              <Text className="ml-2 font-Poppins-Regular">
                 {startTime} - {endTime}
               </Text>
             </View>
-            <View className="mb-2 flex-row items-center">
+            <View className="mb-2 flex-row">
               <Icon name="map-outline" size={20} color="#000000" />
-              <Text className="ml-2">{eventDetail.location}</Text>
+              <Text className="ml-2 font-Poppins-Regular">{eventDetail.location}</Text>
+            </View>
+            <View className="mt-3 mb-2">
+              <RegisterForm
+                start_date={eventDetail.start_date}
+                end_date={eventDetail.end_date}
+              />
             </View>
           </View>
-          <View className="px-5 py-3">
-            <Text className="text-lg font-semibold mb-2">Description</Text>
-            <Text className="leading-5 text-base">{eventDetail.detail}</Text>
+          <View className="px-5 py-3 mt-3">
+            <Text className="text-lg font-semibold mb-2 font-Poppins-SemiBold">Description</Text>
+            <Text className="leading-5 font-Poppins-Regular">{eventDetail.detail}</Text>
           </View>
-          <View className="px-5 m-3 py-5 bg-white rounded-xl">
-            <Text className="text-center text-lg font-semibold mb-3">Event Location</Text>
+          <View className="px-2 m-3 py-5 pt-2 rounded-xl">
+            <Text className="text-lg font-Poppins-SemiBold mb-3">
+              Event Location
+            </Text>
             <WebView
               scalesPageToFit={true}
               bounces={false}
               javaScriptEnabled
-              style={{ height: 400, width: "100%", borderRadius: 10 }}
+              style={{ height: 400, width: "100%", backgroundColor: "transparent"}}
               automaticallyAdjustContentInsets={false}
               source={{
                 html: `
@@ -152,16 +160,9 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
               }}
             />
           </View>
-          <View className="px-5 mt-2">
-            <Text className="font-semibold text-lg">
-              Event Owner : <Text> {eventDetail.owner}</Text>
-            </Text>
-          </View>
-          <View className="p-5 border m-5 rounded-lg">
-            <RegisterForm
-              start_date={eventDetail.start_date}
-              end_date={eventDetail.end_date}
-            />
+          <View className="p-5 m-4 mt-2 border rounded-2xl">
+            <Text className="text-sm text-center font-Poppins-Light">Organized by</Text>
+            <Text className="text-lg text-center font-Poppins-SemiBold"> {eventDetail.owner}</Text>
           </View>
         </View>
       </KeyboardAwareScrollView>

@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
-import { Slot, SplashScreen, Stack } from "expo-router";
+import { Slot, Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
 import App from ".";
+import * as SplashScreen from 'expo-splash-screen';
 import { AppProvider } from "@/components/AppContext";
 import * as NavigationBar from 'expo-navigation-bar';
 
@@ -11,10 +12,17 @@ SplashScreen.preventAutoHideAsync();
 const RootLayout = () => {
   const [fontsLoaded, error] = useFonts({
     "SpaceMono-Regular": require("../assets/fonts/SpaceMono-Regular.ttf"),
-    "SomJitIstalic-Regular": require("../assets/fonts/SomJitItalic-Regular.ttf"),
-    "TorsilpKhwamRiang": require("../assets/fonts/TorsilpKhwamRiang.ttf"),
-    "JacquesFrancois-Regular": require("../assets/fonts/JacquesFrancois-Regular.ttf"),
     "OoohBaby-Regular": require("../assets/fonts/OoohBaby-Regular.ttf"),
+    "Poppins-Light": require("../assets/fonts/Poppins-Light.ttf"),
+    "Poppins-ExtraLight": require("../assets/fonts/Poppins-ExtraLight.ttf"),
+    "Poppins-Thin": require("../assets/fonts/Poppins-Thin.ttf"), 
+    "Poppins-ExtraBold": require("../assets/fonts/Poppins-ExtraBold.ttf"),
+    "Poppins-Black": require("../assets/fonts/Poppins-Black.ttf"),
+    "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-Base": require("../assets/fonts/Poppins-Medium.ttf"),
+    "Poppins-Meduim-Italic": require("../assets/fonts/Poppins-MediumItalic.ttf"),
+    "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
+    "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
   });
 
 
