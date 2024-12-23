@@ -11,6 +11,7 @@ import { RadioButton } from "react-native-paper";
 import React, { useState, useRef, Fragment } from "react";
 import formatDate from "@/utils/formatDate";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useFetchRegistration } from "@/composables/useFetchRegistration";
 
 const CustomRadioButton = ({
   label,
@@ -39,11 +40,27 @@ const CustomRadioButton = ({
 };
 
 interface RegisterFormProps {
+  eventId: string;
+  user: {
+    userId: number;
+    firstname: string;
+    lastname: string;
+    username: string;
+    gender: string;
+    email: string;
+    phone: string;
+    role: string;
+  };
   start_date: string;
   end_date: string;
 }
 
-const RegisterForm = ({ start_date, end_date }: RegisterFormProps) => {
+const RegisterForm = ({
+  eventId,
+  user,
+  start_date,
+  end_date,
+}: RegisterFormProps) => {
   const [form, setForm] = useState({
     date: "",
     firstname: "",
@@ -56,13 +73,29 @@ const RegisterForm = ({ start_date, end_date }: RegisterFormProps) => {
   const phoneRef = useRef<TextInput>(null); // Reference สำหรับ Phone
   const emailRef = useRef<TextInput>(null); // Reference สำหรับ Email
 
-  const handleInputChange = (name: string, value: string) => {
-    setForm({ ...form, [name]: value });
-  };
+  // const handleInputChange = (name: string, value: string) => {
+  //   setForm({ ...form, [name]: value });
+  // };
+  console.log("User:", user.userId);
 
-  const handleSubmit = () => {  
-    console.log("Form submitted:", form);
-    Alert.alert("Success", "You have registered successfully!");
+  const handleSubmit = async () => {
+    // สร้างค่าที่ต้องการในออบเจกต์ชั่วคราว
+    const registrationBody = {
+      eventId: eventId,
+      userId: user.userId,
+      status: "Awaiting Check-in",
+    };
+
+    // แสดงค่าใน console
+    console.log("Registration body:", registrationBody);
+
+    try {
+      // เรียกฟังก์ชัน fetch พร้อมส่ง registrationBody
+      await useFetchRegistration(registrationBody);
+    } catch (error) {
+      console.error("Error during registration:", error);
+      Alert.alert("Error", "Registration failed. Please try again.");
+    }
   };
 
   // ฟังก์ชันคำนวณจำนวนวันระหว่าง start_date และ end_date

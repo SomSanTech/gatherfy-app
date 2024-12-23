@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -28,6 +28,7 @@ type EventDetailProps = {
 };
 
 interface EventDetail {
+  eventId: string;
   slug: string;
   name: string;
   date: string;
@@ -40,6 +41,19 @@ interface EventDetail {
   location: string;
   map: string;
 }
+
+
+
+const mockupUser = {
+  userId: 5,
+  firstname: 'Michael',
+  lastname: 'Brown',
+  username: 'mikeb',
+  gender: 'Male',
+  email: 'mikeb@example.com',
+  phone: '6677889900',
+  role: 'Attendee',
+};
 
 const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const { slug } = route.params;
@@ -113,6 +127,8 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
             </View>
             <View className="mt-3 mb-2">
               <RegisterForm
+                eventId={eventDetail.eventId}
+                user={mockupUser}
                 start_date={eventDetail.start_date}
                 end_date={eventDetail.end_date}
               />
