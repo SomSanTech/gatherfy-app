@@ -20,6 +20,7 @@ import formatDate from "@/utils/formatDate";
 import RegisterForm from "@/components/RegisterForm";
 import Icon from "react-native-vector-icons/Ionicons";
 import WebView from "react-native-webview";
+import Popup from "@/components/PopUp";
 
 type EventDetailRouteProp = RouteProp<typeof RootStackParamList, "EventDetail">;
 
@@ -42,22 +43,22 @@ interface EventDetail {
   map: string;
 }
 
-
-
 const mockupUser = {
   userId: 5,
-  firstname: 'Michael',
-  lastname: 'Brown',
-  username: 'mikeb',
-  gender: 'Male',
-  email: 'mikeb@example.com',
-  phone: '6677889900',
-  role: 'Attendee',
+  firstname: "Michael",
+  lastname: "Brown",
+  username: "mikeb",
+  gender: "Male",
+  email: "mikeb@example.com",
+  phone: "6677889900",
+  role: "Attendee",
+  password: "123",
 };
 
 const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const { slug } = route.params;
   const navigation = useNavigation();
+  const [isPopupVisible, setPopupVisible] = useState(false);
   const [eventDetail, setEventDetail] = useState<EventDetail>(
     {} as EventDetail
   );
@@ -71,8 +72,8 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     fetchDataDetailAsync();
   }, []);
 
-  const startDate = formatDate(eventDetail.start_date, true , true , true).date;
-  const endDate = formatDate(eventDetail.end_date, true,true , true).date;
+  const startDate = formatDate(eventDetail.start_date, true, true, true).date;
+  const endDate = formatDate(eventDetail.end_date, true, true, true).date;
   const startTime = formatDate(eventDetail.start_date, true).time;
   const endTime = formatDate(eventDetail.end_date, true).time;
 
@@ -98,12 +99,16 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
           <View className="p-4 px-5 pb-6 bg-grayBackground">
             <View className="mb-1">
               {eventDetail.tags && eventDetail.tags.length > 0 ? (
-                <Text className="font-Poppins-Light">{eventDetail.tags.join(", ")}</Text>
+                <Text className="font-Poppins-Light">
+                  {eventDetail.tags.join(", ")}
+                </Text>
               ) : (
                 <Text className="font-Poppins-Light">No tags available</Text>
               )}
             </View>
-            <Text className="text-2xl mb-3 font-Poppins-Bold">{eventDetail.name}</Text>
+            <Text className="text-2xl mb-3 font-Poppins-Bold">
+              {eventDetail.name}
+            </Text>
             <View className="mb-2 flex-row">
               <Icon name="calendar-outline" size={20} color="#000000" />
               <Text className="ml-2 font-Poppins-Regular">
@@ -123,20 +128,23 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
             </View>
             <View className="mb-2 flex-row">
               <Icon name="map-outline" size={20} color="#000000" />
-              <Text className="ml-2 font-Poppins-Regular items-center">{eventDetail.location}</Text>
+              <Text className="ml-2 font-Poppins-Regular items-center">
+                {eventDetail.location}
+              </Text>
             </View>
             <View className="mt-3 mb-2">
-              <RegisterForm
-                eventId={eventDetail.eventId}
-                user={mockupUser}
-                start_date={eventDetail.start_date}
-                end_date={eventDetail.end_date}
-              />
+              <TouchableOpacity style={styles.button} onPress={() => setPopupVisible(true)} >
+                <Text style={styles.buttonText}>Register</Text>
+              </TouchableOpacity>
             </View>
           </View>
           <View className="px-5 py-3 mt-3">
-            <Text className="text-lg font-semibold mb-2 font-Poppins-SemiBold">Description</Text>
-            <Text className="leading-5 font-Poppins-Regular">{eventDetail.detail}</Text>
+            <Text className="text-lg font-semibold mb-2 font-Poppins-SemiBold">
+              Description
+            </Text>
+            <Text className="leading-5 font-Poppins-Regular">
+              {eventDetail.detail}
+            </Text>
           </View>
           <View className="px-2 m-3 py-5 pt-2 rounded-xl">
             <Text className="text-lg font-Poppins-SemiBold mb-3">
@@ -146,7 +154,11 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
               scalesPageToFit={true}
               bounces={false}
               javaScriptEnabled
-              style={{ height: 400, width: "100%", backgroundColor: "transparent"}}
+              style={{
+                height: 400,
+                width: "100%",
+                backgroundColor: "transparent",
+              }}
               automaticallyAdjustContentInsets={false}
               source={{
                 html: `
@@ -177,9 +189,29 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
             />
           </View>
           <View className="p-5 m-4 mt-2 border rounded-2xl">
-            <Text className="text-sm text-center font-Poppins-Light">Organized by</Text>
-            <Text className="text-lg text-center font-Poppins-SemiBold"> {eventDetail.owner}</Text>
+            <Text className="text-sm text-center font-Poppins-Light">
+              Organized by
+            </Text>
+            <Text className="text-lg text-center font-Poppins-SemiBold">
+              {" "}
+              {eventDetail.owner}
+            </Text>
           </View>
+        </View>
+        <View style={styles.popupcontainer}>
+          <Popup
+            visible={isPopupVisible}
+            onClose={() => setPopupVisible(false)}
+            title="Registration"
+            eventName={eventDetail.name}
+            eventLocation={eventDetail.location}
+            startDate={startDate}
+            endDate={endDate}
+            startTime={startTime}
+            endTime={endTime}
+            eventId={eventDetail.eventId}
+            user={mockupUser}
+          />
         </View>
       </KeyboardAwareScrollView>
     </Fragment>
@@ -187,8 +219,23 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+  button: {
+    backgroundColor: "#D71515",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontFamily: "Poppins-SemiBold",
+  },
   headerContainer: {
     flexDirection: "row",
+    alignItems: "center",
+  },
+  popupcontainer: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
   },
 });
