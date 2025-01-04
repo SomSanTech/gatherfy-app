@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   View,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   TextInput,
+  Animated,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useFetchRegistration } from "@/composables/useFetchRegistration";
@@ -54,6 +55,7 @@ const Popup: React.FC<PopupProps> = ({
   const [isPasswordValid, setIsPasswordValid] = useState<boolean>(true); // State สำหรับตรวจสอบ password
   const [errorText, setErrorText] = useState<string>(""); // State สำหรับเก็บข้อความแสดง error
   const [isPasswordVisible, setIsPasswordVisible] = useState(false); // สถานะการแสดงรหัสผ่าน
+  const [fadeAnim] = useState(new Animated.Value(0)); // ค่าเริ่มต้นที่ 0 คือ ซ่อนโมดัล
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -64,8 +66,19 @@ const Popup: React.FC<PopupProps> = ({
     setPassword("");
     setErrorText("");
     setIsPasswordVisible(false);
-    onClose();
-  }
+
+    // เริ่มแอนิเมชันให้โมดัลค่อยๆ จางไป
+    Animated.timing(fadeAnim, {
+      toValue: 0, // ทำให้ opacity เป็น 0
+      duration: 200, // ระยะเวลาการแอนิเมชัน
+      useNativeDriver: true,
+    }).start();
+
+    // เพิ่มดีเลย์ในการปิดโมดัลหลังจากแอนิเมชันเสร็จสิ้น
+    setTimeout(() => {
+      onClose(); // ปิดโมดัลจริง ๆ
+    }, 200); // ดีเลย์ 300ms ให้แอนิเมชันเสร็จสิ้นก่อน
+  };
 
   const handleSubmit = async () => {
     // สร้างค่าที่ต้องการในออบเจกต์ชั่วคราว
@@ -103,14 +116,32 @@ const Popup: React.FC<PopupProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (visible) {
+      // เมื่อโมดัลเปิด
+      Animated.timing(fadeAnim, {
+        toValue: 1, // ทำให้โมดัลแสดง (ค่าของ opacity)
+        duration: 230, // ระยะเวลาการแสดงแอนิเมชัน
+        useNativeDriver: true,
+      }).start();
+    } else {
+      // เมื่อโมดัลปิด
+      Animated.timing(fadeAnim, {
+        toValue: 0, // ทำให้โมดัลหายไป (ค่าของ opacity)
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+
+      // เพิ่มดีเลย์ในการปิดโมดัลหลังจากแอนิเมชันจบ
+      setTimeout(() => {
+        onClose();
+      }, 200); // รอแอนิเมชัน 300ms ก่อนที่จะปิดโมดัล
+    }
+  }, [visible]);
+
   return (
-    <Modal
-      transparent={true}
-      visible={visible}
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <View style={styles.overlay}>
+    <Modal transparent={true} visible={visible} onRequestClose={onClose}>
+      <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
         <View style={styles.popupContainer}>
           {title === "Registration" ? (
             <View>
@@ -164,7 +195,6 @@ const Popup: React.FC<PopupProps> = ({
                       onChangeText={setPassword}
                       secureTextEntry={!isPasswordVisible}
                       style={styles.inputPassword}
-            
                       numberOfLines={2}
                       maxLength={30}
                     />
@@ -217,7 +247,7 @@ const Popup: React.FC<PopupProps> = ({
             <Text style={styles.cancelText}>Cancel</Text>
           </TouchableHighlight>
         </View>
-      </View>
+      </Animated.View>
     </Modal>
   );
 };
