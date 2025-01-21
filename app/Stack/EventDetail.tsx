@@ -79,89 +79,91 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
 
   return (
     <Fragment>
-      <SafeAreaView edges={["top"]} className="p-4 pt-2 bg-white shadow">
+      <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={() => navigation.goBack()} className="">
             <Icon name="arrow-back" size={24} color="#000000" />
           </TouchableOpacity>
           <Text className="text-xl ml-2 font-Poppins-Bold">Event Detail</Text>
         </View>
-      </SafeAreaView>
-      <KeyboardAwareScrollView>
-        <View className="w-full mb-5">
-          <View className="w-full h-72">
-            <Image
-              source={{ uri: eventDetail.image }}
-              className="w-full h-full rounded-lg"
-              resizeMode="contain"
-            />
-          </View>
-          <View className="p-4 px-5 pb-6 bg-grayBackground">
-            <View className="mb-1">
-              {eventDetail.tags && eventDetail.tags.length > 0 ? (
-                <Text className="font-Poppins-Light">
-                  {eventDetail.tags.join(", ")}
-                </Text>
-              ) : (
-                <Text className="font-Poppins-Light">No tags available</Text>
-              )}
+        <KeyboardAwareScrollView>
+          <View className="w-full mb-5">
+            <View className="w-full h-72">
+              <Image
+                source={{ uri: eventDetail.image }}
+                className="w-full h-full rounded-lg"
+                resizeMode="contain"
+              />
             </View>
-            <Text className="text-2xl mb-3 font-Poppins-Bold">
-              {eventDetail.name}
-            </Text>
-            <View className="mb-2 flex-row">
-              <Icon name="calendar-outline" size={20} color="#000000" />
-              <Text className="ml-2 font-Poppins-Regular">
-                {startDate}{" "}
-                {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
-                  <Text>- {endDate}</Text>
+            <View className="p-4 px-5 pb-6 bg-grayBackground">
+              <View className="mb-1">
+                {eventDetail.tags && eventDetail.tags.length > 0 ? (
+                  <Text className="font-Poppins-Light">
+                    {eventDetail.tags.join(", ")}
+                  </Text>
                 ) : (
-                  <Text className="font-Poppins-Regular">No end date</Text>
+                  <Text className="font-Poppins-Light">No tags available</Text>
                 )}
+              </View>
+              <Text className="text-2xl mb-3 font-Poppins-Bold">
+                {eventDetail.name}
+              </Text>
+              <View className="mb-2 flex-row">
+                <Icon name="calendar-outline" size={20} color="#000000" />
+                <Text className="ml-2 font-Poppins-Regular">
+                  {startDate}{" "}
+                  {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
+                    <Text>- {endDate}</Text>
+                  ) : (
+                    <Text className="font-Poppins-Regular">No end date</Text>
+                  )}
+                </Text>
+              </View>
+              <View className="mb-2 flex-row">
+                <Icon name="time-outline" size={20} color="#000000" />
+                <Text className="ml-2 font-Poppins-Regular">
+                  {startTime} - {endTime}
+                </Text>
+              </View>
+              <View className="mb-2 flex-row">
+                <Icon name="map-outline" size={20} color="#000000" />
+                <Text className="ml-2 font-Poppins-Regular items-center">
+                  {eventDetail.location}
+                </Text>
+              </View>
+              <View className="mt-3 mb-2">
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => setPopupVisible(true)}
+                >
+                  <Text style={styles.buttonText}>Register</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View className="px-5 py-3 mt-3">
+              <Text className="text-lg font-semibold mb-2 font-Poppins-SemiBold">
+                Description
+              </Text>
+              <Text className="leading-5 font-Poppins-Regular">
+                {eventDetail.detail}
               </Text>
             </View>
-            <View className="mb-2 flex-row">
-              <Icon name="time-outline" size={20} color="#000000" />
-              <Text className="ml-2 font-Poppins-Regular">
-                {startTime} - {endTime}
+            <View className="px-2 m-3 py-5 pt-2 rounded-xl">
+              <Text className="text-lg font-Poppins-SemiBold mb-3">
+                Event Location
               </Text>
-            </View>
-            <View className="mb-2 flex-row">
-              <Icon name="map-outline" size={20} color="#000000" />
-              <Text className="ml-2 font-Poppins-Regular items-center">
-                {eventDetail.location}
-              </Text>
-            </View>
-            <View className="mt-3 mb-2">
-              <TouchableOpacity style={styles.button} onPress={() => setPopupVisible(true)} >
-                <Text style={styles.buttonText}>Register</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View className="px-5 py-3 mt-3">
-            <Text className="text-lg font-semibold mb-2 font-Poppins-SemiBold">
-              Description
-            </Text>
-            <Text className="leading-5 font-Poppins-Regular">
-              {eventDetail.detail}
-            </Text>
-          </View>
-          <View className="px-2 m-3 py-5 pt-2 rounded-xl">
-            <Text className="text-lg font-Poppins-SemiBold mb-3">
-              Event Location
-            </Text>
-            <WebView
-              scalesPageToFit={true}
-              bounces={false}
-              javaScriptEnabled
-              style={{
-                height: 400,
-                width: "100%",
-                backgroundColor: "transparent",
-              }}
-              automaticallyAdjustContentInsets={false}
-              source={{
-                html: `
+              <WebView
+                scalesPageToFit={true}
+                bounces={false}
+                javaScriptEnabled
+                style={{
+                  height: 400,
+                  width: "100%",
+                  backgroundColor: "transparent",
+                }}
+                automaticallyAdjustContentInsets={false}
+                source={{
+                  html: `
             <!DOCTYPE html>
             <html>
               <head>
@@ -185,35 +187,36 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
               </body>
             </html>
           `,
-              }}
+                }}
+              />
+            </View>
+            <View className="p-5 m-4 mt-2 border rounded-2xl">
+              <Text className="text-sm text-center font-Poppins-Light">
+                Organized by
+              </Text>
+              <Text className="text-lg text-center font-Poppins-SemiBold">
+                {" "}
+                {eventDetail.owner}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.popupcontainer}>
+            <Popup
+              visible={isPopupVisible}
+              onClose={() => setPopupVisible(false)}
+              title="Registration"
+              eventName={eventDetail.name}
+              eventLocation={eventDetail.location}
+              startDate={startDate}
+              endDate={endDate}
+              startTime={startTime}
+              endTime={endTime}
+              eventId={eventDetail.eventId}
+              user={mockupUser}
             />
           </View>
-          <View className="p-5 m-4 mt-2 border rounded-2xl">
-            <Text className="text-sm text-center font-Poppins-Light">
-              Organized by
-            </Text>
-            <Text className="text-lg text-center font-Poppins-SemiBold">
-              {" "}
-              {eventDetail.owner}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.popupcontainer}>
-          <Popup
-            visible={isPopupVisible}
-            onClose={() => setPopupVisible(false)}
-            title="Registration"
-            eventName={eventDetail.name}
-            eventLocation={eventDetail.location}
-            startDate={startDate}
-            endDate={endDate}
-            startTime={startTime}
-            endTime={endTime}
-            eventId={eventDetail.eventId}
-            user={mockupUser}
-          />
-        </View>
-      </KeyboardAwareScrollView>
+        </KeyboardAwareScrollView>
+      </SafeAreaView>
     </Fragment>
   );
 };
@@ -232,6 +235,13 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
+    padding: 15,
+        shadowColor: "#000", // สีของเงา
+    shadowOffset: { width: 0, height: 8 }, // เงาเฉพาะด้านล่าง
+    shadowOpacity: 0.1, // ความโปร่งแสงของเงา
+    shadowRadius: 5, // ความเบลอของเงา
+    elevation: 2, // สำหรับ Android
+    backgroundColor: "#ffffff", // พื้นหลังของ View
   },
   popupcontainer: {
     flex: 1,

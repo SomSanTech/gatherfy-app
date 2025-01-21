@@ -62,7 +62,7 @@ export const getEvent = async (
     }
 
 
-    if (page === "search") {
+    if (page === "search" || page === "tag") {
       // Set default values if undefined
       const searchParam = search || "";
       const sortParam = sort || "";

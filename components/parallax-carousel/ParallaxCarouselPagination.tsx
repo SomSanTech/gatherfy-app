@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 10,
+    marginTop: 10,
   },
   dots: {
     height: 5,

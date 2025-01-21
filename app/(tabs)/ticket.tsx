@@ -3,13 +3,13 @@ import React, { Fragment } from "react";
 import { View, StyleSheet ,Text} from "react-native";
 import UnderConstruction from "@/components/UnderConstruction";
 
-const Liked = () => {
+const Ticket = () => {
   return (
     <Fragment>
       <SafeAreaView className="bg-white">
       </SafeAreaView>
       <View style={styles.container}>
-          <UnderConstruction page="Liked Tab" />
+          <UnderConstruction page="Ticket Tab" />
         </View>
     </Fragment>
   );
@@ -23,4 +23,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Liked;
+export default Ticket;

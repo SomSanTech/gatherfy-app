@@ -64,18 +64,11 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
     }
   };
 
-  const checkFilter = () => {
-    if (props.selectedTags || props.date) {
-      return true;
-    } else {
-      return false;
-    }
-  };
 
   return (
     <GestureHandlerRootView style={styles.bottomModalContainer}>
       <View className="m-0 p-0" style={{ flex: 1 }}>
-        <View className="flex-row justify-between items-center mx-5 mt-8 pb-4">
+        <View className="flex-row justify-between items-center mx-5 mt-1 pb-4">
           {props.countResult > 0 && (
             <Text className="text-sm text-searchText font-Poppins-Regular">
               {props.countResult === 0 ? "" : `${props.countResult} `}
@@ -180,7 +173,6 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
 const styles = StyleSheet.create({
   bottomModalContainer: {
     flex: 1,
-
     justifyContent: "center",
     position: "relative",
   },

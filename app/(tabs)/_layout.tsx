@@ -13,13 +13,15 @@ import { createStackNavigator } from "@react-navigation/stack";
 import icons from "../../constants/icons"; // Adjust the path according to your folder structure
 
 import Home from "./home";
-import Liked from "./liked";
+import Liked from "./ticket";
 import Profile from "./profile";
 import Search from "./search";
 import Tag from "./tag";
 import EventDetail from "../stack/EventDetail";
+import EventTag from "../stack/EventTag";
 import RootStackParamList from "@/rootStack/RootStackParamList";
 import CustomTabBarButton from "@/components/CustomTabBarButton";
+import Ticket from "./ticket";
 
 // Define prop types
 type TabIconProps = {
@@ -46,8 +48,6 @@ const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
 
 const Tab = createBottomTabNavigator();
 
-
-
 const TabNav = () => {
   return (
     <Tab.Navigator
@@ -60,7 +60,7 @@ const TabNav = () => {
         tabBarInactiveTintColor: "#CDCDE0",
         tabBarStyle: {
           backgroundColor: "white",
-          borderTopWidth: 1,
+          borderTopWidth: 0.5,
           borderTopColor: "transparent",
           paddingHorizontal: 5,
           elevation: 0, // ลดหรือปิดเงาของ tabBar
@@ -70,6 +70,21 @@ const TabNav = () => {
         tabBarButton: (props) => <CustomTabBarButton {...props} />,
       }}
     >
+      <Tab.Screen
+        name="Home"
+        component={StackHomeNavigator}
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              icon={icons.home}
+              color={color}
+              name="Home"
+              focused={focused}
+            />
+          ),
+        }}
+      />
       <Tab.Screen
         name="Search"
         component={StackSearchNavigation}
@@ -87,7 +102,7 @@ const TabNav = () => {
       />
       <Tab.Screen
         name="Tag"
-        component={Tag}
+        component={StackTagNavigation}
         options={{
           title: "Tag",
           tabBarIcon: ({ color, focused }) => (
@@ -101,30 +116,15 @@ const TabNav = () => {
         }}
       />
       <Tab.Screen
-        name="Home"
-        component={StackHomeNavigator}
+        name="Ticket"
+        component={Ticket}
         options={{
-          title: "Home",
+          title: "Ticket",
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.home}
+              icon={icons.ticket}
               color={color}
-              name="Home"
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Liked"
-        component={Liked}
-        options={{
-          title: "Liked",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              icon={icons.liked}
-              color={color}
-              name="Liked"
+              name="Ticket"
               focused={focused}
             />
           ),
@@ -174,6 +174,28 @@ const StackSearchNavigation = () => {
       <Stack.Screen
         name="SearchScreen"
         component={Search}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EventDetail"
+        component={EventDetail}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const StackTagNavigation = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="TagScreen"
+        component={Tag}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EventTag"
+        component={EventTag}
         options={{ headerShown: false }}
       />
       <Stack.Screen

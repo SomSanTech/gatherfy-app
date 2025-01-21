@@ -25,6 +25,7 @@ import ParallaxCarouselPagination from "@/components/parallax-carousel/ParallaxC
 import { useNavigation } from "@react-navigation/native";
 import groupEventsByDate from "@/utils/groupEventsByDate";
 import formatDate from "@/utils/formatDate";
+import { Icon } from "react-native-elements";
 
 interface SlideshowData {
   id: string;
@@ -33,6 +34,7 @@ interface SlideshowData {
   slug: string;
 }
 
+const mockupUserName = "MABELZ SUCHADA SONPAN";
 const OFFSET = 45; // Define OFFSET with an appropriate value
 const Item_width = Dimensions.get("window").width - OFFSET * 2;
 
@@ -118,136 +120,179 @@ const Home: React.FC = () => {
 
   return (
     <Fragment>
-      <StatusBar backgroundColor="#ffffff" style="dark" />
-      <SafeAreaView edges={["top"]} className="px-3  pb-0 bg-white shadow">
-        <View className="mb-5 px-4 mt-4 space-y-6 h-9">
+      <SafeAreaView edges={["top"]} className="flex-1 bg-white">
+        <StatusBar backgroundColor="#ffffff" style="dark" />
+        <View className="px-5 h-24 justify-center" style={styles.header}>
           <View className="items-center justify-between flex-row">
-            <View className="w-9"></View>
-            <Text
+            <View className="flex-row items-center">
+              <TouchableOpacity onPress={handleNavigateToProfile}>
+                <Image
+                  source={require("@/assets/profile.png")}
+                  className="w-12 h-12 mr-4 object-bottom rounded-full"
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
+              <View className="flex-col">
+                <Text
+                  className="text-sm font-Poppins-Light text-black"
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Hello
+                </Text>
+                <Text
+                  className="text-lg font-Poppins-SemiBold text-black "
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={{ textTransform: "capitalize" }}
+                >
+                  {mockupUserName}
+                </Text>
+              </View>
+            </View>
+            {/* <Text
               className="text-[40px] font-OoohBaby-Regular text-black"
               style={{ lineHeight: 40 }}
             >
               <Text className="text-primary">Ga</Text>therfy
-            </Text>
-            <View className="">
-              <TouchableOpacity onPress={handleNavigateToProfile}>
-                <Image
-                  source={require("@/assets/profile.png")}
-                  className="w-9 h-10 object-bottom rounded-full"
-                  resizeMode="cover"
-                />
-              </TouchableOpacity>
-            </View>
+            </Text> */}
+            <TouchableOpacity className="w-9">
+              <Icon
+                name="ticket-outline"
+                type="ionicon"
+                size={24}
+                color="#000000"
+                onPress={() => navigation.navigate("Ticket")}
+              />
+            </TouchableOpacity>
           </View>
         </View>
-      </SafeAreaView>
-      {isLoading ? (
-        <View className="flex-1 justify-center items-center">
-          <Text className="text-3xl font-Poppins-Regular text-black mx-4 my-5 text-center ">
-            Loading events...
-          </Text>
-        </View>
-      ) : Object.entries(groupEventsByDate(events)).length === 0 ? (
-        <View className="flex-1 justify-center items-center">
-          <Image
-            source={require("@/assets/noEvent.jpg")}
-            className="w-72 h-72 rounded-2xl"
-            resizeMode="contain"
-          />
-          <Text className="text-3xl font-Poppins-SemiBold text-black mx-4 my-10 text-center">
-            No Events
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={[{ type: "slideshow" }, { type: "events" }]}
-          keyExtractor={(item, index) => index.toString()}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => {
-            if (item.type === "slideshow") {
-              return (
-                <View className="mb-5 mt-7">
-                  <Text
-                    className={`text-center ${
-                      Platform.OS === "android"
-                        ? "text-[33px] leading-9"
-                        : "text-3xl"
-                    } font-Poppins-Regular my-4`}
-                  >
-                    Recommended
-                  </Text>
-                  <View style={styles.parallaxCarouselView}>
-                    <Animated.ScrollView
-                      ref={scrollViewRef}
-                      horizontal={true}
-                      decelerationRate={0.6}
-                      contentOffset={{ x: 0, y: 0 }}
-                      snapToInterval={Item_width}
-                      showsHorizontalScrollIndicator={false}
-                      bounces={false}
-                      disableIntervalMomentum
-                      scrollEventThrottle={16}
-                      onScroll={handleUserScroll}
+        {isLoading ? (
+          <View className="flex-1 justify-center items-center">
+            <Text className="text-3xl font-Poppins-Regular text-black mx-4 my-5 text-center ">
+              Loading events...
+            </Text>
+          </View>
+        ) : Object.entries(groupEventsByDate(events)).length === 0 ? (
+          <View className="flex-1 justify-center items-center">
+            <Image
+              source={require("@/assets/noEvent.jpg")}
+              className="w-72 h-72 rounded-2xl"
+              resizeMode="contain"
+            />
+            <Text className="text-3xl font-Poppins-SemiBold text-black mx-4 my-10 text-center">
+              No Events
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={[{ type: "slideshow" }, { type: "events" }]}
+            keyExtractor={(item, index) => index.toString()}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => {
+              if (item.type === "slideshow") {
+                return (
+                  <View className="mb-3 mt-7">
+                    <Text
+                      className={`text-center ${
+                        Platform.OS === "android"
+                          ? "text-[30px] leading-9"
+                          : "text-3xl"
+                      } font-Poppins-Regular mt-4 mb-3`}
+                      style={{ lineHeight: 38 }}
                     >
-                      {slideshow.map((item, index) => (
-                        <TouchableOpacity
-                          key={item.slug}
-                          onPress={() => navigateToEventDetail(item.slug)}
-                        >
-                          <ParallaxCarouselCard
-                            item={item}
-                            key={index}
-                            id={index}
-                            scrollX={scrollX}
-                            total={slideshow.length}
-                          />
-                        </TouchableOpacity>
-                      ))}
-                    </Animated.ScrollView>
-                    <ParallaxCarouselPagination
-                      data={slideshow}
-                      scrollX={scrollX}
-                    />
+                      Recommended
+                    </Text>
+                    <View style={styles.parallaxCarouselView}>
+                      <Animated.ScrollView
+                        ref={scrollViewRef}
+                        horizontal={true}
+                        decelerationRate={0.6}
+                        contentOffset={{ x: 0, y: 0 }}
+                        snapToInterval={Item_width}
+                        showsHorizontalScrollIndicator={false}
+                        bounces={false}
+                        disableIntervalMomentum
+                        scrollEventThrottle={16}
+                        onScroll={handleUserScroll}
+                      >
+                        {slideshow.map((item, index) => (
+                          <TouchableOpacity
+                            key={item.slug}
+                            onPress={() => navigateToEventDetail(item.slug)}
+                          >
+                            <ParallaxCarouselCard
+                              item={item}
+                              key={index}
+                              id={index}
+                              scrollX={scrollX}
+                              total={slideshow.length}
+                            />
+                          </TouchableOpacity>
+                        ))}
+                      </Animated.ScrollView>
+                      <ParallaxCarouselPagination
+                        data={slideshow}
+                        scrollX={scrollX}
+                      />
+                    </View>
                   </View>
-                </View>
-              );
-            } else if (item.type === "events") {
-              const groupedEvents = groupEventsByDate(events); // Group events by date
-
-              return (
-                <Fragment key={item.type}>
-                  <Text className="font-Poppins-Regular text-2xl p-4 pt-0 text-primary">Explore by date</Text>
-                  {Object.entries(groupedEvents).map(([date, eventsOnDate]) => {
-                    const eventsArray = Array.isArray(eventsOnDate)
-                      ? eventsOnDate
-                      : [];
-
-                    return (
-                      <View key={date}>
-                        <Text className="text-lg font-Poppins-Regular text-black mb-5 mx-4">
-                          {formatDate(date, false, false, true).date}
-                        </Text>
-                        <EventCard
-                          key={date}
-                          events={eventsArray}
-                          page="home"
-                        />
-                      </View>
-                    );
-                  })}
-                </Fragment>
-              );
-            }
-
-            return null;
-          }}
-        />
-      )}
+                );
+              } else if (item.type === "events") {
+                const groupedEvents = groupEventsByDate(events); // Group events by date
+                return (
+                  <Fragment key={item.type}>
+                    <View className="mb-5">
+                      <Text className="font-Poppins-Regular text-2xl p-4 pt-0 text-primary">
+                        Explore by date
+                      </Text>
+                      {Object.entries(groupedEvents).map(
+                        ([date, eventsOnDate], index) => {
+                          const eventsArray = Array.isArray(eventsOnDate)
+                            ? eventsOnDate
+                            : [];
+                          return (
+                            <View key={date} className="mb-3">
+                              <Text
+                                className={`text-lg font-Poppins-Regular text-black mb-3 ${
+                                  index === 0 ? "mt-0" : "mt-4"
+                                } mx-4`}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                              >
+                                {formatDate(date, false, false, true).date}
+                              </Text>
+                              <EventCard
+                                key={date}
+                                events={eventsArray}
+                                page="home"
+                              />
+                            </View>
+                          );
+                        }
+                      )}
+                    </View>
+                  </Fragment>
+                );
+              }
+              return null;
+            }}
+          />
+        )}
+      </SafeAreaView>
     </Fragment>
   );
 };
 
 const styles = StyleSheet.create({
+  header: {
+    shadowColor: "#000", // สีของเงา
+    shadowOffset: { width: 0, height: 8 }, // เงาเฉพาะด้านล่าง
+    shadowOpacity: 0.1, // ความโปร่งแสงของเงา
+    shadowRadius: 5, // ความเบลอของเงา
+    elevation: 2, // สำหรับ Android
+    backgroundColor: "#ffffff", // พื้นหลังของ View
+  },
   itemContainer: {
     justifyContent: "center",
     alignItems: "center",
@@ -255,8 +300,8 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
   },
   parallaxCarouselView: {
-    paddingBottom: 30,
-    paddingTop: 20,
+    paddingBottom: 20,
+    paddingTop: 10,
   },
 });
 

@@ -27,7 +27,7 @@ interface EventCardProps {
   page: string;
   events: Event[];
   search?: string;
-  isSearched? : boolean;
+  isSearched?: boolean;
   setIsSearched?: (value: boolean) => void;
   isLoading?: boolean;
 }
@@ -44,12 +44,12 @@ const EventCard: React.FC<EventCardProps> = ({
   const { navigateToEventDetail } = useNavigateToEventDetail();
 
   useEffect(() => {
+    console.log(page);
 
     if (page === "search") {
       if (search && isSearched) {
         setIsSearched && setIsSearched(true);
       } else {
-        
       }
     }
   }, [isLoading]);
@@ -66,17 +66,21 @@ const EventCard: React.FC<EventCardProps> = ({
         marginTop: 0,
         flexGrow: 1, // ทำให้ข้อความอยู่ตรงกลาง
       }}
-      renderItem={({ item }) => (
+      renderItem={({ item, index }) => (
         <TouchableOpacity
           key={item.slug}
           onPress={() => navigateToEventDetail(item.slug)}
           className="items-center justify-center"
+          style={[
+            styles.cardContainer,
+            {
+              marginTop:
+                page === "tag" && index === 0 ? 25 : index === 0 ? 5 : 20,
+            },
+          ]}
         >
-          <View
-            className="mb-5 bg-white p-4 h-52 rounded-lg flex-row"
-            style={{ width: screenWidth - 40 }}
-          >
-            <View className="w-[45%] mr-4">
+          <View className=" bg-white p-4 h-52 rounded-lg flex-row">
+            <View className="w-[44%] mr-4">
               <Image
                 source={{ uri: item.image }}
                 className="w-full h-full rounded-lg"
@@ -98,20 +102,28 @@ const EventCard: React.FC<EventCardProps> = ({
                 <Text style={[styles.detailTag]}>{item.tags.join(", ")}</Text>
                 <View style={[styles.detailContainer]}>
                   <Icon name="calendar-outline" size={18} color="#000000" />
-                  <Text style={[styles.detail]}>
+                  <Text
+                    style={[styles.detail]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
                     {formatDate(item.start_date, true).date} -{" "}
-                    {formatDate(item.end_date, true).date}
+                    {formatDate(item.end_date, true).date} 
                   </Text>
                 </View>
                 <View style={[styles.detailContainer]}>
                   <Icon name="time-outline" size={20} color="#000000" />
-                  <Text style={[styles.detail]}>
+                  <Text
+                    style={[styles.detail]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
                     {formatDate(item.start_date, true).time} -{" "}
                     {formatDate(item.end_date, true).time}
                   </Text>
                 </View>
                 <View style={[styles.detailContainer]}>
-                  <Icon name="map-outline" size={20} color="#000000"/>
+                  <Icon name="map-outline" size={20} color="#000000" />
                   <Text
                     style={[styles.detail]}
                     numberOfLines={1}
@@ -139,6 +151,19 @@ const EventCard: React.FC<EventCardProps> = ({
               Can't Find Events You're Looking For
             </Text>
           </View>
+        ) : page === "tag" && events ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: 20,
+            }}
+          >
+            <Text style={{ fontSize: 16, color: "gray" }}>
+              Can't Find Events You're Looking For
+            </Text>
+          </View>
         ) : null
       }
     />
@@ -146,6 +171,19 @@ const EventCard: React.FC<EventCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  cardContainer: {
+    marginHorizontal: 20,
+    borderRadius: 10, // มุมโค้งมน
+    backgroundColor: "#FFFFFF", // พื้นหลังของการ์ด
+    shadowColor: "#000000",
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.17,
+    shadowRadius: 5,
+    elevation: 6,
+  },
   detailContainer: {
     flexDirection: "row",
     width: "98%",
@@ -162,6 +200,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
     color: "#4B5563",
+    width: "90%",
     marginLeft: 5,
     fontFamily: "Poppins-Regular",
   },

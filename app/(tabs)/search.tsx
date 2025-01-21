@@ -81,7 +81,7 @@ const Search = () => {
     <Fragment>
       <SafeAreaView
         edges={["top"]}
-        className="bg-white shadow"
+        className="flex-1 bg-white"
         style={{
           flex: 0,
         }}
@@ -91,25 +91,24 @@ const Search = () => {
           onChangeText={setSearch} // ส่งฟังก์ชัน setSearch ไปยัง SearchInput
           onSearchSubmit={handleSearchSubmit} // ส่งฟังก์ชัน handleSearchSubmit ไปยัง SearchInput
         />
+        <CustomBottomSheet
+          ref={bottomSheetRef}
+          title="Filter Event"
+          events={events}
+          setDate={setDate} // ฟังก์ชันสำหรับเปลี่ยนวันที่
+          sorting={sorting}
+          tags={tags}
+          selectedTags={selectedTags}
+          handleTagPress={handleTagPress} // ฟังก์ชันสำหรับเลือก tag
+          handleSearchSubmit={handleSearchSubmit}
+          date={date ?? ""}
+          countResult={countResult}
+          search={search}
+          isSearched={isSearched}
+          setIsSearched={setIsSearched}
+          isLoading={false}
+        />
       </SafeAreaView>
-
-      <CustomBottomSheet
-        ref={bottomSheetRef}
-        title="Filter Event"
-        events={events}
-        setDate={setDate} // ฟังก์ชันสำหรับเปลี่ยนวันที่
-        sorting={sorting}
-        tags={tags}
-        selectedTags={selectedTags}
-        handleTagPress={handleTagPress} // ฟังก์ชันสำหรับเลือก tag
-        handleSearchSubmit={handleSearchSubmit}
-        date={date ?? ""}
-        countResult={countResult}
-        search={search}
-        isSearched={isSearched}
-        setIsSearched={setIsSearched}
-        isLoading={false}
-      />
     </Fragment>
   );
 };
