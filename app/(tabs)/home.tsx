@@ -242,8 +242,8 @@ const Home: React.FC = () => {
                 const groupedEvents = groupEventsByDate(events); // Group events by date
                 return (
                   <Fragment key={item.type}>
-                    <View className="mb-5">
-                      <Text className="font-Poppins-Regular text-2xl p-4 pt-0 text-primary">
+                    <View className="bg-gray-200 py-5 mx-2 mb-3 rounded-2xl">
+                      <Text className="font-Poppins-Regular text-2xl p-4 py-3 pt-0 text-primary">
                         Explore by date
                       </Text>
                       {Object.entries(groupedEvents).map(
@@ -256,7 +256,7 @@ const Home: React.FC = () => {
                               <Text
                                 className={`text-lg font-Poppins-Regular text-black mb-3 ${
                                   index === 0 ? "mt-0" : "mt-4"
-                                } mx-4`}
+                                } px-4`}
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
                               >

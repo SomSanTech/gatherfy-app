@@ -39,6 +39,36 @@ interface Props {
   isLoading: boolean;
 }
 
+const mockupEvent = [
+  {
+    slug: "event-1",
+    name: "Event 1",
+    start_date: "2022-01-01",
+    end_date: "2022-01-02",
+    tags: ["tag1", "tag2"],
+    image: "https://via.placeholder.com/150",
+    location: "Location 1",
+  },
+  {
+    slug: "event-2",
+    name: "Event 2",
+    start_date: "2022-01-03",
+    end_date: "2022-01-04",
+    tags: ["tag2", "tag3"],
+    image: "https://via.placeholder.com/150",
+    location: "Location 2",
+  },
+  {
+    slug: "event-3",
+    name: "Event 3",
+    start_date: "2022-01-05",
+    end_date: "2022-01-06",
+    tags: ["tag1", "tag3"],
+    image: "https://via.placeholder.com/150",
+    location: "Location 3",
+  },
+];
+
 type Ref = BottomSheet;
 
 const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
@@ -49,6 +79,8 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
     duration: 400, // ปรับเวลาของแอนิเมชันเป็น 500ms
     easing: Easing.out(Easing.quad), // ใช้ easing แบบออกช้า
   });
+
+  const suggestedEvents = mockupEvent;
 
   const handleClose = () => {
     if (ref && typeof ref !== "function" && ref.current) {
@@ -64,10 +96,23 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
     }
   };
 
-
   return (
     <GestureHandlerRootView style={styles.bottomModalContainer}>
       <View className="m-0 p-0" style={{ flex: 1 }}>
+        {props.isSearched == false && props.events && (
+          <View className="flex-row flex-wrap justify-start items-center mt-1 gap-2 px-5">
+            {suggestedEvents.map((event, index) => (
+              <TouchableOpacity
+                key={index}
+                className="text-base text-primary font-Poppins-SemiBold p-3 bg-gray-200 rounded-lg"
+              >
+                <Text className="text-base text-primary font-Poppins-SemiBold text-center bg-gray-200 rounded-lg">
+                  {event.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
         <View className="flex-row justify-between items-center mx-5 mt-1 pb-4">
           {props.countResult > 0 && (
             <Text className="text-sm text-searchText font-Poppins-Regular">
@@ -76,15 +121,21 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
             </Text>
           )}
           <Text> </Text>
-          <TouchableOpacity
-            onPress={handleOpen}
-            className="px-4 py-[2px] border rounded-lg items-center"
-          >
-            <View className="flex-row">
-              <Image source={icons.filter} style={{ width: 15, height: 18 }} className="mr-1" />
-              <Text className="font-Poppins-Regular text-sm"> Filter</Text>
-            </View>
-          </TouchableOpacity>
+          {props.isSearched && (
+            <TouchableOpacity
+              onPress={handleOpen}
+              className="px-4 py-[2px] border rounded-lg items-center"
+            >
+              <View className="flex-row">
+                <Image
+                  source={icons.filter}
+                  style={{ width: 15, height: 18 }}
+                  className="mr-1"
+                />
+                <Text className="font-Poppins-Regular text-sm"> Filter</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
         <EventCard
           page="search"

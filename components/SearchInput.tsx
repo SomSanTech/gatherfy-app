@@ -1,13 +1,16 @@
-// SearchInput.tsx
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Platform,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Text,
 } from "react-native";
-import { SearchBar } from "@rneui/themed";
+import { Icon } from "react-native-elements";
 
 const SearchInput: React.FC<{
   value: string;
@@ -21,57 +24,70 @@ const SearchInput: React.FC<{
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View className={Platform.OS === "android" ? "py-1" : "p-3"}>
-          <View
-            className={
-              Platform.OS === "android"
-                ? "mb-6 h-9 px-3 flex justify-center items-center"
-                : "mb-6 h-9 "
-            }
-          >
-            <SearchBar
-              placeholder="Search"
-              onChangeText={onChangeText}
-              value={value} // ใช้ค่า value ที่ส่งมาจาก props
-              platform={isIOS ? "ios" : isAndroid ? "android" : "default"}
-              searchIcon={
-                Platform.OS === "ios" ? { name: "search" } : { name: "search" }
-              }
-              clearIcon={
-                Platform.OS === "ios"
-                  ? { name: "close-circle" }
-                  : { name: "close" }
-              }
-              returnKeyType="search"
-              inputStyle={{
-                color: "#D71515", // สีของข้อความใน input
-                fontSize: 20,
-                fontFamily: "Poppins-Regular",
-                lineHeight: 30,
-                marginTop: 4,
-              }}
-              inputContainerStyle={
-                Platform.OS === "ios" ? { height: 20 } : { height: 60 }
-              }
-              showCancel={true}
-              containerStyle={{
-                backgroundColor: "transparent",
-                borderBottomWidth: 0,
-                borderTopWidth: 0,
-                height: Platform.OS === "android" ? 60 : "auto",
-              }}
-              cancelButtonProps={{
-                color: "#D71515",
-              }}
-              onSubmitEditing={onSearchSubmit} // เรียกใช้ onSearchSubmit เมื่อผู้ใช้กดปุ่ม search
-
-            />
-          </View>
+      <View style={styles.container}>
+        <View style={styles.searchInputContainer}>
+          <TextInput
+            placeholder="Search"
+            onChangeText={onChangeText}
+            value={value}
+            onSubmitEditing={onSearchSubmit}
+            style={styles.searchInput}
+          />
+          {value !== "" && (
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={() => onChangeText("")}
+            >
+              <Icon
+                name="close-circle-outline"
+                type="ionicon"
+                size={24}
+                color="#000000"
+              />
+            </TouchableOpacity>
+          )}
         </View>
-      </TouchableWithoutFeedback>
+      </View>
     </KeyboardAvoidingView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  searchInputContainer: {
+    position: "relative",
+    justifyContent: "center",
+  },
+  searchInput: {
+    fontFamily: "Poppins-Regular",
+    fontSize: 16,
+    lineHeight: 22,
+    height: 55,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingLeft: 20,
+    paddingRight: 50,
+    paddingVertical: 0, // ลด vertical padding
+    textAlignVertical: "center", // จัดข้อความให้อยู่ตรงกลาง
+    includeFontPadding: false, // ปิด font padding ใน Android
+  },
+
+  clearButton: {
+    position: "absolute",
+    right: 11,
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+    borderRadius: 5,
+  },
+  clearButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontFamily: "Poppins-Regular",
+  },
+});
 
 export default SearchInput;

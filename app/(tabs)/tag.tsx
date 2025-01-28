@@ -28,7 +28,7 @@ const Tag = () => {
   };
 
   const { navigateToEventTag } = useNavigateToEventTag("defaultTag");
-  
+
   useEffect(() => {
     fetchTagData();
   }, []);
@@ -48,10 +48,11 @@ const Tag = () => {
                   style={styles.tagButton}
                   onPress={() => navigateToEventTag(tag.tag_title)}
                 >
+                  <View></View>
+                  <Text style={styles.tagText}>{tag.tag_title}</Text>
                   <View
                     style={[styles.tagLine, { backgroundColor: tag.tag_code }]}
                   ></View>
-                  <Text style={styles.tagText}>{tag.tag_title}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -88,26 +89,25 @@ const styles = StyleSheet.create({
   tagButton: {
     backgroundColor: "white",
     width: "47%",
-    height: "80%",
+    height: "30%",
     marginBottom: 20,
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
-    flexDirection: "row",
     shadowColor: "#000000",
     shadowOffset: {
       width: 0,
       height: 0,
     },
+    justifyContent: "space-between",
     shadowOpacity: 0.17,
     shadowRadius: 5,
     elevation: 5,
   },
   tagLine: {
-    width: 5,
-    height: "100%",
+    width: "100%",
+    height: 5,
     borderRadius: 9,
-    marginRight: 15,
   },
   tagText: {
     fontFamily: "Poppins-SemiBold",
