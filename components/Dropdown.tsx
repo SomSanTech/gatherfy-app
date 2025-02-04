@@ -59,6 +59,7 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
           fontSize: 16,
           lineHeight: 30,
           marginTop: 2,
+          includeFontPadding: false,
         }} // เปลี่ยนฟอนต์ของ placeholder
         selectedTextStyle={{
           color: "black",

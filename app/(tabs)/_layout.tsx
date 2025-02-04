@@ -19,9 +19,11 @@ import Search from "./search";
 import Tag from "./tag";
 import EventDetail from "../stack/EventDetail";
 import EventTag from "../stack/EventTag";
+import ScanQR from "../stack/Scanner/ScanQR";
 import RootStackParamList from "@/rootStack/RootStackParamList";
 import CustomTabBarButton from "@/components/CustomTabBarButton";
 import Ticket from "./ticket";
+
 
 // Define prop types
 type TabIconProps = {
@@ -213,6 +215,11 @@ const StackProfileNavigation = () => {
       <Stack.Screen
         name="ProfileScreen"
         component={Profile}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ScanQR"
+        component={ScanQR}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

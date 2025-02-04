@@ -21,6 +21,7 @@ import Datepicker from "@/components/Datepicker";
 import SortingDropdown from "@/components/Dropdown";
 import EventCard from "./EventCard";
 import icons from "@/constants/icons";
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 interface Props {
   title: string;
@@ -175,35 +176,35 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
             <View style={styles.sortingWrapper}>
               <SortingDropdown sorting={props.sorting} />
             </View>
-            <View className="mb-5">
+            <View className="mb-5 bg-gray-200 rounded-lg p-5 mt-4">
               <Text className="text-center text-lg text-primary font-Poppins-SemiBold">
                 Tags
               </Text>
               <View style={styles.checkboxWrapper}>
                 {props.tags.map((tag, index) => (
-                  <CheckBox
-                    key={tag.tag_id}
-                    title={tag.tag_title}
-                    checkedColor="#D71515"
-                    value={tag.tag_title}
-                    fontFamily="@/assets/fonts/Poppins-Regular.ttf"
-                    checked={props.selectedTags.includes(tag.tag_title)}
-                    onPress={() => props.handleTagPress(tag.tag_title)}
-                    containerStyle={[
-                      styles.checkboxContainer,
-                      props.selectedTags.includes(tag.tag_title)
-                        ? styles.selectedCheckbox
-                        : styles.unselectedCheckbox,
-                      index >= Math.floor((props.tags.length - 1) / 2) * 2 &&
-                        styles.lastRow,
-                    ]}
-                    textStyle={[
-                      styles.text,
-                      props.selectedTags.includes(tag.tag_title)
-                        ? styles.selectedText
-                        : styles.unselectedText,
-                    ]}
-                  />
+                  <View key={tag.tag_id} style={styles.checkboxContainer}>
+                    <BouncyCheckbox
+                      size={25}
+                      fillColor="#D71515"
+                      unFillColor="#FFFFFF"
+                      iconStyle={{ borderColor: "#D71515" }}
+                      bounceEffectIn={0.9}
+                      bounceEffectOut={1}
+                      bounceVelocityIn = {0.5}
+                      bounceVelocityOut = {0.3}
+                      bouncinessIn = {0.5}
+                      bouncinessOut = {0.5}
+                      text={tag.tag_title} // ใช้ {} แทน ''
+                      isChecked={props.selectedTags.includes(tag.tag_title)}
+                      onPress={() => props.handleTagPress(tag.tag_title)}
+                      textStyle={{
+                        fontFamily: "Poppins-Regular",
+                        textDecorationLine: "none",
+                        padding: 0,
+                        color: "#000000",
+                      }}
+                    />
+                  </View>
                 ))}
               </View>
             </View>
@@ -257,30 +258,27 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   checkboxWrapper: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingVertical: 0,
-    paddingBottom: 0,
-    paddingHorizontal: 0,
+    flexDirection: "row", // เรียงแบบ row
+    flexWrap: "wrap", // ให้สามารถขึ้นบรรทัดใหม่ได้
+    justifyContent: "space-between", // จัดให้ช่องว่างระหว่าง Checkbox เท่ากัน
+    alignItems: "center", // จัดให้อยู่กึ่งกลาง
+    padding: 10,
     marginTop: 10,
-  },
-  checkboxContainer: {
-    width: "44%", // ทำให้มี 2 อันต่อแถว (แบ่งพื้นที่ 48% ของแต่ละอัน)
+    backgroundColor: "#FFFFFF",
     borderRadius: 10,
-    marginBottom: 10,
+  },
+
+  checkboxContainer: {
+    width: "48%", // ทำให้มี 2 อันต่อแถว (แบ่งพื้นที่ 48% ของแต่ละอัน)
+    borderRadius: 10,
+    marginBottom: 18,
     borderWidth: 0,
     marginVertical: 0,
     marginHorizontal: 0,
   },
-  selectedCheckbox: {
-    backgroundColor: "#fff", // สีพื้นหลังเมื่อเลือก
-    color: "red", // สีข้อความเมื่อเลือก
-  },
-  unselectedCheckbox: {
-    backgroundColor: "#e0e0e0", // สีพื้นหลังเมื่อไม่เลือก
-  },
+
   modalContainer: {
     flex: 1,
     justifyContent: "center",

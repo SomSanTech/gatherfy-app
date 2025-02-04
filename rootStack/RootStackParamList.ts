@@ -5,6 +5,7 @@ const RootStackParamList = {
     ProfileScreen: undefined,
     TagScreen: undefined,
     EventTag: { tag: 'string' }, // Ensure the params match your logic
+    ScanQR: undefined,
   };
   
   export default RootStackParamList;

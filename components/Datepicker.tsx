@@ -21,7 +21,14 @@ const Datepicker: React.FC<DatepickerProps> = ({ date, setDate }) => {
         selectedItemColor="#D71515"
         selectedTextStyle={{ fontSize: 18, fontFamily: "Poppins-SemiBold" , lineHeight: 24  }} // เปลี่ยนฟอนต์ในวันที่เลือก
         headerContainerStyle={{ borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5 }}
-        headerTextStyle={{ fontSize: 20, fontFamily: "Poppins-SemiBold" }} // เปลี่ยนฟอนต์ใน header
+
+        headerTextStyle={{
+          fontSize: 20,
+          fontFamily: "Poppins-SemiBold", // ลองใช้ "Arial" หรือ "Roboto" ดูก่อน
+          fontWeight: "600",
+          textAlign: "center",
+        }}
+        
         headerButtonSize={20}
         headerButtonsPosition="around"
         weekDaysTextStyle={{ color: "#D71515", fontSize: 18, fontFamily: "Poppins-SemiBold" }} // เปลี่ยนฟอนต์ในวัน
