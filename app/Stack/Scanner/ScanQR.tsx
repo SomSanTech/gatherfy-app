@@ -1,8 +1,9 @@
-import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View , Button } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
-import { Overlay } from "./Overlay"; // Assuming Overlay is a component that adds additional UI overlay
+import Overlay from "./Overlay"; // Assuming Overlay is a component that adds additional UI overlay
+import { useNavigation } from "@react-navigation/native";
 
 const ScanQR = () => {
   const [permission, requestPermission] = useCameraPermissions();
@@ -10,15 +11,21 @@ const ScanQR = () => {
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const isPermissionGranted = Boolean(permission?.granted);
 
+    const navigation = useNavigation();
+
   // Request camera permission when the component mounts
   useEffect(() => {
     requestPermission();
   }, [requestPermission]);
 
+  
+
   const barcodeScanned = async ({ data }: { data: string }) => {
+    console.log("Barcode scanned:", data);
+    
     setTimeout(() => {
-      Linking.openURL(data!);
-    }, 200);
+      Linking.openURL(data);
+    }, 5000);
   };
 
   const handleBarcodeScanned = async ({ data }: { data: string }) => {
@@ -27,8 +34,8 @@ const ScanQR = () => {
     if (data) {
       try {
         // Send the scanned value to the backend API
-        const response = await fetch("YOUR_API_URL/v1/check-in", {
-          method: "PUT",
+        const response = await fetch("localhost:4040/v1/check-in", {
+          method: "POST",
           headers: {
             Authorization: `Bearer ${data}`, // Attach the scanned value as the token
             "Content-Type": "application/json",
@@ -51,6 +58,10 @@ const ScanQR = () => {
           style={StyleSheet.absoluteFillObject}
           facing="back"
           onBarcodeScanned={barcodeScanned}
+        />
+        <Button
+          title="Go Back"
+          onPress={() => navigation.goBack()} // หรือ navigation.pop() ก็ได้
         />
         <Overlay />
 

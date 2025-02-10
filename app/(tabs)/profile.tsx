@@ -20,7 +20,7 @@ const Profile = () => {
 
 
   const navigateToScanQR = () => {
-    requestPermission;
+    requestPermission();
     navigation.navigate("ScanQR");
 
   };
@@ -28,7 +28,7 @@ const Profile = () => {
     // Reset navigation ไปยัง tab แรก
     navigation.reset({
       index: 0,
-      routes: [{ name: "Home" as never }], // เปลี่ยน "Home" เป็นชื่อ tab แรกของคุณ
+      routes: [{ name: "index" as never }], // เปลี่ยน "Home" เป็นชื่อ tab แรกของคุณ
     });
   };
 

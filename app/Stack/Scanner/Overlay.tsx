@@ -9,7 +9,7 @@ const outer = rrect(rect(0, 0, width, height), 0, 0);
 const inner = rrect(
   rect(
     width / 2 - innerDimension / 2,
-    height / 2 - innerDimension / 2,
+    height / 2.5 - innerDimension / 2,
     innerDimension,
     innerDimension
   ),
@@ -17,14 +17,17 @@ const inner = rrect(
   50
 );
 
-export const Overlay = () => {
+const Overlay = () => {
   return (
+
     <Canvas
       style={
-        Platform.OS === "android" ? { flex: 1 } : StyleSheet.absoluteFillObject
+        Platform.OS === "android" ? { flex: 2 } : StyleSheet.absoluteFillObject
       }
     >
       <DiffRect inner={inner} outer={outer} color="black" opacity={0.5} />
     </Canvas>
   );
 };
+
+export default Overlay;

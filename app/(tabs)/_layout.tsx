@@ -24,6 +24,7 @@ import RootStackParamList from "@/rootStack/RootStackParamList";
 import CustomTabBarButton from "@/components/CustomTabBarButton";
 import Ticket from "./ticket";
 
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 // Define prop types
 type TabIconProps = {
@@ -55,21 +56,28 @@ const TabNav = () => {
     <Tab.Navigator
       backBehavior="history"
       initialRouteName="Home"
-      screenOptions={{
-        headerShown: false,
-        tabBarShowLabel: false,
-        tabBarActiveTintColor: "#D71515",
-        tabBarInactiveTintColor: "#CDCDE0",
-        tabBarStyle: {
-          backgroundColor: "white",
-          borderTopWidth: 0.5,
-          borderTopColor: "transparent",
-          paddingHorizontal: 5,
-          elevation: 0, // ลดหรือปิดเงาของ tabBar
-          shadowColor: "transparent", // ไม่มีเงาที่ tabBar
-          ...(Platform.OS === "android" ? { height: 65 } : {}),
-        },
-        tabBarButton: (props) => <CustomTabBarButton {...props} />,
+      screenOptions={({ route }) => {
+        const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+
+        return {
+          headerShown: false,
+          tabBarShowLabel: false,
+          tabBarActiveTintColor: "#D71515",
+          tabBarInactiveTintColor: "#CDCDE0",
+          tabBarStyle:
+            routeName === "ScanQR"
+              ? { display: "none" }
+              : {
+                  backgroundColor: "white",
+                  borderTopWidth: 0.5,
+                  borderTopColor: "transparent",
+                  paddingHorizontal: 5,
+                  elevation: 0, // ลดหรือปิดเงาของ tabBar
+                  shadowColor: "transparent", // ไม่มีเงาที่ tabBar
+                  ...(Platform.OS === "android" ? { height: 65 } : {}),
+                },
+          tabBarButton: (props) => <CustomTabBarButton {...props} />,
+        };
       }}
     >
       <Tab.Screen

@@ -1,32 +1,67 @@
-import { TouchableOpacity, Text, GestureResponderEvent} from 'react-native';
-import React from 'react'
+import {
+  TouchableOpacity,
+  Text,
+  GestureResponderEvent,
+  View,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
+  StyleSheet,
+} from "react-native";
+import React from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "@/constants/Colors";
 
 type CustomButtonProps = {
   title: string;
   handlePress: (event: GestureResponderEvent) => void;
-  containerStyles?: string;
-  textStyle?: string; 
+  containerStyles?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
   isLoading?: boolean;
+  classNameContainerStyle?: string;
+  classNameTextStyle?: string;
+  IconComponent?: React.ReactNode;
 };
 
-
-const CustomButton: React.FC<CustomButtonProps> = ({ 
-  title, 
-  handlePress, 
-  containerStyles = "", 
-  textStyle = "", 
-  isLoading = false 
+const CustomButton: React.FC<CustomButtonProps> = ({
+  title,
+  handlePress,
+  containerStyles,
+  textStyle = "",
+  isLoading = false,
+  classNameContainerStyle = "",
+  classNameTextStyle = "",
+  IconComponent = null,
 }) => {
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       onPress={handlePress}
-      activeOpacity={0.7}
-      className={`bg-[#ff9797] rounded-xl min-h-[62px] justify-center items-center ${containerStyles} ${isLoading ? 'opacity-50' : ''}`}
+      className={classNameContainerStyle}
+      style={containerStyles || defaultButtonStyle.button}
       disabled={isLoading}
     >
-      <Text className={`text-primary font-SpaceMono text-lg ${textStyle}`}>{title}</Text>
+      {IconComponent}
+      <Text  className={classNameTextStyle} style={textStyle || defaultButtonStyle.buttonText}>{title}</Text>
     </TouchableOpacity>
   );
 };
 
-export default CustomButton
+const defaultButtonStyle = StyleSheet.create({
+  button: {
+    backgroundColor: "#ff9797",
+    borderRadius: 10,
+    minHeight: 62,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+    width: "100%",
+    opacity: 1,
+  },
+  buttonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontFamily: "SpaceMono",
+  },
+});
+
+export default CustomButton;
