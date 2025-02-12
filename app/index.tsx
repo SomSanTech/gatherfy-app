@@ -75,7 +75,7 @@ export default function App() {
   const { authState } = useAuth();
 
   useEffect(() => {
-    
+
     if (authState?.authenticated === true) {
         router.replace("/(tabs)/home");
     }

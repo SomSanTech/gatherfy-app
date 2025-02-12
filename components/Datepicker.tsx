@@ -3,6 +3,7 @@ import { View, StyleSheet, Text } from "react-native";
 import DateTimePicker from "react-native-ui-datepicker";
 import dayjs from "dayjs";
 import { Button } from "@rneui/base";
+import { Dimensions } from "react-native";
 
 interface DatepickerProps {
   date: string | undefined;
@@ -15,7 +16,7 @@ const Datepicker: React.FC<DatepickerProps> = ({ date, setDate }) => {
       <DateTimePicker
         mode="single"
         date={date ? dayjs(date).toDate() : undefined}
-        height={290}
+        height={Dimensions.get("window").height/3.3}
         onChange={(params) => setDate(dayjs(params.date).format("YYYY-MM-DD"))}
         timePickerContainerStyle={{ backgroundColor: "white" }}
         selectedItemColor="#D71515"

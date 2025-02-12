@@ -22,34 +22,30 @@ import Animated, {
   FadeInDown,
   FadeInRight,
 } from "react-native-reanimated";
-import { useHandleLogin } from "@/composables/useHandleLogin";
 import { useAuth } from "@/app/context/AuthContext";
+import { backToIndex } from "@/composables/backToIndex"
 
 const SignIn = () => {
   const navigation = useNavigation();
 
-  const [ username  , setUsername ] = useState('')
-  const [ password  , setPassword ] = useState('')
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const passwordRef = useRef<TextInput>(null);
 
-  const handleLogin = useHandleLogin();
-
-  const { onLogin } = useAuth()
+  const { onLogin } = useAuth();
 
   const onSignInPress = async () => {
-    console.log('username', username);
-    console.log('password', password);
-    
-    onLogin!(username, password)
-  }
+    onLogin!(username, password);
+  };
+  
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1 }}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback>
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
@@ -59,7 +55,7 @@ const SignIn = () => {
             <SafeAreaView edges={["top"]} className="flex">
               <View className="flex-row justify-start">
                 <TouchableOpacity
-                  onPress={() => navigation.goBack()}
+                  onPress={backToIndex}
                   className="bg-primary p-2 rounded-tr-2xl rounded-bl-2xl ml-4"
                 >
                   <Icon name="arrow-back" size={24} color="#ffffff" />
