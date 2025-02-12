@@ -100,7 +100,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
   return (
     <GestureHandlerRootView style={styles.bottomModalContainer}>
       <View className="m-0 p-0" style={{ flex: 1 }}>
-        {props.isSearched == false && props.events && (
+        {/* {props.isSearched == false && props.events && (
           <View className="flex-row flex-wrap justify-start items-center mt-1 gap-2 px-5">
             {suggestedEvents.map((event, index) => (
               <TouchableOpacity
@@ -113,7 +113,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
               </TouchableOpacity>
             ))}
           </View>
-        )}
+        )} */}
         <View className="flex-row justify-between items-center mx-5 mt-1 pb-4">
           {props.countResult > 0 && (
             <Text className="text-sm text-searchText font-Poppins-Regular">

@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, Redirect, router } from "expo-router";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -23,13 +23,26 @@ import Animated, {
   FadeInRight,
 } from "react-native-reanimated";
 import { useHandleLogin } from "@/composables/useHandleLogin";
+import { useAuth } from "@/app/context/AuthContext";
 
 const SignIn = () => {
   const navigation = useNavigation();
 
+  const [ username  , setUsername ] = useState('')
+  const [ password  , setPassword ] = useState('')
+
   const passwordRef = useRef<TextInput>(null);
 
   const handleLogin = useHandleLogin();
+
+  const { onLogin } = useAuth()
+
+  const onSignInPress = async () => {
+    console.log('username', username);
+    console.log('password', password);
+    
+    onLogin!(username, password)
+  }
 
   return (
     <KeyboardAvoidingView
@@ -75,12 +88,14 @@ const SignIn = () => {
                 <View className="form space-y-2 gap-4">
                   <View>
                     <Text style={styles.topicField} className="text-sm">
-                      Email Address
+                      Username
                     </Text>
                     <TextInput
                       style={styles.inputField}
+                      value={username}
+                      onChangeText={setUsername}
                       className="w-100 p-4 bg-gray-100 text-gray-800 rounded-xl text-sm"
-                      placeholder="Enter your email address"
+                      placeholder="Enter username"
                       returnKeyType="next"
                       onSubmitEditing={() => passwordRef.current?.focus()}
                     />
@@ -89,6 +104,8 @@ const SignIn = () => {
                     <Text style={styles.topicField}>Password</Text>
                     <TextInput
                       ref={passwordRef}
+                      value={password}
+                      onChangeText={setPassword}
                       className="p-4 bg-gray-100 text-gray-800 rounded-xl"
                       style={styles.inputField}
                       secureTextEntry={true}
@@ -104,7 +121,7 @@ const SignIn = () => {
                   <View>
                     <CustomButton
                       title="Login"
-                      handlePress={handleLogin}
+                      handlePress={onSignInPress}
                       containerStyles={{}}
                       textStyle={styles.inputField}
                       classNameContainerStyle="w-full py-3 bg-primary rounded-xl"

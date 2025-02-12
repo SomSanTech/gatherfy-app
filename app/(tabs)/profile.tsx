@@ -12,12 +12,20 @@ import UnderConstruction from "@/components/UnderConstruction";
 import { Button } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import { useCameraPermissions } from "expo-camera";
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "expo-router";
 
 const Profile = () => {
   const navigation = useNavigation<any>();
 
   const [permission, requestPermission] = useCameraPermissions();
 
+  const { authState , onLogout } = useAuth();
+  const router = useRouter();
+
+const onLogoutPress = () => {
+  onLogout!()
+}
 
   const navigateToScanQR = () => {
     requestPermission();
@@ -62,7 +70,7 @@ const Profile = () => {
               alignSelf: "center",
             }}
             titleStyle={{ color: "red" }}
-            onPress={handleLogout}
+            onPress={onLogoutPress}
           />
         </View>
       </SafeAreaView>

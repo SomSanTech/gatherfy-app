@@ -25,6 +25,7 @@ import CustomTabBarButton from "@/components/CustomTabBarButton";
 import Ticket from "./ticket";
 
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 // Define prop types
 type TabIconProps = {
@@ -35,7 +36,7 @@ type TabIconProps = {
 };
 
 // Calculate height based on screen height
-const screenHeight = Dimensions.get("window").height;
+const screenHeight = Dimensions.get("window");
 
 const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
   return (
@@ -50,112 +51,117 @@ const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
 };
 
 const Tab = createBottomTabNavigator();
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const TabNav = () => {
+  const insets = useSafeAreaInsets();
   return (
-    <Tab.Navigator
-      backBehavior="history"
-      initialRouteName="Home"
-      screenOptions={({ route }) => {
-        const routeName = getFocusedRouteNameFromRoute(route) ?? "";
+    <GestureHandlerRootView>
+      <Tab.Navigator
+        backBehavior="history"
+        initialRouteName="Home"
+        screenOptions={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? "";
 
-        return {
-          headerShown: false,
-          tabBarShowLabel: false,
-          tabBarActiveTintColor: "#D71515",
-          tabBarInactiveTintColor: "#CDCDE0",
-          tabBarStyle:
-            routeName === "ScanQR"
-              ? { display: "none" }
-              : {
-                  backgroundColor: "white",
-                  borderTopWidth: 0.5,
-                  borderTopColor: "transparent",
-                  paddingHorizontal: 5,
-                  elevation: 0, // ลดหรือปิดเงาของ tabBar
-                  shadowColor: "transparent", // ไม่มีเงาที่ tabBar
-                  ...(Platform.OS === "android" ? { height: 65 } : {}),
-                },
-          tabBarButton: (props) => <CustomTabBarButton {...props} />,
-        };
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        component={StackHomeNavigator}
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              icon={icons.home}
-              color={color}
-              name="Home"
-              focused={focused}
-            />
-          ),
+          return {
+            headerShown: false,
+            tabBarShowLabel: false,
+            tabBarActiveTintColor: "#D71515",
+            tabBarInactiveTintColor: "#CDCDE0",
+            tabBarStyle:
+              routeName === "ScanQR"
+                ? { display: "none" }
+                : {
+                    backgroundColor: "white",
+                    borderTopWidth: 0.5,
+                    borderTopColor: "transparent",
+                    paddingHorizontal: 5,
+                    elevation: 0, // ลดหรือปิดเงาของ tabBar
+                    shadowColor: "transparent", // ไม่มีเงาที่ tabBar
+                    flex: 0.07, // ให้ tabBar สูงตามสัดส่วนของจอ
+
+                  },
+            tabBarButton: (props) => <CustomTabBarButton {...props} />,
+          };
         }}
-      />
-      <Tab.Screen
-        name="Search"
-        component={StackSearchNavigation}
-        options={{
-          title: "Search",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              icon={icons.search}
-              color={color}
-              name="Search"
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Tag"
-        component={StackTagNavigation}
-        options={{
-          title: "Tag",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              icon={icons.tag}
-              color={color}
-              name="Home"
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Ticket"
-        component={Ticket}
-        options={{
-          title: "Ticket",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              icon={icons.ticket}
-              color={color}
-              name="Ticket"
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={StackProfileNavigation}
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              icon={icons.user}
-              color={color}
-              name="Profile"
-              focused={focused}
-            />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+      >
+        <Tab.Screen
+          name="Home"
+          component={StackHomeNavigator}
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon
+                icon={icons.home}
+                color={color}
+                name="Home"
+                focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Search"
+          component={StackSearchNavigation}
+          options={{
+            title: "Search",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon
+                icon={icons.search}
+                color={color}
+                name="Search"
+                focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Tag"
+          component={StackTagNavigation}
+          options={{
+            title: "Tag",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon
+                icon={icons.tag}
+                color={color}
+                name="Home"
+                focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Ticket"
+          component={Ticket}
+          options={{
+            title: "Ticket",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon
+                icon={icons.ticket}
+                color={color}
+                name="Ticket"
+                focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={StackProfileNavigation}
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon
+                icon={icons.user}
+                color={color}
+                name="Profile"
+                focused={focused}
+              />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </GestureHandlerRootView>
   );
 };
 

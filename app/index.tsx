@@ -67,15 +67,25 @@ import Animated, {
   FadeInDown,
   FadeInRight,
 } from "react-native-reanimated";
+import { useAuth } from "./context/AuthContext";
 
 type Props = {};
 
 export default function App() {
+  const { authState } = useAuth();
+
+  useEffect(() => {
+    
+    if (authState?.authenticated === true) {
+        router.replace("/(tabs)/home");
+    }
+  }, []);
+
   return (
     <>
       <StatusBar backgroundColor="transparent" style="dark" />
       <ImageBackground
-        source={require("@/assets/images/onboarding-background.jpg")}
+        source={require("@/assets/images/onboarding-background-2.jpeg")}
         style={{ flex: 1 }}
         resizeMode="cover"
       >
@@ -106,20 +116,20 @@ export default function App() {
                   entering={FadeInDown.delay(300).duration(400).springify()}
                 >
                   <CustomButton
-                    title="Continue with Email"
-                    handlePress={() => (router.push("/signIn"))}
+                    title="Continue with Username"
+                    handlePress={() => router.push("/signIn")}
                     containerStyles={styles.button}
                     textStyle={styles.buttonText}
                     IconComponent={
                       <Ionicons
-                        name="mail-outline"
+                        name="person-circle-outline"
                         size={20}
                         color={Colors.black}
                       />
                     }
                   />
                 </Animated.View>
-                <Animated.View
+                {/* <Animated.View
                   entering={FadeInDown.delay(600).duration(400).springify()}
                 >
                   <CustomButton
@@ -129,7 +139,7 @@ export default function App() {
                     textStyle={styles.buttonText}
                     IconComponent={<Google width={20} height={20} />}
                   />
-                </Animated.View>
+                </Animated.View> */}
               </View>
               <View
                 style={{
@@ -229,3 +239,16 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
   },
 });
+
+// import { View, Text } from 'react-native'
+// import React from 'react'
+
+// const Page = () => {
+//   return (
+//     <View>
+//       <Text>Page</Text>
+//     </View>
+//   )
+// }
+
+// export default Page

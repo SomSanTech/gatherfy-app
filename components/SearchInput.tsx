@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
   View,
@@ -26,12 +27,15 @@ const SearchInput: React.FC<{
     >
       <View style={styles.container}>
         <View style={styles.searchInputContainer}>
+          <Ionicons name="search-outline" size={20} color="#000" style={styles.searchIcon} />
           <TextInput
-            placeholder="Search"
+            placeholder="Search..."
             onChangeText={onChangeText}
+            inlineImageLeft='search_icon'
             value={value}
             onSubmitEditing={onSearchSubmit}
             style={styles.searchInput}
+            underlineColorAndroid="transparent"
           />
           {value !== "" && (
             <TouchableOpacity
@@ -61,6 +65,10 @@ const styles = StyleSheet.create({
     position: "relative",
     justifyContent: "center",
   },
+  searchIcon: {
+    position: "absolute",
+    left: 20,
+  },
   searchInput: {
     fontFamily: "Poppins-Regular",
     fontSize: 16,
@@ -69,7 +77,7 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderWidth: 1,
     borderRadius: 10,
-    paddingLeft: 20,
+    paddingLeft: 50,
     paddingRight: 50,
     paddingVertical: 0, // ลด vertical padding
     textAlignVertical: "center", // จัดข้อความให้อยู่ตรงกลาง
