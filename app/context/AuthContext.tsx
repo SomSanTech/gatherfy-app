@@ -149,6 +149,8 @@ export const AuthProvider = ({ children }: any) => {
 
       console.log("📷 ~ file: AuthContext.tsx:41 ~ login ~ result:", result);
 
+      console.log(result.data.username);
+      
       setAuthState({
         token: result.data.accessToken,
         authenticated: true,

@@ -30,6 +30,7 @@ import {
 import Datepicker from "@/components/Datepicker";
 import formatDate from "@/utils/formatDate";
 import { backToIndex } from "@/composables/backToIndex";
+import { ActivityIndicator } from "react-native-paper";
 
 const SignUp = () => {
   const navigation = useNavigation();
@@ -51,10 +52,11 @@ const SignUp = () => {
   const [userGender, setUserGender] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCreated, setIsCreated] = useState(false);
 
-  const { onRegister } = useAuth();
+  const { onRegister , onLogin} = useAuth();
 
   const handleOpenDatePicker = () => {
     setOpen(!open);
@@ -81,12 +83,14 @@ const SignUp = () => {
         setErrorMsg(result.msg); // แสดงข้อความ error ถ้ามี
       } else {
         setIsLoading(false);
+        alert("Create Account Success")
+        setIsCreated(true); 
+        onLogin!(username,password)
       }
     } else {
       alert("date of birth empty");
     }
   };
-
 
   const handleChangeDate: React.Dispatch<
     React.SetStateAction<string | undefined>
@@ -340,18 +344,24 @@ const SignUp = () => {
                   </View>
                   <View>
                     <CustomButton
-                      title="Sign Up"
+                      title={isCreated ? "Waiting..." : "Sign Up"}
                       handlePress={onSignUpPress}
                       containerStyles={{}}
                       textStyle={[styles.inputField, { fontSize: wp("4%") }]}
-                      classNameContainerStyle="w-full py-3 bg-primary rounded-xl"
+                      classNameContainerStyle="w-full py-3 bg-primary rounded-xl flex-row justify-center items-center"
                       classNameTextStyle="font-Poppins-Bold text-lg text-center text-white"
+                      IconComponent={
+                        isLoading ? (
+                          <ActivityIndicator size="small" color="white" className="mr-5" />
+                        ) : isCreated ? (
+                          <Icon name="checkmark-circle" size={20} color="white" style={{ marginRight: 20 }} />
+                        ) : null
+                      }
                     />
                   </View>
                   <Animated.View
                     entering={FadeInDown.delay(800).duration(400).springify()}
                   >
-                    {isLoading && <Text>กำลังส่งข้อมูล...</Text>}
                     <Text className="text-gray-600 mt-1 text-center font-Poppins-Light">
                       Already have an account?{" "}
                       <Link href={"/signIn"}>

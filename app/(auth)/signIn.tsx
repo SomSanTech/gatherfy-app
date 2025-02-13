@@ -23,22 +23,32 @@ import Animated, {
   FadeInRight,
 } from "react-native-reanimated";
 import { useAuth } from "@/app/context/AuthContext";
-import { backToIndex } from "@/composables/backToIndex"
+import { backToIndex } from "@/composables/backToIndex";
+import { ActivityIndicator } from "react-native-paper";
 
 const SignIn = () => {
   const navigation = useNavigation();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const passwordRef = useRef<TextInput>(null);
 
   const { onLogin } = useAuth();
 
   const onSignInPress = async () => {
-    onLogin!(username, password);
+    setIsLoading(true)
+    const result = await onLogin!(username, password);
+
+    if (result.error) {
+      setIsLoading(false);
+      setErrorMsg(result.msg);
+    } else {
+      setIsLoading(false);
+    }
   };
-  
 
   return (
     <KeyboardAvoidingView
@@ -120,8 +130,17 @@ const SignIn = () => {
                       handlePress={onSignInPress}
                       containerStyles={{}}
                       textStyle={styles.inputField}
-                      classNameContainerStyle="w-full py-3 bg-primary rounded-xl"
+                      classNameContainerStyle="w-full py-3 bg-primary rounded-xl flex-row justify-center items-center"
                       classNameTextStyle="font-Poppins-Bold text-lg text-center text-white"
+                      IconComponent={
+                        isLoading ? (
+                          <ActivityIndicator
+                            size="small"
+                            color="white"
+                            className="mr-5"
+                          />
+                        ) : null
+                      }
                     />
                   </View>
                   <Animated.View
