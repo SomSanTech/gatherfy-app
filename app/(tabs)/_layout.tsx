@@ -20,9 +20,11 @@ import Tag from "./tag";
 import EventDetail from "../stack/EventDetail";
 import EventTag from "../stack/EventTag";
 import ScanQR from "../stack/Scanner/ScanQR";
+import Review from "../stack/Review";
 import RootStackParamList from "@/rootStack/RootStackParamList";
 import CustomTabBarButton from "@/components/CustomTabBarButton";
 import Ticket from "./ticket";
+import { StatusBar } from "expo-status-bar";
 
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -79,7 +81,6 @@ const TabNav = () => {
                     elevation: 0, // ลดหรือปิดเงาของ tabBar
                     shadowColor: "transparent", // ไม่มีเงาที่ tabBar
                     flex: 0.07, // ให้ tabBar สูงตามสัดส่วนของจอ
-
                   },
             tabBarButton: (props) => <CustomTabBarButton {...props} />,
           };
@@ -132,7 +133,7 @@ const TabNav = () => {
         />
         <Tab.Screen
           name="Ticket"
-          component={Ticket}
+          component={StackTicketNavigation}
           options={{
             title: "Ticket",
             tabBarIcon: ({ color, focused }) => (
@@ -161,6 +162,7 @@ const TabNav = () => {
           }}
         />
       </Tab.Navigator>
+      <StatusBar backgroundColor="transparent" style="dark" />
     </GestureHandlerRootView>
   );
 };
@@ -217,6 +219,23 @@ const StackTagNavigation = () => {
       <Stack.Screen
         name="EventDetail"
         component={EventDetail}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const StackTicketNavigation = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="TicketScreen"
+        component={Ticket}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReviewScreen"
+        component={Review}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

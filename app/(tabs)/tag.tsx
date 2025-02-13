@@ -35,7 +35,7 @@ const Tag = () => {
 
   return (
     <Fragment>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <View style={styles.container}>
           <Text style={styles.header}>Tags</Text>
           {isLoading ? (
@@ -64,10 +64,6 @@ const Tag = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-  },
   container: {
     flex: 1,
     paddingTop: 16,

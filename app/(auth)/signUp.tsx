@@ -101,7 +101,7 @@ const SignUp = () => {
 
   return (
     <View className="flex-1 bg-gray-100 pt-2">
-      <SafeAreaView edges={["top"]} className="flex-1 pt-2 ">
+      <SafeAreaView edges={["top"]} className="flex-1 pt-2">
         <View className="flex-row items-center justify-between">
           <TouchableOpacity
             onPress={backToIndex}

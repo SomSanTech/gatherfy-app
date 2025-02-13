@@ -5,6 +5,9 @@ const RootStackParamList = {
     ProfileScreen: undefined,
     TagScreen: undefined,
     EventTag: { tag: 'string' }, // Ensure the params match your logic
+    TicketScreen: undefined,
+    TicketDetail: { ticketId: 'string' }, // Ensure the params match your logic
+    ReviewScreen: { eventId: 'number' }, // Ensure the params match your logic
     ScanQR: undefined,
   };
   

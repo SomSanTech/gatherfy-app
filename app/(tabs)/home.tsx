@@ -121,50 +121,51 @@ const Home: React.FC = () => {
   return (
     <Fragment>
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
-        <StatusBar backgroundColor="#ffffff" style="dark" />
-        <View className="px-5 h-24 justify-center" style={styles.header}>
-          <View className="items-center justify-between flex-row">
-            <View className="flex-row items-center">
-              <TouchableOpacity onPress={handleNavigateToProfile}>
-                <Image
-                  source={require("@/assets/profile.png")}
-                  className="w-12 h-12 mr-4 object-bottom rounded-full"
-                  resizeMode="cover"
-                />
-              </TouchableOpacity>
-              <View className="flex-col">
-                <Text
-                  className="text-sm font-Poppins-Light text-black"
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  Hello
-                </Text>
-                <Text
-                  className="text-lg font-Poppins-SemiBold text-black "
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={{ textTransform: "capitalize" }}
-                >
-                  {mockupUserName}
-                </Text>
+        <View >
+          <View className="px-5 h-24 justify-center" style={styles.header}>
+            <View className="items-center justify-between flex-row">
+              <View className="flex-row items-center">
+                <TouchableOpacity onPress={handleNavigateToProfile}>
+                  <Image
+                    source={require("@/assets/profile.png")}
+                    className="w-12 h-12 mr-4 object-bottom rounded-full"
+                    resizeMode="cover"
+                  />
+                </TouchableOpacity>
+                <View className="flex-col">
+                  <Text
+                    className="text-sm font-Poppins-Light text-black"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Hello
+                  </Text>
+                  <Text
+                    className="text-lg font-Poppins-SemiBold text-black "
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{ textTransform: "capitalize" }}
+                  >
+                    {mockupUserName}
+                  </Text>
+                </View>
               </View>
-            </View>
-            {/* <Text
+              {/* <Text
               className="text-[40px] font-OoohBaby-Regular text-black"
               style={{ lineHeight: 40 }}
             >
               <Text className="text-primary">Ga</Text>therfy
             </Text> */}
-            <TouchableOpacity className="w-9">
-              <Icon
-                name="ticket-outline"
-                type="ionicon"
-                size={24}
-                color="#000000"
-                onPress={() => navigation.navigate("Ticket")}
-              />
-            </TouchableOpacity>
+              <TouchableOpacity className="w-9">
+                <Icon
+                  name="ticket-outline"
+                  type="ionicon"
+                  size={24}
+                  color="#000000"
+                  onPress={() => navigation.navigate("Ticket")}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
         {isLoading ? (
@@ -192,7 +193,7 @@ const Home: React.FC = () => {
             renderItem={({ item }) => {
               if (item.type === "slideshow") {
                 return (
-                  <View className="mb-3 mt-7">
+                  <View className="mb-3 mt-5">
                     <Text
                       className={`text-center ${
                         Platform.OS === "android"
@@ -285,13 +286,21 @@ const Home: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+
   header: {
-    shadowColor: "#000", // สีของเงา
-    shadowOffset: { width: 0, height: 8 }, // เงาเฉพาะด้านล่าง
-    shadowOpacity: 0.1, // ความโปร่งแสงของเงา
-    shadowRadius: 5, // ความเบลอของเงา
-    elevation: 2, // สำหรับ Android
     backgroundColor: "#ffffff", // พื้นหลังของ View
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000", // สีของเงา
+        shadowOffset: { width: 0, height: 7 }, // เงาเฉพาะด้านล่าง
+        shadowOpacity: 0.1, // ความโปร่งแสงของเงา
+        shadowRadius: 5, // ความเบลอของเงา
+      },
+      android: {
+        elevation: 5, // เงาสำหรับ Android
+        shadowColor: "#000", // สีของเงา (ใช้ elevation บน Android)
+      },
+    }),
   },
   itemContainer: {
     justifyContent: "center",

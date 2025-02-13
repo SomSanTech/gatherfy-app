@@ -21,6 +21,7 @@ import RegisterForm from "@/components/RegisterForm";
 import Icon from "react-native-vector-icons/Ionicons";
 import WebView from "react-native-webview";
 import Popup from "@/components/PopUp";
+import CustomButton from "@/components/CustomButton";
 
 type EventDetailRouteProp = RouteProp<typeof RootStackParamList, "EventDetail">;
 
@@ -132,12 +133,12 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                 </Text>
               </View>
               <View className="mt-3 mb-2">
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => setPopupVisible(true)}
-                >
-                  <Text style={styles.buttonText}>Register</Text>
-                </TouchableOpacity>
+                <CustomButton
+                  title="Register event"
+                  containerStyles={styles.button}
+                  textStyle={styles.buttonText}
+                  handlePress={() => setPopupVisible(true)}
+                />
               </View>
             </View>
             <View className="px-5 py-3 mt-3">

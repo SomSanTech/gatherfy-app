@@ -90,7 +90,7 @@ const Search = () => {
           value={search}
           onChangeText={setSearch} // ส่งฟังก์ชัน setSearch ไปยัง SearchInput
           onSearchSubmit={handleSearchSubmit} // ส่งฟังก์ชัน handleSearchSubmit ไปยัง SearchInput
-        />
+        /> 
         <CustomBottomSheet
           ref={bottomSheetRef}
           title="Filter Event"

@@ -152,7 +152,9 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
         index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose={true}
-        backdropComponent={BottomSheetBackdrop}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop {...props} opacity={0.5} />
+        )}
         backgroundStyle={{ backgroundColor: "white" }}
         handleIndicatorStyle={{ backgroundColor: "#D71515" }}
         animationConfigs={timingConfigs}

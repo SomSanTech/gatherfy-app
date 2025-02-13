@@ -22,7 +22,6 @@ export const getEvent = async (
 
     if (page === "home") {
       url = `${url}?sort=date_desc`;
-      console.log("Fetching from URL Home:", url);
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -42,7 +41,6 @@ export const getEvent = async (
     }
     if (page === "homeSlide") {
       url = `${url}/recommended`;
-      console.log("Fetching from URL Home:", url);
       const response = await fetch(url, {
         method: "GET",
         headers: {
