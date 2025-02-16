@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { Button } from "react-native-elements";
 import Svg, { Path } from "react-native-svg";
@@ -26,18 +26,18 @@ interface Ticket {
 }
 interface TicketProps {
   item: Ticket;
+  reviewed: string[];
 }
 
-const TicketCard: React.FC<TicketProps> = ({ item }) => {
+const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
   const { navigateToReview } = useNavigateToReview();
 
   const { navigateToEventDetail } = useNavigateToEventDetail();
   const { navigateToTicketDetail } = useNavigateToTicketDetail();
+  const reviewedStrings = reviewed.map((id) => id.toString());
 
-  const { registrationId , eventId, name, image, slug, start_date, end_date, location } = item;
+  const { eventId, name, image, slug, start_date, end_date, location } = item;
 
-  console.log("ticketId", registrationId);
-  
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -57,21 +57,41 @@ const TicketCard: React.FC<TicketProps> = ({ item }) => {
               />
 
               <View className="w-full justify-end ">
-                <CustomButton
-                  title="Review"
-                  handlePress={() => navigateToReview(eventId)}
-                  containerStyles={{}}
-                  textStyle={{ includeFontPadding: false }}
-                  classNameContainerStyle="flex-row w-full px-2 py-1  bg-white justify-center items-center border border-black rounded-lg"
-                  classNameTextStyle="font-Poppins-Bold text-regular text-center text-black ml-1"
-                  IconComponent={
-                    <Ionicons
-                      name="star-half-outline"
-                      size={20}
-                      color="black"
-                    />
-                  }
-                />
+                {/* Check if the ticket has been reviewed */}
+                {reviewedStrings.includes(eventId.toString()) ? (
+                  <CustomButton
+                    title="Reviewed"
+                    handlePress={() => {}}
+                    containerStyles={{}}
+                    textStyle={{ includeFontPadding: false }}
+                    classNameContainerStyle="flex-row w-full px-2 py-1 bg-white justify-center items-center border border-[#d8d8d8] rounded-lg"
+                    classNameTextStyle="font-Poppins-Bold text-regular text-center text-[#d8d8d8] ml-1"
+                    IconComponent={
+                      <Ionicons
+                        name="checkmark-circle-outline"
+                        size={20}
+                        color="#d8d8d8"
+                      />
+                    }
+                    isLoading={true} // ปิดการใช้งานปุ่ม
+                  />
+                ) : (
+                  <CustomButton
+                    title="Review"
+                    handlePress={() => navigateToReview(eventId)}
+                    containerStyles={{}}
+                    textStyle={{ includeFontPadding: false }}
+                    classNameContainerStyle="flex-row w-full px-2 py-1 bg-white justify-center items-center border border-black rounded-lg"
+                    classNameTextStyle="font-Poppins-Bold text-regular text-center text-black ml-1"
+                    IconComponent={
+                      <Ionicons
+                        name="star-half-outline"
+                        size={20}
+                        color="black"
+                      />
+                    }
+                  />
+                )}
               </View>
             </View>
             <View style={styles.dashedLineContainer2}>
@@ -116,7 +136,9 @@ const TicketCard: React.FC<TicketProps> = ({ item }) => {
           </View>
           <TouchableOpacity
             style={styles.footerTicket}
-            onPress={() => {navigateToTicketDetail(registrationId)}}
+            onPress={() => {
+              navigateToTicketDetail(eventId, slug);
+            }}
             className="w-[13%] bg-primary"
           >
             <View style={styles.dashedLineContainer}>
@@ -145,8 +167,8 @@ export default TicketCard;
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 15,
     padding: 10,
+    marginBottom: 5,
   },
   ticketContainer: {
     position: "relative",

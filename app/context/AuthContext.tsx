@@ -9,9 +9,6 @@ interface AuthProps {
   authState?: {
     token: string | null;
     authenticated: boolean | null;
-    username: string | null;
-    firstname: string | null;
-    lastname: string | null;
   };
   onRegister?: (
     role: string,
@@ -32,6 +29,7 @@ const TOKEN_KEY = "my-jwt";
 const usernameStorage = "username";
 const firstnameStorage = "firstname";
 const lastnameStorage = "lastname";
+const emailStorage = "email";
 
 const API_URL =
   Platform.OS === "ios"
@@ -51,15 +49,9 @@ export const AuthProvider = ({ children }: any) => {
   const [authState, setAuthState] = useState<{
     token: string | null;
     authenticated: boolean | null;
-    username: string | null;
-    firstname: string | null;
-    lastname: string | null;
   }>({
     token: null,
     authenticated: null,
-    username: null,
-    firstname: null,
-    lastname: null,
   });
 
   useEffect(() => {
@@ -80,16 +72,13 @@ export const AuthProvider = ({ children }: any) => {
         const username = await SecureStore.getItemAsync(usernameStorage);
         const firstname = await SecureStore.getItemAsync(firstnameStorage);
         const lastname = await SecureStore.getItemAsync(lastnameStorage);
-
+        const email = await SecureStore.getItemAsync(emailStorage);
 
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         setAuthState({
           token,
           authenticated: true,
-          username,
-          firstname,
-          lastname,
         });
       }
     };
@@ -192,22 +181,11 @@ export const AuthProvider = ({ children }: any) => {
       // Assuming the API returns user data in the response
       const userProfile = profileResponse.data;
 
-      console.log("User Profile allllr:", userProfile);
-      
-
-      console.log("User Profile:", userProfile.username);
-      console.log("User Profile:", userProfile.users_firstname);
-      console.log("User Profile:", userProfile.users_lastname);
-
       console.log("📷 ~ file: AuthContext.tsx:41 ~ login ~ result:", result);
-
 
       setAuthState({
         token: result.data.accessToken,
         authenticated: true,
-        username: userProfile.username,
-        firstname: userProfile.users_firstname,
-        lastname: userProfile.users_lastname,
       });
 
       axios.defaults.headers.common[
@@ -216,8 +194,15 @@ export const AuthProvider = ({ children }: any) => {
 
       await SecureStore.setItemAsync(TOKEN_KEY, result.data.accessToken);
       await SecureStore.setItemAsync(usernameStorage, userProfile.username);
-      await SecureStore.setItemAsync(firstnameStorage, userProfile.users_firstname);
-      await SecureStore.setItemAsync(lastnameStorage, userProfile.users_lastname);
+      await SecureStore.setItemAsync(
+        firstnameStorage,
+        userProfile.users_firstname
+      );
+      await SecureStore.setItemAsync(
+        lastnameStorage,
+        userProfile.users_lastname
+      );
+      await SecureStore.setItemAsync(emailStorage, userProfile.users_email);
 
       return result;
     } catch (err: any) {
@@ -253,9 +238,6 @@ export const AuthProvider = ({ children }: any) => {
     setAuthState({
       token: null,
       authenticated: false,
-      username: null,
-      firstname: null,
-      lastname: null,
     });
   };
 

@@ -6,7 +6,7 @@ export type RootStackParamList = {
   TagScreen: undefined;
   EventTag: { tag: string }; 
   TicketScreen: undefined;
-  TicketDetail: { registrationId: number };
+  TicketDetail: { eventId: number , slug: string };
   ReviewScreen: { eventId: number };
   ScanQR: undefined;
 };

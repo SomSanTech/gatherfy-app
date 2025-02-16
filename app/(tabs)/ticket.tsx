@@ -1,11 +1,20 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { Fragment, useEffect, useState, useCallback } from "react";
-import { View, StyleSheet, Text, FlatList, RefreshControl } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  FlatList,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
 import { useAuth } from "@/app/context/AuthContext";
-import { useFetchTicketWithAuth } from "@/composables/useFetchTicket";
+import {
+  useFetchTicketWithAuth,
+  fetchReviewedTickets,
+} from "@/composables/useFetchTicket";
 import { Colors } from "@/constants/Colors";
 import TicketCard from "@/components/TicketCard";
-import formatDate from "@/utils/formatDate";
 
 interface Ticket {
   registrationId: number;
@@ -21,28 +30,35 @@ interface Ticket {
 const Ticket = () => {
   const { authState } = useAuth();
   const [refreshing, setRefreshing] = useState<boolean>(false);
-
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [reviewedTickets, setReviewedTickets] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const fetchTickets = async () => {
     if (!authState?.token) {
       setError("You need to log in to view tickets.");
+      setIsLoading(false);
       setRefreshing(false);
       return;
     }
 
     try {
+      setIsLoading(true);
       const allTickets = await useFetchTicketWithAuth(
         "v1/tickets",
         "GET",
         authState.token
       );
+      const reviewedTicketsData = await fetchReviewedTickets(authState.token);
+      setReviewedTickets(reviewedTicketsData.eventId);
+
       setTickets(allTickets);
       setError(null);
     } catch (err) {
       setError("Failed to fetch tickets.");
     }
+    setIsLoading(false);
     setRefreshing(false);
   };
 
@@ -52,18 +68,21 @@ const Ticket = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      fetchTickets();
-    }, 1000); // ⬅️ หน่วงเวลา 1 วินาทีก่อน fetch
+    fetchTickets();
+    console.log("asdas", reviewedTickets);
   }, []);
-  
 
   return (
     <Fragment>
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <View style={styles.container}>
           <Text style={styles.header}>Tickets</Text>
-          {error ? (
+
+          {isLoading ? (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size="large" color={Colors.primary} />
+            </View>
+          ) : error ? (
             <Text style={styles.error}>{error}</Text>
           ) : tickets.length === 0 ? (
             <Text style={styles.noTickets}>No tickets available.</Text>
@@ -71,17 +90,19 @@ const Ticket = () => {
             <FlatList
               data={tickets}
               keyExtractor={(item) => item.eventId.toString()}
-              renderItem={({ item }) => <TicketCard item={item} />}
+              renderItem={({ item }) => (
+                <TicketCard item={item} reviewed={reviewedTickets} />
+              )}
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingTop: 10 }} // ⬅️ เพิ่ม padding ด้านบน
+              contentContainerStyle={{ paddingTop: 10, paddingBottom: 30 }}
               refreshControl={
                 <RefreshControl
                   refreshing={refreshing}
                   onRefresh={onRefresh}
-                  colors={[Colors.primary, "#FF9800"]} // ⬅️ เปลี่ยนสี
+                  colors={[Colors.primary, "#FF9800"]}
                   tintColor={Colors.primary}
-                  progressViewOffset={1} // ⬅️ ปรับระยะห่าง
+                  progressViewOffset={1}
                 />
               }
             />
@@ -115,16 +136,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#888",
   },
-
   loaderContainer: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: [{ translateX: -50 }, { translateY: -50 }],
-  },
-  loader: {
-    width: 80,
-    height: 80,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

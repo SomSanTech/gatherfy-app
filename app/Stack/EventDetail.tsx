@@ -22,6 +22,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import WebView from "react-native-webview";
 import Popup from "@/components/PopUp";
 import CustomButton from "@/components/CustomButton";
+import * as SecureStore from "expo-secure-store";
+import { fetchUserProfile } from "@/composables/useFetchUserProfile";
 
 type EventDetailRouteProp = RouteProp<RootStackParamList, "EventDetail">;
 
@@ -37,24 +39,12 @@ interface EventDetail {
   detail: string;
   start_date: string;
   end_date: string;
-  tags: string[];
+  tags: { tag_id: number; tag_title: string; tag_code: string }[];
   image: string;
   owner: string;
   location: string;
   map: string;
 }
-
-const mockupUser = {
-  userId: 5,
-  firstname: "Michael",
-  lastname: "Brown",
-  username: "mikeb",
-  gender: "Male",
-  email: "mikeb@example.com",
-  phone: "6677889900",
-  role: "Attendee",
-  password: "123",
-};
 
 const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const { slug } = route.params;
@@ -63,20 +53,36 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const [eventDetail, setEventDetail] = useState<EventDetail>(
     {} as EventDetail
   );
+  const [usersInfo, setUsersInfo] = useState<any>([]);
 
   const fetchDataDetailAsync = async () => {
     const response = await getEvent("detail", undefined, slug);
     setEventDetail(response);
   };
 
+  const getUsersInfo = async () => {
+    const token = await SecureStore.getItemAsync("my-jwt");
+    const response = await fetchUserProfile(token, "/v1/profile", "GET");
+    setUsersInfo(response);
+  };
+
   useEffect(() => {
     fetchDataDetailAsync();
+    getUsersInfo();
   }, []);
 
-  const startDate = formatDate(eventDetail.start_date, true, true, true).date;
-  const endDate = formatDate(eventDetail.end_date, true, true, true).date;
-  const startTime = formatDate(eventDetail.start_date, true).time;
-  const endTime = formatDate(eventDetail.end_date, true).time;
+  const startDate = eventDetail.start_date
+    ? formatDate(eventDetail.start_date, true, true, true).date
+    : "";
+  const endDate = eventDetail.end_date
+    ? formatDate(eventDetail.end_date, true, true, true).date
+    : "";
+  const startTime = eventDetail.start_date
+    ? formatDate(eventDetail.start_date, true).time
+    : "";
+  const endTime = eventDetail.end_date
+    ? formatDate(eventDetail.end_date, true).time
+    : "";
 
   return (
     <Fragment>
@@ -95,16 +101,13 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                 className="w-full h-full rounded-lg"
                 resizeMode="contain"
               />
-              
             </View>
             <View className="p-4 px-5 pb-6 bg-grayBackground">
               <View className="mb-1">
-                {eventDetail.tags && eventDetail.tags.length > 0 ? (
+                {eventDetail.tags?.length > 0 && (
                   <Text className="font-Poppins-Light">
-                    {eventDetail.tags.join(", ")}
+                    {eventDetail.tags.map((tag) => tag.tag_title).join(", ")}
                   </Text>
-                ) : (
-                  <Text className="font-Poppins-Light">No tags available</Text>
                 )}
               </View>
               <Text className="text-2xl mb-3 font-Poppins-Bold">
@@ -165,7 +168,8 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                 }}
                 automaticallyAdjustContentInsets={false}
                 source={{
-                  html: `
+                  html: eventDetail.map
+                    ? `
             <!DOCTYPE html>
             <html>
               <head>
@@ -188,7 +192,8 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                 ${eventDetail.map}
               </body>
             </html>
-          `,
+          `
+                    : `<html><body><p style="text-align:center;">No map available</p></body></html>`,
                 }}
               />
             </View>
@@ -214,7 +219,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
               startTime={startTime}
               endTime={endTime}
               eventId={eventDetail.eventId}
-              user={mockupUser}
+              user={usersInfo}
             />
           </View>
         </KeyboardAwareScrollView>
@@ -238,7 +243,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
-        shadowColor: "#000", // สีของเงา
+    shadowColor: "#000", // สีของเงา
     shadowOffset: { width: 0, height: 8 }, // เงาเฉพาะด้านล่าง
     shadowOpacity: 0.1, // ความโปร่งแสงของเงา
     shadowRadius: 5, // ความเบลอของเงา

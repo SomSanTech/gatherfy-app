@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useFetchRegistration } from "@/composables/useFetchRegistration";
+import * as SecureStore from "expo-secure-store";
 
 type PopupProps = {
   visible: boolean;
@@ -26,14 +27,9 @@ type PopupProps = {
   endTime?: string;
   eventId: string;
   user: {
-    userId: number;
-    firstname: string;
-    lastname: string;
+    users_id: number;
     username: string;
-    gender: string;
-    email: string;
-    phone: string;
-    role: string;
+    users_email: string;
     password: string;
   };
 };
@@ -84,28 +80,16 @@ const Popup: React.FC<PopupProps> = ({
     // สร้างค่าที่ต้องการในออบเจกต์ชั่วคราว
     const registrationBody = {
       eventId: eventId,
-      userId: user.userId,
+      userId: user.users_id,
       status: "Awaiting Check-in",
     };
 
-    // ตรวจสอบ password ก่อน
-    if (password === "") {
-      setErrorText("Please enter your password.");
-      setIsPasswordValid(false);
-      return;
-    }
+    const token = await SecureStore.getItemAsync("my-jwt"); 
 
-    if (user.password !== password) {
-      setErrorText("Password is incorrect.");
-      setIsPasswordValid(false);
-      return;
-    } else {
-      setErrorText("");
-      setIsPasswordValid(true);
-    }
+    console.log("Registration Body:", registrationBody);
+    
     try {
-      const response = await useFetchRegistration(registrationBody);
-      setPassword("");
+      const response = await useFetchRegistration(registrationBody , token);
       if (response?.status === "Awaiting Check-in") {
         Alert.alert("Success", "Registration successful.");
         onClose();
@@ -180,7 +164,7 @@ const Popup: React.FC<PopupProps> = ({
                     />
                     <Text style={styles.userName}>
                       <Text>{user.username} </Text>
-                      <Text style={styles.email}>{user.email}</Text>
+                      <Text style={styles.email}>{user.users_email}</Text>
                     </Text>
                   </View>
                 )}

@@ -28,6 +28,7 @@ import groupEventsByDate from "@/utils/groupEventsByDate";
 import formatDate from "@/utils/formatDate";
 import { Icon } from "react-native-elements";
 import { useAuth } from "@/app/context/AuthContext";
+import { fetchUserProfile } from "@/composables/useFetchUserProfile";
 
 interface SlideshowData {
   id: string;
@@ -47,10 +48,10 @@ const Home: React.FC = () => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { authState } = useAuth(); 
+  const { authState } = useAuth();
   const [firstname, setFirstname] = useState<string | null>(null);
   const [lastname, setLastname] = useState<string | null>(null);
-
+  const [userInfo, setUserInfo] = useState<any>({});
 
   const [isAutoPlay, setIsAutoPlay] = useState(true); // Autoplay state
   const [scrolling, setScrolling] = useState(false); // Detect if scrolling manually
@@ -100,30 +101,19 @@ const Home: React.FC = () => {
     return () => clearInterval(interval); // Clear interval on unmount
   }, [activityIndex, slideshow.length, isAutoPlay]); // Depend on autoplay state
 
+  const loadUser = async () => {
+    const token = await SecureStore.getItemAsync("my-jwt");
+    const user = await fetchUserProfile(token, "/v1/profile", "GET");
+    setUserInfo(user);
+  };
+
   useEffect(() => {
+    loadUser();
     fetchData();
     fetchSlideshow();
   }, []);
 
-  useEffect(() => {
-    const loadUserProfile = async () => {
-      if (authState?.authenticated) {
-        // ดึงค่า username และ lastname จาก SecureStore
-
-        const storedFirstname = authState?.firstname;
-        const storedLastname = authState?.lastname;
-
-        console.log("Stored firstrname:", storedFirstname);
-        console.log("Stored lastname:", storedLastname);
-        
-
-        setFirstname(storedFirstname);
-        setLastname(storedLastname);
-      }
-    };
-
-    loadUserProfile();
-  }, [authState?.authenticated]);
+  useEffect(() => {}, [authState?.authenticated]);
 
   // Handle manual scroll detection
   const handleUserScroll = (event: any) => {
@@ -152,28 +142,21 @@ const Home: React.FC = () => {
           <View className="px-5 h-24 justify-center" style={styles.header}>
             <View className="items-center justify-between flex-row">
               <View className="flex-row items-center">
-                <TouchableOpacity onPress={handleNavigateToProfile}>
-                  <Image
-                    source={require("@/assets/profile.png")}
-                    className="w-12 h-12 mr-4 object-bottom rounded-full"
-                    resizeMode="cover"
-                  />
-                </TouchableOpacity>
                 <View className="flex-col">
                   <Text
-                    className="text-sm font-Poppins-Light text-black"
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    Hello
-                  </Text>
-                  <Text
-                    className="text-lg font-Poppins-SemiBold text-black "
+                    className="text-2xl font-Poppins-SemiBold text-black "
                     numberOfLines={1}
                     ellipsizeMode="tail"
                     style={{ textTransform: "capitalize" }}
                   >
-                    {firstname} {lastname}
+                    Hello, {userInfo.users_firstname}
+                  </Text>
+                  <Text
+                    className="text-xs font-Poppins-Light text-black"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Welcome To Gatherfy
                   </Text>
                 </View>
               </View>
@@ -183,15 +166,29 @@ const Home: React.FC = () => {
             >
               <Text className="text-primary">Ga</Text>therfy
             </Text> */}
-              <TouchableOpacity className="w-9">
-                <Icon
-                  name="ticket-outline"
-                  type="ionicon"
-                  size={24}
-                  color="#000000"
-                  onPress={() => navigation.navigate("Ticket")}
-                />
-              </TouchableOpacity>
+              <View className="flex-row items-center gap-x-6">
+                <TouchableOpacity className="w-12">
+                  <Icon
+                    name="ticket-outline"
+                    type="ionicon"
+                    size={24}
+                    color="#000000"
+                    onPress={() => navigation.navigate("Ticket")}
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={handleNavigateToProfile}>
+                  <Image
+                    source={
+                      userInfo.users_image
+                        ? { uri: userInfo.users_image }
+                        : require("@/assets/images/default-profile.svg") // ใส่รูป default ถ้าไม่มีรูปผู้ใช้
+                    }
+                    className="w-12 h-12 object-bottom rounded-full"
+                    resizeMode="cover"
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -247,9 +244,7 @@ const Home: React.FC = () => {
                         {slideshow.map((item, index) => (
                           <TouchableOpacity
                             key={item.slug}
-                            onPress={() =>
-                              navigateToEventDetail(item.slug)
-                            }
+                            onPress={() => navigateToEventDetail(item.slug)}
                           >
                             <ParallaxCarouselCard
                               item={item}

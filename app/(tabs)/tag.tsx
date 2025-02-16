@@ -6,9 +6,14 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView, // เพิ่ม ScrollView
 } from "react-native";
 import { getTag } from "@/composables/getTag";
 import useNavigateToEventTag from "@/composables/navigateToEventTag";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const Tag = () => {
   const [tags, setTags] = useState<
@@ -35,12 +40,16 @@ const Tag = () => {
 
   return (
     <Fragment>
-      <SafeAreaView edges={["top"]} className="flex-1 bg-white">
-        <View style={styles.container}>
-          <Text style={styles.header}>Tags</Text>
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#0000ff" />
-          ) : (
+      <SafeAreaView edges={["top"]} style={styles.container}>
+        <Text style={styles.header}>Tags</Text>
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <ScrollView
+            style={styles.scrollView} 
+            contentContainerStyle={styles.scrollContent} 
+            showsVerticalScrollIndicator={false} // ซ่อน scrollbar
+          >
             <View style={styles.listContainer}>
               {tags.map((tag) => (
                 <TouchableOpacity
@@ -56,8 +65,8 @@ const Tag = () => {
                 </TouchableOpacity>
               ))}
             </View>
-          )}
-        </View>
+          </ScrollView>
+        )}
       </SafeAreaView>
     </Fragment>
   );
@@ -66,8 +75,8 @@ const Tag = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 16,
     backgroundColor: "#ffffff",
+    paddingTop: 16,
   },
   header: {
     fontSize: 28,
@@ -75,27 +84,30 @@ const styles = StyleSheet.create({
     marginBottom: 22,
     textAlign: "center",
   },
+  scrollView: {
+    flex: 1, // ให้ ScrollView ขยายเต็มพื้นที่ที่เหลือ
+  },
+  scrollContent: {
+    flexGrow: 1, // ทำให้เลื่อนเฉพาะเนื้อหาภายใน
+    paddingHorizontal: 16,
+  },
   listContainer: {
     flexDirection: "row",
-    flexWrap: "wrap", // เพื่อให้แท็กลงแถวใหม่เมื่อพื้นที่ไม่พอ
-    justifyContent: "space-between", // จัดระยะห่างระหว่างแท็ก
-    paddingHorizontal: 16,
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     gap: 10,
   },
   tagButton: {
     backgroundColor: "white",
-    width: "47%",
-    height: "30%",
+    width: wp("44%"),
+    height: hp("15%"),
     marginBottom: 20,
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
-    shadowColor: "#000000",
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
     justifyContent: "space-between",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.17,
     shadowRadius: 5,
     elevation: 5,

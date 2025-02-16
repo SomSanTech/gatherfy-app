@@ -18,7 +18,7 @@ interface Event {
   name: string;
   start_date: string;
   end_date: string;
-  tags: string[];
+  tags: { tag_id: number; tag_title: string; tag_code: string }[];
   image: string;
   location: string;
 }
@@ -99,7 +99,10 @@ const EventCard: React.FC<EventCardProps> = ({
                 </Text>
               </View>
               <View>
-                <Text style={[styles.detailTag]}>{item.tags.join(", ")}</Text>
+                <Text style={[styles.detailTag]}>
+                  {item.tags.map((tag) => tag.tag_title).join(", ")}
+                </Text>
+
                 <View style={[styles.detailContainer]}>
                   <Icon name="calendar-outline" size={18} color="#000000" />
                   <Text
@@ -108,7 +111,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     ellipsizeMode="tail"
                   >
                     {formatDate(item.start_date, true).date} -{" "}
-                    {formatDate(item.end_date, true).date} 
+                    {formatDate(item.end_date, true).date}
                   </Text>
                 </View>
                 <View style={[styles.detailContainer]}>

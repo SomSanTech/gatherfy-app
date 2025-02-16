@@ -7,6 +7,7 @@ import {
   ViewStyle,
   TextStyle,
   StyleSheet,
+  TouchableWithoutFeedback,
 } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,6 +22,7 @@ type CustomButtonProps = {
   classNameContainerStyle?: string;
   classNameTextStyle?: string;
   IconComponent?: React.ReactNode;
+  disabled?: boolean;
 };
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -33,6 +35,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   classNameTextStyle = "",
   IconComponent = null,
 }) => {
+
   return (
     <TouchableOpacity
       onPress={handlePress}
@@ -41,7 +44,12 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       disabled={isLoading}
     >
       {IconComponent}
-      <Text  className={classNameTextStyle} style={textStyle || defaultButtonStyle.buttonText}>{title}</Text>
+      <Text
+        className={classNameTextStyle}
+        style={textStyle || defaultButtonStyle.buttonText}
+      >
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 };

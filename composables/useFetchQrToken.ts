@@ -8,11 +8,10 @@ const API_BASE_URL =
 // const API_BASE_URL =
 //   Platform.OS === "android" ? "http://10.0.2.2:4040" : "http://localhost:4040";
 
-export const useFetchTicketWithAuth = async (
+export const fetchQrToken = async (
+  token: any,
   url: string,
   method: string,
-  token: any,
-  body?: object
 ) => {
   try {
     if (!API_BASE_URL) {
@@ -20,7 +19,7 @@ export const useFetchTicketWithAuth = async (
       return [];
     }
 
-    let urlToFetch = `${API_BASE_URL}/api/${url}`;
+    let urlToFetch = `${API_BASE_URL}/${url}`;
 
     const response = await fetch(urlToFetch, {
       method: method,
@@ -28,7 +27,7 @@ export const useFetchTicketWithAuth = async (
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: body ? JSON.stringify(body) : undefined,
+      
     });
     if (!response.ok) {
       console.error(`Error: ${response.status} - ${response.statusText}`);
@@ -40,30 +39,3 @@ export const useFetchTicketWithAuth = async (
     return { error: "Failed to fetch data" };
   }
 };
-
-export const fetchReviewedTickets = async (token:any) => {
-  try {
-    if (!API_BASE_URL) {
-      console.error("API_BASE_URL is not defined in the app's configuration.");
-      return [];
-    }
-
-    let urlToFetch = `${API_BASE_URL}/api/v1/feedbacked`;
-
-    const response = await fetch(urlToFetch, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      console.error(`Error: ${response.status} - ${response.statusText}`);
-      return `Error: ${response.status} - ${response.statusText}`;
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return { error: "Failed to fetch data" };
-  }
-}
