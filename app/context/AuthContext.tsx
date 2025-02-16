@@ -6,7 +6,13 @@ import dayjs from "dayjs";
 import { jwtDecode } from "jwt-decode";
 
 interface AuthProps {
-  authState?: { token: string | null; authenticated: boolean | null };
+  authState?: {
+    token: string | null;
+    authenticated: boolean | null;
+    username: string | null;
+    firstname: string | null;
+    lastname: string | null;
+  };
   onRegister?: (
     role: string,
     username: string,
@@ -23,6 +29,9 @@ interface AuthProps {
 }
 
 const TOKEN_KEY = "my-jwt";
+const usernameStorage = "username";
+const firstnameStorage = "firstname";
+const lastnameStorage = "lastname";
 
 const API_URL =
   Platform.OS === "ios"
@@ -42,60 +51,81 @@ export const AuthProvider = ({ children }: any) => {
   const [authState, setAuthState] = useState<{
     token: string | null;
     authenticated: boolean | null;
+    username: string | null;
+    firstname: string | null;
+    lastname: string | null;
   }>({
     token: null,
     authenticated: null,
+    username: null,
+    firstname: null,
+    lastname: null,
   });
 
   useEffect(() => {
     const loadToken = async () => {
       const token = await SecureStore.getItemAsync(TOKEN_KEY);
       console.log("store-token: ", token);
-  
+
       if (token) {
         const decoded: any = jwtDecode(token); // ✅ Now it works
         const isExpired = decoded.exp * 1000 < Date.now(); // Check expiration time
-    
+
         if (isExpired) {
           console.log("Token expired, logging out...");
           await logout();
           return;
         }
-    
+
+        const username = await SecureStore.getItemAsync(usernameStorage);
+        const firstname = await SecureStore.getItemAsync(firstnameStorage);
+        const lastname = await SecureStore.getItemAsync(lastnameStorage);
+
+
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    
+
         setAuthState({
           token,
           authenticated: true,
+          username,
+          firstname,
+          lastname,
         });
       }
     };
 
     loadToken();
-  
+
     // Setup axios interceptor
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
         console.log("🚨 Interceptor triggered:", error.response); // Debugging
-    
-        if (error.response?.status === 401) { // Unauthorized
+
+        if (error.response?.status === 401) {
+          // Unauthorized
           console.log("🔄 Token expired, trying to refresh...");
-    
+
           try {
-            const refreshToken = await SecureStore.getItemAsync("refresh-token");
+            const refreshToken = await SecureStore.getItemAsync(
+              "refresh-token"
+            );
             console.log("🔑 Stored refreshToken:", refreshToken); // Debugging
-    
+
             if (!refreshToken) throw new Error("No refresh token");
-    
-            const res = await axios.post(`${API_URL}/refresh`, { refreshToken });
+
+            const res = await axios.post(`${API_URL}/refresh`, {
+              refreshToken,
+            });
             console.log("✅ Token refreshed:", res.data.accessToken); // Debugging
-    
+
             const newToken = res.data.accessToken;
-    
+
             await SecureStore.setItemAsync(TOKEN_KEY, newToken);
-            axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
-    
+            axios.defaults.headers.common[
+              "Authorization"
+            ] = `Bearer ${newToken}`;
+
             return axios(error.config); // Retry the original request
           } catch (refreshError) {
             console.error("❌ Failed to refresh token:", refreshError);
@@ -105,13 +135,11 @@ export const AuthProvider = ({ children }: any) => {
         return Promise.reject(error);
       }
     );
-    
-  
+
     return () => {
       axios.interceptors.response.eject(interceptor); // Clean up when component unmounts
     };
   }, []);
-  
 
   const register = async (
     role: string,
@@ -141,7 +169,7 @@ export const AuthProvider = ({ children }: any) => {
       // ตรวจสอบ error เพื่อแสดงข้อความที่เข้าใจได้ง่าย
       const errorMsg =
         err?.response?.data?.message ||
-        "An unexpected error occurred. Please try again later.";
+        "An unexpected error occurred. Please try again later."; //แก้ให้ error แสดงข้อความที่เข้าใจว่า error อะไร
       console.error("Registration Error:", errorMsg);
       return { error: true, msg: errorMsg };
     }
@@ -154,13 +182,32 @@ export const AuthProvider = ({ children }: any) => {
         password,
       });
 
+      // Fetch user profile after successful login
+      const profileResponse = await axios.get(`${API_URL}/profile`, {
+        headers: {
+          Authorization: `Bearer ${result.data.accessToken}`,
+        },
+      });
+
+      // Assuming the API returns user data in the response
+      const userProfile = profileResponse.data;
+
+      console.log("User Profile allllr:", userProfile);
+      
+
+      console.log("User Profile:", userProfile.username);
+      console.log("User Profile:", userProfile.users_firstname);
+      console.log("User Profile:", userProfile.users_lastname);
+
       console.log("📷 ~ file: AuthContext.tsx:41 ~ login ~ result:", result);
 
-      console.log(result.data.username);
 
       setAuthState({
         token: result.data.accessToken,
         authenticated: true,
+        username: userProfile.username,
+        firstname: userProfile.users_firstname,
+        lastname: userProfile.users_lastname,
       });
 
       axios.defaults.headers.common[
@@ -168,6 +215,9 @@ export const AuthProvider = ({ children }: any) => {
       ] = `Bearer ${result.data.accessToken}`;
 
       await SecureStore.setItemAsync(TOKEN_KEY, result.data.accessToken);
+      await SecureStore.setItemAsync(usernameStorage, userProfile.username);
+      await SecureStore.setItemAsync(firstnameStorage, userProfile.users_firstname);
+      await SecureStore.setItemAsync(lastnameStorage, userProfile.users_lastname);
 
       return result;
     } catch (err: any) {
@@ -192,6 +242,9 @@ export const AuthProvider = ({ children }: any) => {
   const logout = async () => {
     //Delete token from storage
     await SecureStore.deleteItemAsync(TOKEN_KEY);
+    await SecureStore.deleteItemAsync(usernameStorage);
+    await SecureStore.deleteItemAsync(firstnameStorage);
+    await SecureStore.deleteItemAsync(lastnameStorage);
 
     //Update TTP Headers
     axios.defaults.headers.common["Authorization"] = "";
@@ -200,6 +253,9 @@ export const AuthProvider = ({ children }: any) => {
     setAuthState({
       token: null,
       authenticated: false,
+      username: null,
+      firstname: null,
+      lastname: null,
     });
   };
 
@@ -212,7 +268,6 @@ export const AuthProvider = ({ children }: any) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
 
 // import { createContext, useContext, useEffect, useState } from "react";
 // import axios from "axios";
@@ -419,4 +474,3 @@ export const AuthProvider = ({ children }: any) => {
 
 //   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 // };
-

@@ -21,11 +21,13 @@ import Animated, {
   useAnimatedRef,
   useSharedValue,
 } from "react-native-reanimated";
+import * as SecureStore from "expo-secure-store";
 import ParallaxCarouselPagination from "@/components/parallax-carousel/ParallaxCarouselPagination";
 import { useNavigation } from "@react-navigation/native";
 import groupEventsByDate from "@/utils/groupEventsByDate";
 import formatDate from "@/utils/formatDate";
 import { Icon } from "react-native-elements";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface SlideshowData {
   id: string;
@@ -44,6 +46,11 @@ const Home: React.FC = () => {
   const [activityIndex, setActivityIndex] = useState(0);
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const { authState } = useAuth(); 
+  const [firstname, setFirstname] = useState<string | null>(null);
+  const [lastname, setLastname] = useState<string | null>(null);
+
 
   const [isAutoPlay, setIsAutoPlay] = useState(true); // Autoplay state
   const [scrolling, setScrolling] = useState(false); // Detect if scrolling manually
@@ -98,6 +105,26 @@ const Home: React.FC = () => {
     fetchSlideshow();
   }, []);
 
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (authState?.authenticated) {
+        // ดึงค่า username และ lastname จาก SecureStore
+
+        const storedFirstname = authState?.firstname;
+        const storedLastname = authState?.lastname;
+
+        console.log("Stored firstrname:", storedFirstname);
+        console.log("Stored lastname:", storedLastname);
+        
+
+        setFirstname(storedFirstname);
+        setLastname(storedLastname);
+      }
+    };
+
+    loadUserProfile();
+  }, [authState?.authenticated]);
+
   // Handle manual scroll detection
   const handleUserScroll = (event: any) => {
     scrollX.value = event.nativeEvent.contentOffset.x;
@@ -121,7 +148,7 @@ const Home: React.FC = () => {
   return (
     <Fragment>
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
-        <View >
+        <View>
           <View className="px-5 h-24 justify-center" style={styles.header}>
             <View className="items-center justify-between flex-row">
               <View className="flex-row items-center">
@@ -146,7 +173,7 @@ const Home: React.FC = () => {
                     ellipsizeMode="tail"
                     style={{ textTransform: "capitalize" }}
                   >
-                    {mockupUserName}
+                    {firstname} {lastname}
                   </Text>
                 </View>
               </View>
@@ -220,7 +247,9 @@ const Home: React.FC = () => {
                         {slideshow.map((item, index) => (
                           <TouchableOpacity
                             key={item.slug}
-                            onPress={() => navigateToEventDetail(item.slug)}
+                            onPress={() =>
+                              navigateToEventDetail(item.slug)
+                            }
                           >
                             <ParallaxCarouselCard
                               item={item}
@@ -286,7 +315,6 @@ const Home: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-
   header: {
     backgroundColor: "#ffffff", // พื้นหลังของ View
     ...Platform.select({

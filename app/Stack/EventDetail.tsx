@@ -13,7 +13,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
-import RootStackParamList from "@/rootStack/RootStackParamList";
+import { RootStackParamList } from "@/rootStack/RootStackParamList";
 import Constants from "expo-constants";
 import { getEvent } from "@/composables/getEvent";
 import formatDate from "@/utils/formatDate";
@@ -23,7 +23,7 @@ import WebView from "react-native-webview";
 import Popup from "@/components/PopUp";
 import CustomButton from "@/components/CustomButton";
 
-type EventDetailRouteProp = RouteProp<typeof RootStackParamList, "EventDetail">;
+type EventDetailRouteProp = RouteProp<RootStackParamList, "EventDetail">;
 
 type EventDetailProps = {
   route: EventDetailRouteProp; // Expect the `route` prop
@@ -95,6 +95,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                 className="w-full h-full rounded-lg"
                 resizeMode="contain"
               />
+              
             </View>
             <View className="p-4 px-5 pb-6 bg-grayBackground">
               <View className="mb-1">

@@ -21,9 +21,10 @@ import EventDetail from "../stack/EventDetail";
 import EventTag from "../stack/EventTag";
 import ScanQR from "../stack/Scanner/ScanQR";
 import Review from "../stack/Review";
-import RootStackParamList from "@/rootStack/RootStackParamList";
+import { RootStackParamList } from "@/rootStack/RootStackParamList";
 import CustomTabBarButton from "@/components/CustomTabBarButton";
 import Ticket from "./ticket";
+import TicketDetail from "@/app/stack/TicketDetail";
 import { StatusBar } from "expo-status-bar";
 
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
@@ -167,7 +168,7 @@ const TabNav = () => {
   );
 };
 
-const Stack = createStackNavigator<typeof RootStackParamList>();
+const Stack = createStackNavigator<RootStackParamList>();
 
 const StackHomeNavigator = () => {
   return (
@@ -236,6 +237,16 @@ const StackTicketNavigation = () => {
       <Stack.Screen
         name="ReviewScreen"
         component={Review}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TicketDetail"
+        component={TicketDetail}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EventDetail"
+        component={EventDetail}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

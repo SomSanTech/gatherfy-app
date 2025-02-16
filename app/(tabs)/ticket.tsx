@@ -5,15 +5,16 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useFetchTicketWithAuth } from "@/composables/useFetchTicket";
 import { Colors } from "@/constants/Colors";
 import TicketCard from "@/components/TicketCard";
-import CustomBottomSheet from "@/components/CustomBottomSheet";
 import formatDate from "@/utils/formatDate";
 
 interface Ticket {
+  registrationId: number;
   eventId: number;
   name: string;
   start_date: string;
   end_date: string;
   image: string;
+  slug: string;
   location: string;
 }
 
