@@ -67,11 +67,6 @@ export const AuthProvider = ({ children }: any) => {
           return;
         }
 
-        const username = await SecureStore.getItemAsync(usernameStorage);
-        const firstname = await SecureStore.getItemAsync(firstnameStorage);
-        const lastname = await SecureStore.getItemAsync(lastnameStorage);
-        const email = await SecureStore.getItemAsync(emailStorage);
-
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         setAuthState({
@@ -84,27 +79,75 @@ export const AuthProvider = ({ children }: any) => {
     loadToken();
 
     // Setup axios interceptor
+    // const interceptor = axios.interceptors.response.use(
+    //   (response) => response,
+    //   async (error) => {
+    //     console.log("🚨 Interceptor triggered:", error.response); // Debugging
+
+    //     if (error.response?.status === 401) {
+    //       // Unauthorized
+    //       console.log("🔄 Token expired, trying to refresh...");
+
+    //       try {
+    //         const refreshToken = await SecureStore.getItemAsync(
+    //           "refresh-token"
+    //         );
+    //         console.log("🔑 Stored refreshToken:", refreshToken); // Debugging
+
+    //         if (!refreshToken) throw new Error("No refresh token");
+
+    //         const res = await axios.post(`${API_URL}/api/v1/refresh`, {
+    //           refreshToken,
+    //         });
+    //         console.log("✅ Token refreshed:", res.data.accessToken); // Debugging
+
+    //         const newToken = res.data.accessToken;
+
+    //         await SecureStore.setItemAsync(TOKEN_KEY, newToken);
+    //         axios.defaults.headers.common[
+    //           "Authorization"
+    //         ] = `Bearer ${newToken}`;
+
+    //         return axios(error.config); // Retry the original request
+    //       } catch (refreshError) {
+    //         console.error("❌ Failed to refresh token:", refreshError);
+    //         logout();
+    //       }
+    //     }
+    //     return Promise.reject(error);
+    //   }
+    // );
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
-        console.log("🚨 Interceptor triggered:", error.response); // Debugging
+        console.log("🚨 Interceptor triggered:", error.response);
+
+        const originalRequest = error.config;
+
+        // ถ้า request เป็น /login หรือ /refresh → ไม่ต้องพยายาม refresh token
+        if (
+          originalRequest.url?.includes("/login") ||
+          originalRequest.url?.includes("/refresh")
+        ) {
+          console.log(
+            "⚠️ Login or Refresh request failed, skipping refresh token."
+          );
+          return Promise.reject(error);
+        }
 
         if (error.response?.status === 401) {
-          // Unauthorized
           console.log("🔄 Token expired, trying to refresh...");
 
           try {
             const refreshToken = await SecureStore.getItemAsync(
               "refresh-token"
             );
-            console.log("🔑 Stored refreshToken:", refreshToken); // Debugging
 
             if (!refreshToken) throw new Error("No refresh token");
 
             const res = await axios.post(`${API_URL}/api/v1/refresh`, {
               refreshToken,
             });
-            console.log("✅ Token refreshed:", res.data.accessToken); // Debugging
 
             const newToken = res.data.accessToken;
 
@@ -113,7 +156,7 @@ export const AuthProvider = ({ children }: any) => {
               "Authorization"
             ] = `Bearer ${newToken}`;
 
-            return axios(error.config); // Retry the original request
+            return axios(originalRequest);
           } catch (refreshError) {
             console.error("❌ Failed to refresh token:", refreshError);
             logout();
@@ -179,8 +222,6 @@ export const AuthProvider = ({ children }: any) => {
       // Assuming the API returns user data in the response
       const userProfile = profileResponse.data;
 
-      console.log("📷 ~ file: AuthContext.tsx:41 ~ login ~ result:", result);
-
       setAuthState({
         token: result.data.accessToken,
         authenticated: true,
@@ -208,7 +249,7 @@ export const AuthProvider = ({ children }: any) => {
       let errorMsg = "An unknown error occurred";
 
       if (status === 401) {
-        errorMsg = "Please check your email or your password.";
+        errorMsg = "Your email or your password was incorrect.";
       } else if (status === 400) {
         errorMsg = "Bad request. Please check the input.";
       } else if (status === 500) {

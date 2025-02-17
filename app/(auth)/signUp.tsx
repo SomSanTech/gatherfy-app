@@ -12,14 +12,12 @@ import {
   Keyboard,
   Modal,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import Icon from "react-native-vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
 import CustomButton from "@/components/CustomButton";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { useHandleLogin } from "@/composables/useHandleLogin";
 import { useAuth } from "@/app/context/AuthContext";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { genderOptions } from "@/utils/genderOptions";
@@ -33,7 +31,6 @@ import { backToIndex } from "@/composables/backToIndex";
 import { ActivityIndicator } from "react-native-paper";
 
 const SignUp = () => {
-  const navigation = useNavigation();
   const firstnameRef = useRef<TextInput>(null);
   const lastnameRef = useRef<TextInput>(null);
   const emailRef = useRef<TextInput>(null);
@@ -41,7 +38,6 @@ const SignUp = () => {
   const passwordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
   const [open, setOpen] = useState(false);
-  const handleLogin = useHandleLogin();
   const [userRole, setUserRole] = useState("Attendee");
   const [username, setUsername] = useState("");
   const [firstname, setFirstname] = useState("");
@@ -51,44 +47,131 @@ const SignUp = () => {
   const [dateOfBirth, setDateOfBirth] = useState<string | undefined>(undefined); // เริ่มต้นเป็น undefined
   const [userGender, setUserGender] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPasswordErrors, setConfirmPasswordErrors] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreated, setIsCreated] = useState(false);
 
-  const { onRegister , onLogin} = useAuth();
+  const { onRegister, onLogin } = useAuth();
 
   const handleOpenDatePicker = () => {
     setOpen(!open);
   };
 
-  const onSignUpPress = async () => {
-    if (dateOfBirth) {
-      setIsLoading(true);
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+  const validatePassword = (password: string) => {
+    const errors: string[] = [];
 
-      const result = await onRegister!(
-        userRole,
-        username,
-        firstname,
-        lastname,
-        email,
-        phone,
-        dateOfBirth,
-        userGender,
-        password
+    if (password.length < 8) {
+      errors.push("Password must be at least 8 characters.");
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push("Must include at least one uppercase letter (A–Z).");
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push("Must include at least one lowercase letter (a–z).");
+    }
+    if (!/\d/.test(password)) {
+      errors.push("Must include at least one number (0–9).");
+    }
+    if (!/[@#$%^&+=!]/.test(password)) {
+      errors.push(
+        "Must include at least one special character (@, #, $, %, &, +, =, etc.)."
       );
+    }
 
-      if (result.error) {
-        setIsLoading(false);
-        setErrorMsg(result.msg); // แสดงข้อความ error ถ้ามี
-      } else {
-        setIsLoading(false);
-        alert("Create Account Success")
-        setIsCreated(true); 
-        onLogin!(username,password)
-      }
+    return errors;
+  };
+
+  const validateConfirmPassword = (confirmPassword: string) => {
+    let errors = "";
+    if (password !== confirmPassword) {
+      errors = "Password and confirm password do not match.";
+    }
+    return errors;
+  };
+
+  const validateFields = () => {
+    if (
+      !username ||
+      !firstname ||
+      !lastname ||
+      !email ||
+      !phone ||
+      !dateOfBirth ||
+      !userGender ||
+      !password ||
+      !confirmPassword
+    ) {
+      alert("Please fill in all the fields.");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      alert("Password and confirm password do not match.");
+      return false;
+    }
+    return true;
+  };
+
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    setPasswordErrors(validatePassword(text)); // ตรวจสอบข้อผิดพลาดของรหัสผ่าน
+  };
+
+  const handleConfirmPasswordChange = (text: string) => {
+    setConfirmPassword(text);
+    setConfirmPasswordErrors(validateConfirmPassword(text)); // ตรวจสอบข้อผิดพลาดของรหัสผ่าน
+  };
+
+  const onSignUpPress = async () => {
+    setIsLoading(true);
+    if (!validateFields()) {
+      return;
+    }
+
+    const passwordValidationErrors = validatePassword(password);
+    const confirmPasswordValidationErrors =
+      validateConfirmPassword(confirmPassword);
+
+    if (passwordValidationErrors.length > 0) {
+      alert(passwordValidationErrors.join("\n")); // แจ้งเตือนข้อผิดพลาดที่ไม่ผ่าน
+      return;
+    }
+
+    if (confirmPasswordValidationErrors !== "") {
+      alert(confirmPasswordValidationErrors); // แจ้งเตือนข้อผิดพลาดที่ไม่ผ่าน
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      alert("Invalid email format. Please enter a valid email.");
+      return;
+    }
+
+    const result = await onRegister!(
+      userRole,
+      username,
+      firstname,
+      lastname,
+      email,
+      phone,
+      dateOfBirth,
+      userGender,
+      password
+    );
+
+    if (result.error) {
+      setIsLoading(false);
+      setErrorMsg(result.msg); // แสดงข้อความ error ถ้ามี
     } else {
-      alert("date of birth empty");
+      setIsLoading(false);
+      alert("Create Account Success");
+      setIsCreated(true);
     }
   };
 
@@ -211,8 +294,8 @@ const SignUp = () => {
                       textAlignVertical="center" // จัดให้อยู่ตรงกลางแนวตั้ง
                     />
                   </View>
-                  <View className="flex-row">
-                    <View className="w-60">
+                  <View className="flex flex-row space-x-2">
+                    <View className="flex-1">
                       <Text style={styles.topicField} className="text-sm">
                         Phone
                       </Text>
@@ -221,7 +304,7 @@ const SignUp = () => {
                         style={styles.inputField}
                         value={phone}
                         onChangeText={setPhone}
-                        className="w-100 mr-2 p-4 bg-gray-100 text-gray-800 rounded-xl text-sm"
+                        className=" p-4 bg-gray-100 text-gray-800 rounded-xl text-sm"
                         placeholder="Enter your phone number"
                         returnKeyType="next"
                         keyboardType="phone-pad"
@@ -311,9 +394,16 @@ const SignUp = () => {
                     <TextInput
                       ref={passwordRef}
                       className="p-4 pr-10 bg-gray-100 text-gray-800 rounded-xl"
-                      style={styles.inputField}
+                      style={[
+                        styles.inputField,
+                        {
+                          borderBottomWidth: password.length > 0 ? 1 : 0,
+                          borderColor:
+                            passwordErrors.length > 0 ? "red" : "green",
+                        },
+                      ]}
                       value={password}
-                      onChangeText={setPassword}
+                      onChangeText={handlePasswordChange}
                       secureTextEntry={true}
                       placeholder="Enter Your password"
                       textContentType="newPassword" // บอก iOS ว่าเป็นรหัสผ่านใหม่
@@ -325,15 +415,27 @@ const SignUp = () => {
                         confirmPasswordRef.current?.focus()
                       }
                     />
+                    {passwordErrors.map((error, index) => (
+                      <Text key={index} style={{ color: "red" }}>
+                        {error}
+                      </Text>
+                    ))}
                   </View>
                   <View className="mb-3">
                     <Text style={styles.topicField}>Confirm Password</Text>
                     <TextInput
                       ref={confirmPasswordRef}
                       className="p-4 pr-10 bg-gray-100 text-gray-800 rounded-xl"
-                      style={styles.inputField}
+                      style={[
+                        styles.inputField,
+                        {
+                          borderBottomWidth: confirmPassword.length > 0 ? 1 : 0,
+                          borderColor:
+                            confirmPasswordErrors.length > 0 ? "red" : "green",
+                        },
+                      ]}
                       value={confirmPassword}
-                      onChangeText={setConfirmPassword}
+                      onChangeText={handleConfirmPasswordChange}
                       secureTextEntry={true}
                       placeholder="Confirm your password"
                       multiline={false} // ป้องกันการพิมพ์หลายบรรทัด
@@ -352,9 +454,18 @@ const SignUp = () => {
                       classNameTextStyle="font-Poppins-Bold text-lg text-center text-white"
                       IconComponent={
                         isLoading ? (
-                          <ActivityIndicator size="small" color="white" className="mr-5" />
+                          <ActivityIndicator
+                            size="small"
+                            color="white"
+                            className="mr-5"
+                          />
                         ) : isCreated ? (
-                          <Icon name="checkmark-circle" size={20} color="white" style={{ marginRight: 20 }} />
+                          <Icon
+                            name="checkmark-circle"
+                            size={20}
+                            color="white"
+                            style={{ marginRight: 20 }}
+                          />
                         ) : null
                       }
                     />
@@ -393,7 +504,7 @@ const styles = StyleSheet.create({
   inputField: {
     fontSize: wp("3.1%"), // ขนาด font เป็น 4% ของหน้าจอ
     fontFamily: "Poppins-Regular",
-    includeFontPadding: false,
+    includeFontPadding: false, 
   },
   datePickerButton: {
     padding: 14,

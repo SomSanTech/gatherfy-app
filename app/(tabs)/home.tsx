@@ -29,6 +29,7 @@ import formatDate from "@/utils/formatDate";
 import { Icon } from "react-native-elements";
 import { useAuth } from "@/app/context/AuthContext";
 import { fetchUserProfile } from "@/composables/useFetchUserProfile";
+import DefaultProfile from "@/assets/images/default-profile.svg";
 
 interface SlideshowData {
   id: string;
@@ -166,7 +167,7 @@ const Home: React.FC = () => {
             >
               <Text className="text-primary">Ga</Text>therfy
             </Text> */}
-              <View className="flex-row items-center gap-x-6">
+              <View className="flex-row items-center gap-x-4">
                 <TouchableOpacity className="w-12">
                   <Icon
                     name="ticket-outline"
@@ -178,15 +179,17 @@ const Home: React.FC = () => {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={handleNavigateToProfile}>
-                  <Image
-                    source={
-                      userInfo.users_image
-                        ? { uri: userInfo.users_image }
-                        : require("@/assets/images/default-profile.svg") // ใส่รูป default ถ้าไม่มีรูปผู้ใช้
-                    }
-                    className="w-12 h-12 object-bottom rounded-full"
-                    resizeMode="cover"
-                  />
+                  {userInfo.users_image ? (
+                    <Image
+                      source={{ uri: userInfo.users_image }}
+                      className="w-12 h-12 object-bottom rounded-full"
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <DefaultProfile
+                      className="w-12 h-12 object-bottom rounded-full"
+                    />
+                  )}
                 </TouchableOpacity>
               </View>
             </View>

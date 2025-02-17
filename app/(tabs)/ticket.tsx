@@ -57,9 +57,10 @@ const Ticket = () => {
       setError(null);
     } catch (err) {
       setError("Failed to fetch tickets.");
+    } finally {
+      setIsLoading(false);
+      setRefreshing(false);
     }
-    setIsLoading(false);
-    setRefreshing(false);
   };
 
   useEffect(() => {
@@ -67,10 +68,10 @@ const Ticket = () => {
   }, [authState?.token]);
 
   const onRefresh = useCallback(() => {
+    if (isLoading) return; // Prevent refresh if already loading
     setRefreshing(true);
     fetchTickets();
-    console.log("asdas", reviewedTickets);
-  }, []);
+  }, [isLoading]);
 
   return (
     <Fragment>
@@ -84,8 +85,6 @@ const Ticket = () => {
             </View>
           ) : error ? (
             <Text style={styles.error}>{error}</Text>
-          ) : tickets.length === 0 ? (
-            <Text style={styles.noTickets}>No tickets available.</Text>
           ) : (
             <FlatList
               data={tickets}
@@ -95,7 +94,8 @@ const Ticket = () => {
               )}
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingTop: 10, paddingBottom: 30 }}
+              contentContainerStyle={{ paddingTop: 5, paddingBottom: 30 }}
+              ListEmptyComponent={<Text style={styles.noTickets}>No tickets available.</Text>}
               refreshControl={
                 <RefreshControl
                   refreshing={refreshing}
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontFamily: "Poppins-Bold",
-    marginBottom: 5,
+    marginBottom: 4,
     textAlign: "center",
   },
   error: {

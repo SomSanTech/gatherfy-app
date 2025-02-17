@@ -12,7 +12,6 @@ export const useFetchTicketWithAuth = async (
   url: string,
   method: string,
   token: any,
-  body?: object
 ) => {
   try {
     if (!API_BASE_URL) {
@@ -28,7 +27,6 @@ export const useFetchTicketWithAuth = async (
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: body ? JSON.stringify(body) : undefined,
     });
     if (!response.ok) {
       console.error(`Error: ${response.status} - ${response.statusText}`);

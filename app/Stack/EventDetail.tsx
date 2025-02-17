@@ -1,34 +1,23 @@
-import React, { Fragment, useEffect, useRef, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Platform,
-  Image,
-  TextInput,
-  StyleSheet,
-} from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import React, { Fragment, useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp, useNavigation } from "@react-navigation/native";
-import { ScrollView } from "react-native-gesture-handler";
-import { RootStackParamList } from "@/rootStack/RootStackParamList";
-import Constants from "expo-constants";
-import { getEvent } from "@/composables/getEvent";
-import formatDate from "@/utils/formatDate";
-import RegisterForm from "@/components/RegisterForm";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/Ionicons";
 import WebView from "react-native-webview";
 import Popup from "@/components/PopUp";
 import CustomButton from "@/components/CustomButton";
 import * as SecureStore from "expo-secure-store";
 import { fetchUserProfile } from "@/composables/useFetchUserProfile";
+import { useFetchTicketWithAuth } from "@/composables/useFetchTicket";
+import { getEvent } from "@/composables/getEvent";
+import formatDate from "@/utils/formatDate";
+import { RootStackParamList } from "@/rootStack/RootStackParamList";
 
 type EventDetailRouteProp = RouteProp<RootStackParamList, "EventDetail">;
 
 type EventDetailProps = {
-  route: EventDetailRouteProp; // Expect the `route` prop
+  route: EventDetailRouteProp;
 };
 
 interface EventDetail {
@@ -53,7 +42,9 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const [eventDetail, setEventDetail] = useState<EventDetail>(
     {} as EventDetail
   );
+  const [isRegistered, setIsRegistered] = useState<boolean>(false);
   const [usersInfo, setUsersInfo] = useState<any>([]);
+  const [confirmRegister, setConfirmRegister] = useState<boolean>(false);
 
   const fetchDataDetailAsync = async () => {
     const response = await getEvent("detail", undefined, slug);
@@ -67,9 +58,23 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   };
 
   useEffect(() => {
+    setConfirmRegister(false);
+    console.log("confirmRegister", confirmRegister);
+    
+    const fetchRegistration = async () => {
+      const token = await SecureStore.getItemAsync("my-jwt");
+      const response = await useFetchTicketWithAuth("v1/tickets", "GET", token);
+      setIsRegistered(
+        response.some(
+          (ticket: { slug : string }) =>
+            ticket.slug === eventDetail.slug
+        )
+      );
+    };
+    fetchRegistration();
     fetchDataDetailAsync();
     getUsersInfo();
-  }, []);
+  }, [eventDetail.slug , confirmRegister]);
 
   const startDate = eventDetail.start_date
     ? formatDate(eventDetail.start_date, true, true, true).date
@@ -88,172 +93,251 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     <Fragment>
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()} className="">
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Icon name="arrow-back" size={24} color="#000000" />
           </TouchableOpacity>
-          <Text className="text-xl ml-2 font-Poppins-Bold">Event Detail</Text>
+          <Text style={styles.headerText}>Event Detail</Text>
         </View>
         <KeyboardAwareScrollView>
-          <View className="w-full mb-5">
-            <View className="w-full h-72">
-              <Image
-                source={{ uri: eventDetail.image }}
-                className="w-full h-full rounded-lg"
-                resizeMode="contain"
-              />
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: eventDetail.image }}
+              style={styles.image}
+              resizeMode="contain"
+            />
+          </View>
+          <View style={styles.detailContainer}>
+            <View style={styles.tagsContainer}>
+              {eventDetail.tags?.length > 0 && (
+                <Text style={styles.tagsText}>
+                  {eventDetail.tags.map((tag) => tag.tag_title).join(", ")}
+                </Text>
+              )}
             </View>
-            <View className="p-4 px-5 pb-6 bg-grayBackground">
-              <View className="mb-1">
-                {eventDetail.tags?.length > 0 && (
-                  <Text className="font-Poppins-Light">
-                    {eventDetail.tags.map((tag) => tag.tag_title).join(", ")}
-                  </Text>
+            <Text style={styles.eventName}>{eventDetail.name}</Text>
+            <View style={styles.dateContainer}>
+              <Icon name="calendar-outline" size={20} color="#000000" />
+              <Text style={styles.dateText}>
+                {startDate}{" "}
+                {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
+                  <Text>- {endDate}</Text>
+                ) : (
+                  <Text>No end date</Text>
                 )}
-              </View>
-              <Text className="text-2xl mb-3 font-Poppins-Bold">
-                {eventDetail.name}
               </Text>
-              <View className="mb-2 flex-row">
-                <Icon name="calendar-outline" size={20} color="#000000" />
-                <Text className="ml-2 font-Poppins-Regular">
-                  {startDate}{" "}
-                  {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
-                    <Text>- {endDate}</Text>
-                  ) : (
-                    <Text className="font-Poppins-Regular">No end date</Text>
-                  )}
-                </Text>
-              </View>
-              <View className="mb-2 flex-row">
-                <Icon name="time-outline" size={20} color="#000000" />
-                <Text className="ml-2 font-Poppins-Regular">
-                  {startTime} - {endTime}
-                </Text>
-              </View>
-              <View className="mb-2 flex-row">
-                <Icon name="map-outline" size={20} color="#000000" />
-                <Text className="ml-2 font-Poppins-Regular items-center">
-                  {eventDetail.location}
-                </Text>
-              </View>
-              <View className="mt-3 mb-2">
+            </View>
+            <View style={styles.timeContainer}>
+              <Icon name="time-outline" size={20} color="#000000" />
+              <Text style={styles.timeText}>
+                {startTime} - {endTime}
+              </Text>
+            </View>
+            <View style={styles.locationContainer}>
+              <Icon name="map-outline" size={20} color="#000000" />
+              <Text style={styles.locationText}>{eventDetail.location}</Text>
+            </View>
+            <View style={styles.registerButtonContainer}>
+              {isRegistered ? (
+                <CustomButton
+                  title="Already Registered"
+                  containerStyles={styles.registerButtonDisabled}
+                  textStyle={styles.registerButtonTextDisabled}
+                  handlePress={() => {}}
+                  disabled={true}
+                />
+              ) : (
                 <CustomButton
                   title="Register event"
-                  containerStyles={styles.button}
-                  textStyle={styles.buttonText}
+                  containerStyles={styles.registerButton}
+                  textStyle={styles.registerButtonText}
                   handlePress={() => setPopupVisible(true)}
                 />
-              </View>
-            </View>
-            <View className="px-5 py-3 mt-3">
-              <Text className="text-lg font-semibold mb-2 font-Poppins-SemiBold">
-                Description
-              </Text>
-              <Text className="leading-5 font-Poppins-Regular">
-                {eventDetail.detail}
-              </Text>
-            </View>
-            <View className="px-2 m-3 py-5 pt-2 rounded-xl">
-              <Text className="text-lg font-Poppins-SemiBold mb-3">
-                Event Location
-              </Text>
-              <WebView
-                scalesPageToFit={true}
-                bounces={false}
-                javaScriptEnabled
-                style={{
-                  height: 400,
-                  width: "100%",
-                  backgroundColor: "transparent",
-                }}
-                automaticallyAdjustContentInsets={false}
-                source={{
-                  html: eventDetail.map
-                    ? `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <style>
-                  html, body {
-                    margin: 0;
-                    padding: 0;
-                    width: 100%;
-                    height: 100%;
-                  }
-                  iframe {
-                    border: 0;
-                    border-radius: 50px;
-                    width: 100%;
-                    height: 100%;
-                  }
-                </style>
-              </head>
-              <body>
-                ${eventDetail.map}
-              </body>
-            </html>
-          `
-                    : `<html><body><p style="text-align:center;">No map available</p></body></html>`,
-                }}
-              />
-            </View>
-            <View className="p-5 m-4 mt-2 border rounded-2xl">
-              <Text className="text-sm text-center font-Poppins-Light">
-                Organized by
-              </Text>
-              <Text className="text-lg text-center font-Poppins-SemiBold">
-                {" "}
-                {eventDetail.owner}
-              </Text>
+              )}
             </View>
           </View>
-          <View style={styles.popupcontainer}>
-            <Popup
-              visible={isPopupVisible}
-              onClose={() => setPopupVisible(false)}
-              title="Registration"
-              eventName={eventDetail.name}
-              eventLocation={eventDetail.location}
-              startDate={startDate}
-              endDate={endDate}
-              startTime={startTime}
-              endTime={endTime}
-              eventId={eventDetail.eventId}
-              user={usersInfo}
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.descriptionTitle}>Description</Text>
+            <Text style={styles.descriptionText}>{eventDetail.detail}</Text>
+          </View>
+          <View style={styles.mapContainer}>
+            <Text style={styles.mapTitle}>Event Location</Text>
+            <WebView
+              scalesPageToFit={true}
+              bounces={false}
+              javaScriptEnabled
+              style={styles.map}
+              automaticallyAdjustContentInsets={false}
+              source={{
+                html: eventDetail.map
+                  ? `
+                  <html>
+                    <body>
+                      ${eventDetail.map}
+                    </body>
+                  </html>`
+                  : `<html><body><p>No map available</p></body></html>`,
+              }}
             />
+          </View>
+          <View style={styles.organizerContainer}>
+            <Text style={styles.organizerText}>Organized by</Text>
+            <Text style={styles.organizerName}>{eventDetail.owner}</Text>
           </View>
         </KeyboardAwareScrollView>
       </SafeAreaView>
+      <Popup
+        visible={isPopupVisible}
+        onClose={() => setPopupVisible(false)}
+        title="Registration"
+        eventName={eventDetail.name}
+        eventLocation={eventDetail.location}
+        startDate={startDate}
+        endDate={endDate}
+        startTime={startTime}
+        endTime={endTime}
+        eventId={eventDetail.eventId}
+        user={usersInfo}
+        setConfirmRegister={setConfirmRegister}
+      />
     </Fragment>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
-    backgroundColor: "#D71515",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontFamily: "Poppins-SemiBold",
-  },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
-    shadowColor: "#000", // สีของเงา
-    shadowOffset: { width: 0, height: 8 }, // เงาเฉพาะด้านล่าง
-    shadowOpacity: 0.1, // ความโปร่งแสงของเงา
-    shadowRadius: 5, // ความเบลอของเงา
-    elevation: 2, // สำหรับ Android
-    backgroundColor: "#ffffff", // พื้นหลังของ View
+    backgroundColor: "#ffffff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
   },
-  popupcontainer: {
-    flex: 1,
-    justifyContent: "center",
+  headerText: {
+    fontSize: 18,
+    fontFamily: "Poppins-Bold",
+    marginLeft: 10,
+  },
+  imageContainer: {
+    width: "100%",
+    height: 220,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+  },
+  detailContainer: {
+    padding: 15,
+    backgroundColor: "#f5f5f5",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  tagsContainer: {
+    marginBottom: 5,
+  },
+  tagsText: {
+    fontSize: 14,
+    fontFamily: "Poppins-Regular",
+    color: "#777777",
+  },
+  eventName: {
+    fontSize: 24,
+    fontFamily: "Poppins-Bold",
+    marginBottom: 15,
+  },
+  dateContainer: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  dateText: {
+    fontSize: 16,
+    fontFamily: "Poppins-Regular",
+    marginLeft: 10,
+  },
+  timeContainer: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  timeText: {
+    fontSize: 16,
+    fontFamily: "Poppins-Regular",
+    marginLeft: 10,
+  },
+  locationContainer: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+  locationText: {
+    fontSize: 16,
+    fontFamily: "Poppins-Regular",
+    marginLeft: 10,
+  },
+  registerButtonContainer: {
+    marginBottom: 15,
+  },
+  registerButton: {
+    backgroundColor: "#D71515",
+    paddingVertical: 12,
+    borderRadius: 5,
     alignItems: "center",
+  },
+  registerButtonText: {
+    color: "#FFFFFF",
+    fontFamily: "Poppins-SemiBold",
+  },
+  registerButtonDisabled: {
+    backgroundColor: "#CCCCCC",
+    paddingVertical: 12,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  registerButtonTextDisabled: {
+    color: "#FFFFFF",
+    fontFamily: "Poppins-SemiBold",
+  },
+  descriptionContainer: {
+    paddingHorizontal: 15,
+  },
+  descriptionTitle: {
+    fontSize: 18,
+    fontFamily: "Poppins-SemiBold",
+    marginBottom: 5,
+  },
+  descriptionText: {
+    fontSize: 16,
+    fontFamily: "Poppins-Regular",
+    lineHeight: 24,
+  },
+  mapContainer: {
+    marginTop: 20,
+    paddingHorizontal: 15,
+  },
+  mapTitle: {
+    fontSize: 18,
+    fontFamily: "Poppins-SemiBold",
+    marginBottom: 10,
+  },
+  map: {
+    height: 300,
+    width: "100%",
+    backgroundColor: "#f5f5f5",
+  },
+  organizerContainer: {
+    paddingHorizontal: 15,
+    marginTop: 20,
+  },
+  organizerText: {
+    fontSize: 14,
+    fontFamily: "Poppins-Light",
+    textAlign: "center",
+  },
+  organizerName: {
+    fontSize: 20,
+    fontFamily: "Poppins-SemiBold",
+    textAlign: "center",
   },
 });
 

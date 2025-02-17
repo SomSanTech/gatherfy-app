@@ -32,6 +32,7 @@ type PopupProps = {
     users_email: string;
     password: string;
   };
+  setConfirmRegister: (value: boolean) => void;
 };
 
 const Popup: React.FC<PopupProps> = ({
@@ -46,6 +47,7 @@ const Popup: React.FC<PopupProps> = ({
   endTime,
   user,
   eventId,
+  setConfirmRegister,
 }) => {
   const [password, setPassword] = useState<string>(""); // State สำหรับเก็บ password
   const [isPasswordValid, setIsPasswordValid] = useState<boolean>(true); // State สำหรับตรวจสอบ password
@@ -77,6 +79,7 @@ const Popup: React.FC<PopupProps> = ({
   };
 
   const handleSubmit = async () => {
+    setConfirmRegister(true);
     // สร้างค่าที่ต้องการในออบเจกต์ชั่วคราว
     const registrationBody = {
       eventId: eventId,
@@ -168,41 +171,6 @@ const Popup: React.FC<PopupProps> = ({
                     </Text>
                   </View>
                 )}
-                <View className="mt-5">
-                  <Text className="font-Poppins-Bold text-lg">
-                    To confirm, Enter Your Password
-                  </Text>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      placeholder="Password"
-                      value={password}
-                      onChangeText={setPassword}
-                      secureTextEntry={!isPasswordVisible}
-                      style={styles.inputPassword}
-                      numberOfLines={2}
-                      maxLength={30}
-                    />
-                    {/* ปุ่ม Show/Hide Password */}
-                    <TouchableOpacity
-                      onPress={togglePasswordVisibility}
-                      style={styles.eyeIcon}
-                    >
-                      <Icon
-                        name={isPasswordVisible ? "eye-off" : "eye"}
-                        size={24}
-                        color="#000"
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  {!isPasswordValid ? (
-                    <Text style={{ color: "red", marginTop: 5 }}>
-                      {" "}
-                      {errorText}{" "}
-                    </Text>
-                  ) : (
-                    ""
-                  )}
-                </View>
               </View>
 
               <TouchableHighlight

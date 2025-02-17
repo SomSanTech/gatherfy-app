@@ -15,6 +15,7 @@ import { useCameraPermissions } from "expo-camera";
 import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "expo-router";
 import { fetchUserProfile } from "@/composables/useFetchUserProfile";
+import DefaultProfile from "@/assets/images/default-profile.svg";
 import * as SecureStore from "expo-secure-store";
 
 const Profile = () => {
@@ -48,15 +49,15 @@ const Profile = () => {
     <Fragment>
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <View style={styles.container}>
-          <Image
-            source={
-              userInfo.users_image
-                ? { uri: userInfo.users_image }
-                : require("@/assets/images/default-profile.svg") // ใส่รูป default ถ้าไม่มีรูปผู้ใช้
-            }
-            className="w-52 h-52 rounded-full mx-auto mt-10"
-            resizeMode="cover"
-          />
+          {userInfo.users_image ? (
+            <Image
+              source={{ uri: userInfo.users_image }}
+              className="w-52 h-52 rounded-full mx-auto mt-10"
+              resizeMode="cover"
+            />
+          ) : (
+            <DefaultProfile className="w-52 h-52 rounded-full mx-auto mt-10" />
+          )}
           <Text className="text-center mt-8 font-Poppins-Regular text-2xl">
             {userInfo.username}
           </Text>

@@ -31,20 +31,20 @@ const SignIn = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const passwordRef = useRef<TextInput>(null);
 
   const { onLogin } = useAuth();
 
   const onSignInPress = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     const result = await onLogin!(username, password);
 
     if (result.error) {
       setIsLoading(false);
-      setErrorMsg(result.msg);
+      alert(result.msg);
     } else {
       setIsLoading(false);
     }
@@ -104,6 +104,7 @@ const SignIn = () => {
                       placeholder="Enter username"
                       returnKeyType="next"
                       onSubmitEditing={() => passwordRef.current?.focus()}
+                      numberOfLines={1}
                     />
                   </View>
                   <View>
@@ -112,12 +113,23 @@ const SignIn = () => {
                       ref={passwordRef}
                       value={password}
                       onChangeText={setPassword}
-                      className="p-4 bg-gray-100 text-gray-800 rounded-xl"
+                      className="p-4 pr-12 bg-gray-100 text-gray-800 rounded-xl"
                       style={styles.inputField}
-                      secureTextEntry={true}
+                      secureTextEntry={!isPasswordVisible}
                       placeholder="Enter your password"
                       returnKeyType="done"
+                      numberOfLines={1}
                     />
+                    <TouchableOpacity
+                      onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                      className="absolute right-5 top-[59%]"
+                    >
+                      <Icon
+                        name={isPasswordVisible ? "eye-off" : "eye"}
+                        size={20}
+                        color="gray"
+                      />
+                    </TouchableOpacity>
                   </View>
                   <TouchableOpacity className="flex items-end mb-5">
                     <Text className="text-gray-600 font-Poppins-Light">
