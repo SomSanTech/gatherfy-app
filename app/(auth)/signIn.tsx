@@ -40,7 +40,7 @@ const SignIn = () => {
 
   const onSignInPress = async () => {
     setIsLoading(true);
-    const result = await onLogin!(username, password);
+    const result = await onLogin!(username.trim(), password);
 
     if (result.error) {
       setIsLoading(false);

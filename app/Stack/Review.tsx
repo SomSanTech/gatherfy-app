@@ -216,8 +216,9 @@ const Review: React.FC<ReviewProps> = ({ route }) => {
                       <TextInput
                         className="border p-4 mt-3 rounded-lg"
                         style={styles.inputField}
-                        onChangeText={(text) => handleAnswerChange(index, text)}
+                        onChangeText={(text) => handleAnswerChange(index, text.trim())}
                         value={(answers[index] as string) || ""}
+                        multiline={true}
                         placeholder="Write your answer here..."
                       />
                     </View>

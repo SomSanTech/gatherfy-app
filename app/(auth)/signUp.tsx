@@ -53,6 +53,8 @@ const SignUp = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreated, setIsCreated] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
 
   const { onRegister, onLogin } = useAuth();
 
@@ -154,15 +156,15 @@ const SignUp = () => {
     }
 
     const result = await onRegister!(
-      userRole,
-      username,
-      firstname,
-      lastname,
-      email,
-      phone,
+      userRole.trim(),
+      username.trim(),
+      firstname.trim(),
+      lastname.trim(),
+      email.trim(),
+      phone.trim(),
       dateOfBirth,
       userGender,
-      password
+      password.trim()
     );
 
     if (result.error) {
@@ -391,58 +393,91 @@ const SignUp = () => {
                   </View>
                   <View>
                     <Text style={styles.topicField}>Password</Text>
-                    <TextInput
-                      ref={passwordRef}
-                      className="p-4 pr-10 bg-gray-100 text-gray-800 rounded-xl"
-                      style={[
-                        styles.inputField,
-                        {
-                          borderBottomWidth: password.length > 0 ? 1 : 0,
-                          borderColor:
-                            passwordErrors.length > 0 ? "red" : "green",
-                        },
-                      ]}
-                      value={password}
-                      onChangeText={handlePasswordChange}
-                      secureTextEntry={true}
-                      placeholder="Enter Your password"
-                      textContentType="newPassword" // บอก iOS ว่าเป็นรหัสผ่านใหม่
-                      returnKeyType="next"
-                      multiline={false} // ป้องกันการพิมพ์หลายบรรทัด
-                      numberOfLines={1} // กำหนดให้มีเพียง 1 บรรทัด
-                      textAlignVertical="center" // จัดให้อยู่ตรงกลางแนวตั้ง
-                      onSubmitEditing={() =>
-                        confirmPasswordRef.current?.focus()
-                      }
-                    />
+                    <View style={{ position: "relative" }}>
+                      <TextInput
+                        ref={passwordRef}
+                        className="p-4 pr-14 bg-gray-100 text-gray-800 rounded-xl"
+                        style={[
+                          styles.inputField,
+                          {
+                            borderBottomWidth: password.length > 0 ? 1 : 0,
+                            borderColor:
+                              passwordErrors.length > 0 ? "red" : "green",
+                          },
+                        ]}
+                        value={password}
+                        onChangeText={handlePasswordChange}
+                        secureTextEntry={!isPasswordVisible}
+                        placeholder="Enter Your password"
+                        textContentType="newPassword" // บอก iOS ว่าเป็นรหัสผ่านใหม่
+                        returnKeyType="next"
+                        multiline={false} // ป้องกันการพิมพ์หลายบรรทัด
+                        numberOfLines={1} // กำหนดให้มีเพียง 1 บรรทัด
+                        textAlignVertical="center" // จัดให้อยู่ตรงกลางแนวตั้ง
+                        onSubmitEditing={() =>
+                          confirmPasswordRef.current?.focus()
+                        }
+                      />
+                      <TouchableOpacity
+                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                        className="absolute right-5 top-[30%]"
+                      >
+                        <Icon
+                          name={isPasswordVisible ? "eye-off" : "eye"}
+                          size={20}
+                          color="gray"
+                        />
+                      </TouchableOpacity>
+                    </View>
                     {passwordErrors.map((error, index) => (
-                      <Text key={index} style={{ color: "red" }}>
+                      <Text key={index} style={{ color: "red", marginTop: 4 }}>
                         {error}
                       </Text>
                     ))}
                   </View>
                   <View className="mb-3">
                     <Text style={styles.topicField}>Confirm Password</Text>
-                    <TextInput
-                      ref={confirmPasswordRef}
-                      className="p-4 pr-10 bg-gray-100 text-gray-800 rounded-xl"
-                      style={[
-                        styles.inputField,
-                        {
-                          borderBottomWidth: confirmPassword.length > 0 ? 1 : 0,
-                          borderColor:
-                            confirmPasswordErrors.length > 0 ? "red" : "green",
-                        },
-                      ]}
-                      value={confirmPassword}
-                      onChangeText={handleConfirmPasswordChange}
-                      secureTextEntry={true}
-                      placeholder="Confirm your password"
-                      multiline={false} // ป้องกันการพิมพ์หลายบรรทัด
-                      numberOfLines={1} // กำหนดให้มีเพียง 1 บรรทัด
-                      textAlignVertical="center" // จัดให้อยู่ตรงกลางแนวตั้ง
-                      returnKeyType="done"
-                    />
+                    <View style={{ position: "relative" }}>
+                      <TextInput
+                        ref={confirmPasswordRef}
+                        className="p-4 pr-14 bg-gray-100 text-gray-800 rounded-xl"
+                        style={[
+                          styles.inputField,
+                          {
+                            borderBottomWidth:
+                              confirmPassword.length > 0 ? 1 : 0,
+                            borderColor:
+                              confirmPasswordErrors.length > 0
+                                ? "red"
+                                : "green",
+                          },
+                        ]}
+                        value={confirmPassword}
+                        onChangeText={handleConfirmPasswordChange}
+                        secureTextEntry={!isConfirmPasswordVisible}
+                        placeholder="Confirm your password"
+                        multiline={false} // ป้องกันการพิมพ์หลายบรรทัด
+                        numberOfLines={1} // กำหนดให้มีเพียง 1 บรรทัด
+                        textAlignVertical="center" // จัดให้อยู่ตรงกลางแนวตั้ง
+                        returnKeyType="done"
+                      />
+                      <TouchableOpacity
+                        onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
+                        className="absolute right-5 top-[30%]"
+                      >
+                        <Icon
+                          name={isConfirmPasswordVisible ? "eye-off" : "eye"}
+                          size={20}
+                          color="gray"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    {confirmPassword.length > 0 &&
+                      confirmPasswordErrors.length > 0 && (
+                        <Text style={{ color: "red", marginTop: 10 }}>
+                          {confirmPasswordErrors}
+                        </Text>
+                      )}
                   </View>
                   <View>
                     <CustomButton
@@ -504,7 +539,7 @@ const styles = StyleSheet.create({
   inputField: {
     fontSize: wp("3.1%"), // ขนาด font เป็น 4% ของหน้าจอ
     fontFamily: "Poppins-Regular",
-    includeFontPadding: false, 
+    includeFontPadding: false,
   },
   datePickerButton: {
     padding: 14,
