@@ -15,6 +15,8 @@ import {
 } from "@/composables/useFetchTicket";
 import { Colors } from "@/constants/Colors";
 import TicketCard from "@/components/TicketCard";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 interface Ticket {
   registrationId: number;
@@ -63,9 +65,12 @@ const Ticket = () => {
     }
   };
 
-  useEffect(() => {
-    fetchTickets();
-  }, [authState?.token]);
+  useFocusEffect(
+    useCallback(() => {
+      setRefreshing(true);
+      fetchTickets();
+    }, [authState?.token])
+  );
 
   const onRefresh = useCallback(() => {
     if (isLoading) return; // Prevent refresh if already loading
@@ -133,6 +138,7 @@ const styles = StyleSheet.create({
   },
   noTickets: {
     fontSize: 16,
+    fontFamily: "Poppins-Regular",
     textAlign: "center",
     color: "#888",
   },

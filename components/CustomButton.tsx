@@ -31,6 +31,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   containerStyles,
   textStyle = "",
   isLoading = false,
+  disabled = false,
   classNameContainerStyle = "",
   classNameTextStyle = "",
   IconComponent = null,
@@ -41,7 +42,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       onPress={handlePress}
       className={classNameContainerStyle}
       style={containerStyles || defaultButtonStyle.button}
-      disabled={isLoading}
+      disabled={isLoading || disabled}
     >
       {IconComponent}
       <Text

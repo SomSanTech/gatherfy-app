@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link } from "expo-router";
+import { Link, useNavigation } from "expo-router";
 import Icon from "react-native-vector-icons/Ionicons";
 import CustomButton from "@/components/CustomButton";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -31,6 +31,7 @@ import { backToIndex } from "@/composables/backToIndex";
 import { ActivityIndicator } from "react-native-paper";
 
 const SignUp = () => {
+  const navigation = useNavigation();
   const firstnameRef = useRef<TextInput>(null);
   const lastnameRef = useRef<TextInput>(null);
   const emailRef = useRef<TextInput>(null);
@@ -95,6 +96,7 @@ const SignUp = () => {
     if (password !== confirmPassword) {
       errors = "Password and confirm password do not match.";
     }
+    setIsLoading(false);
     return errors;
   };
 
@@ -111,10 +113,12 @@ const SignUp = () => {
       !confirmPassword
     ) {
       alert("Please fill in all the fields.");
+      setIsLoading(false);
       return false;
     }
     if (password !== confirmPassword) {
       alert("Password and confirm password do not match.");
+      setIsLoading(false);
       return false;
     }
     return true;
@@ -142,16 +146,19 @@ const SignUp = () => {
 
     if (passwordValidationErrors.length > 0) {
       alert(passwordValidationErrors.join("\n")); // แจ้งเตือนข้อผิดพลาดที่ไม่ผ่าน
+      setIsLoading(false);
       return;
     }
 
     if (confirmPasswordValidationErrors !== "") {
       alert(confirmPasswordValidationErrors); // แจ้งเตือนข้อผิดพลาดที่ไม่ผ่าน
+      setIsLoading(false);
       return;
     }
 
     if (!validateEmail(email)) {
       alert("Invalid email format. Please enter a valid email.");
+      setIsLoading(false);
       return;
     }
 
@@ -174,6 +181,7 @@ const SignUp = () => {
       setIsLoading(false);
       alert("Create Account Success");
       setIsCreated(true);
+      (navigation as any).navigate("signIn")
     }
   };
 

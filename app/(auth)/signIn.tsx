@@ -40,6 +40,13 @@ const SignIn = () => {
 
   const onSignInPress = async () => {
     setIsLoading(true);
+
+    if (!username.trim() || !password.trim()) {
+      setIsLoading(false);
+      alert("Please fill in all fields.");
+      return;
+    }
+
     const result = await onLogin!(username.trim(), password);
 
     if (result.error) {

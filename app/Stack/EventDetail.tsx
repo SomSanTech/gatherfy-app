@@ -60,21 +60,20 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   useEffect(() => {
     setConfirmRegister(false);
     console.log("confirmRegister", confirmRegister);
-    
+
     const fetchRegistration = async () => {
       const token = await SecureStore.getItemAsync("my-jwt");
       const response = await useFetchTicketWithAuth("v1/tickets", "GET", token);
       setIsRegistered(
         response.some(
-          (ticket: { slug : string }) =>
-            ticket.slug === eventDetail.slug
+          (ticket: { slug: string }) => ticket.slug === eventDetail.slug
         )
       );
     };
     fetchRegistration();
     fetchDataDetailAsync();
     getUsersInfo();
-  }, [eventDetail.slug , confirmRegister]);
+  }, [eventDetail.slug, confirmRegister]);
 
   const startDate = eventDetail.start_date
     ? formatDate(eventDetail.start_date, true, true, true).date
@@ -168,14 +167,30 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
               style={styles.map}
               automaticallyAdjustContentInsets={false}
               source={{
-                html: eventDetail.map
-                  ? `
-                  <html>
-                    <body>
-                      ${eventDetail.map}
-                    </body>
-                  </html>`
-                  : `<html><body><p>No map available</p></body></html>`,
+                html: `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <style>
+                  html, body {
+                    margin: 0;
+                    padding: 0;
+                    width: 100%;
+                    height: 100%;
+                  }
+                  iframe {
+                    border: 0;
+                    border-radius: 50px;
+                    width: 100%;
+                    height: 100%;
+                  }
+                </style>
+              </head>
+              <body>
+                ${eventDetail.map}
+              </body>
+            </html>
+          `,
               }}
             />
           </View>
@@ -321,13 +336,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   map: {
-    height: 300,
+    height: 400,
     width: "100%",
     backgroundColor: "#f5f5f5",
   },
   organizerContainer: {
     paddingHorizontal: 15,
     marginTop: 20,
+    marginBottom: 20,
   },
   organizerText: {
     fontSize: 14,

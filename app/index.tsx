@@ -63,13 +63,10 @@ import { Colors } from "@/constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { StatusBar } from "expo-status-bar";
 import Animated, {
-  FadeIn,
   FadeInDown,
   FadeInRight,
 } from "react-native-reanimated";
 import { useAuth } from "./context/AuthContext";
-
-type Props = {};
 
 export default function App() {
   const { authState } = useAuth();

@@ -9,6 +9,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { RouteProp, useNavigation } from "@react-navigation/native";
@@ -54,6 +55,7 @@ const Review: React.FC<ReviewProps> = ({ route }) => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [question, setQuestion] = useState<Question[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigation = useNavigation();
   const [defaultQuestions, setDefaultQuestions] = useState<defaultQuestion[]>([
@@ -94,11 +96,29 @@ const Review: React.FC<ReviewProps> = ({ route }) => {
   const handleAnswerChange = (index: number, value: string | number) => {
     setAnswers((prev) => ({
       ...prev,
-      [index]: value, // ใช้ index เป็น key
+      [index]: typeof value === "string" ? value : value, // ใช้ index เป็น key
     }));
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
+    // ตรวจสอบว่าผู้ใช้กรอกข้อมูลครบทุกช่องหรือไม่
+    const isAllFilled = question.every((q, index) => {
+      if (q.questionType === "rating") {
+        return answers[index] !== undefined && answers[index] !== null;
+      }
+      if (q.questionType === "text") {
+        return answers[index] && (answers[index] as string).trim() !== "";
+      }
+      return true; // สำหรับประเภทคำถามที่ไม่รู้จัก
+    });
+
+    if (!isAllFilled) {
+      Alert.alert("Error", "Please fill in all fields before submitting.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const defaultFeedback = {
         eventId: eventId,
@@ -117,7 +137,17 @@ const Review: React.FC<ReviewProps> = ({ route }) => {
       );
 
       if (defaultResponse.error) {
-        alert(defaultResponse.error); // ✅ แสดงข้อความ error จาก Backend
+        if (defaultResponse.error === "Feedback already exists") {
+          Alert.alert(
+            "Error",
+            "You have already submitted a review for this event.",
+            [{ text: "OK" }]
+          );
+          setIsLoading(false);
+          return;
+        }
+        Alert.alert("Error", "Something went wrong. Please try again.");
+        setIsLoading(false);
         return;
       }
 
@@ -142,25 +172,24 @@ const Review: React.FC<ReviewProps> = ({ route }) => {
           const customResponse = await sendQuestionReview(
             urlCustom,
             "POST",
-            question, // ส่งคำถามทีละตัว
+            question,
             authState?.token
           );
 
           if (customResponse.error) {
-            alert(customResponse.error); // ✅ แสดงข้อความ error จาก Backend
+            Alert.alert("Error", customResponse.error);
+            setIsLoading(false);
             return;
           }
         }
       }
-
-      Alert.alert(
-        "Success",
-        "Review submitted successfully!",
-        [{ text: "OK", onPress: () => navigation.goBack() }] // กลับไปหน้าก่อนหน้าหลังจากกด OK
-      );
+      setIsLoading(false);
+      Alert.alert("Success", "Review submitted successfully!", [
+        { text: "OK", onPress: () => navigation.goBack() },
+      ]);
     } catch (err: any) {
       console.error("Submission error:", err);
-      alert(`Failed to submit review: ${err.message || err}`);
+      Alert.alert("Error", `Failed to submit review: ${err.message || err}`);
     }
   };
 
@@ -216,7 +245,7 @@ const Review: React.FC<ReviewProps> = ({ route }) => {
                       <TextInput
                         className="border p-4 mt-3 rounded-lg"
                         style={styles.inputField}
-                        onChangeText={(text) => handleAnswerChange(index, text.trim())}
+                        onChangeText={(text) => handleAnswerChange(index, text)}
                         value={(answers[index] as string) || ""}
                         multiline={true}
                         placeholder="Write your answer here..."
@@ -232,6 +261,16 @@ const Review: React.FC<ReviewProps> = ({ route }) => {
                 handlePress={handleSubmit}
                 containerStyles={styles.button}
                 textStyle={styles.buttonText}
+                classNameContainerStyle="flex-row justify-center items-center"
+                IconComponent={
+                  isLoading ? (
+                    <ActivityIndicator
+                      size="large"
+                      color="white"
+                      className="mr-5"
+                    />
+                  ) : null
+                }
               />
             </View>
           </ScrollView>

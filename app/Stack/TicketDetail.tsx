@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
   },
   ticketBox: {
     flex: 1,
+    height: "100%",
     backgroundColor: "white",
     borderRadius: width * 0.04,
     padding: width * 0.04,
