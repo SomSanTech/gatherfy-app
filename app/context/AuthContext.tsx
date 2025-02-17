@@ -4,6 +4,7 @@ import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import dayjs from "dayjs";
 import { jwtDecode } from "jwt-decode";
+import Constants from "expo-constants";
 
 interface AuthProps {
   authState?: {
@@ -31,10 +32,7 @@ const firstnameStorage = "firstname";
 const lastnameStorage = "lastname";
 const emailStorage = "email";
 
-const API_URL =
-  Platform.OS === "ios"
-    ? "http://localhost:4040/api/v1"
-    : "http://10.0.2.2:4040/api/v1";
+const API_URL = "https://capstone24.sit.kmutt.ac.th/us1";
 
 export { API_URL };
 
@@ -103,7 +101,7 @@ export const AuthProvider = ({ children }: any) => {
 
             if (!refreshToken) throw new Error("No refresh token");
 
-            const res = await axios.post(`${API_URL}/refresh`, {
+            const res = await axios.post(`${API_URL}/api/v1/refresh`, {
               refreshToken,
             });
             console.log("✅ Token refreshed:", res.data.accessToken); // Debugging
@@ -142,7 +140,7 @@ export const AuthProvider = ({ children }: any) => {
     password: string
   ) => {
     try {
-      const response = await axios.post(`${API_URL}/signup`, {
+      const response = await axios.post(`${API_URL}/api/v1/signup`, {
         role,
         username,
         firstname,
@@ -166,13 +164,13 @@ export const AuthProvider = ({ children }: any) => {
 
   const login = async (username: string, password: string) => {
     try {
-      const result = await axios.post(`${API_URL}/login`, {
+      const result = await axios.post(`${API_URL}/api/v1/login`, {
         username,
         password,
       });
 
       // Fetch user profile after successful login
-      const profileResponse = await axios.get(`${API_URL}/profile`, {
+      const profileResponse = await axios.get(`${API_URL}/api/v1/profile`, {
         headers: {
           Authorization: `Bearer ${result.data.accessToken}`,
         },

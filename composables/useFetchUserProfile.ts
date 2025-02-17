@@ -1,12 +1,12 @@
 import Constants from "expo-constants";
 import { Platform } from "react-native";
 
-// const API_BASE_URL =
-//   Constants.expoConfig?.extra?.apiBaseUrl ||
-//   "https://capstone24.sit.kmutt.ac.th";
-
 const API_BASE_URL =
-  Platform.OS === "android" ? "http://10.0.2.2:4040" : "http://localhost:4040";
+  Constants.expoConfig?.extra?.apiBaseUrl ||
+  "https://capstone24.sit.kmutt.ac.th";
+
+// const API_BASE_URL =
+//   Platform.OS === "android" ? "http://10.0.2.2:4040" : "http://localhost:4040";
 
 export const fetchUserProfile = async (
   token: any,
