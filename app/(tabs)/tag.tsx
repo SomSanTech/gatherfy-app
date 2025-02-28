@@ -58,7 +58,7 @@ const Tag = () => {
                   onPress={() => navigateToEventTag(tag.tag_title)}
                 >
                   <View></View>
-                  <Text style={styles.tagText}>{tag.tag_title}</Text>
+                  <Text style={styles.tagText} numberOfLines={1}>{tag.tag_title}</Text>
                   <View
                     style={[styles.tagLine, { backgroundColor: tag.tag_code }]}
                   ></View>
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     color: "#000000",
     lineHeight: 30,
-    fontSize: 20,
+    fontSize: wp("4.5%"),
   },
 });
 

@@ -1,76 +1,99 @@
-import { Linking, Pressable, StyleSheet, Text, View , Button } from "react-native";
+import {
+  Linking,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
 import Overlay from "./Overlay"; // Assuming Overlay is a component that adds additional UI overlay
 import { useNavigation } from "@react-navigation/native";
+import { checkInByQRCode } from "@/composables/useCheckInAttendance";
+import * as SecureStore from "expo-secure-store";
 
 const ScanQR = () => {
   const [permission, requestPermission] = useCameraPermissions();
   const [scannedValue, setScannedValue] = useState<string | null>(null);
   const [apiResponse, setApiResponse] = useState<string | null>(null);
   const isPermissionGranted = Boolean(permission?.granted);
+  const [scanning, setScanning] = useState(false);
 
-    const navigation = useNavigation();
+  const navigation = useNavigation();
 
   // Request camera permission when the component mounts
   useEffect(() => {
-    requestPermission();
-  }, [requestPermission]);
+    // Check user role when component is mounted
+    const checkUserRole = async () => {
+      const userRole = await SecureStore.getItemAsync("role");
 
-  
+      if (userRole === "Attendee") {
+        Alert.alert(
+          "Access Denied",
+          "You do not have permission to feature."
+        );
+        navigation.goBack();
+      }
+    };
+
+    // Request permission and check user role
+    requestPermission();
+    checkUserRole();
+  }, [requestPermission, navigation]);
 
   const barcodeScanned = async ({ data }: { data: string }) => {
-    console.log("Barcode scanned:", data);
-    
-    setTimeout(() => {
-      Linking.openURL(data);
-    }, 5000);
-  };
+    if (scanning) {
+      return;
+    }
 
-  const handleBarcodeScanned = async ({ data }: { data: string }) => {
-    setScannedValue(data); // Save the QR Code data
+    setScanning(true);
+    setScannedValue(data);
 
     if (data) {
       try {
-        // Send the scanned value to the backend API
-        const response = await fetch("localhost:4040/v1/check-in", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${data}`, // Attach the scanned value as the token
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ qrCode: data }), // Example payload
-        });
-        const result = await response.json();
-        setApiResponse(JSON.stringify(result, null, 2)); // Display the API response
+        const token = await SecureStore.getItemAsync("my-jwt");
+
+        const response = await checkInByQRCode(
+          token,
+          data,
+          "api/v2/check-in",
+          "PUT"
+        );
+
+        if (!response || response.status !== 200) {
+          throw new Error("Check-in failed! Please try again.");
+        }
+
+        setApiResponse("API call successful!");
+
+        alert("Check-in successful!");
+        navigation.goBack();
       } catch (error) {
-        console.error("API call failed:", error);
+        console.error("API Error:", error);
         setApiResponse("API call failed!");
+        Alert.alert("Error", "Check-in failed! Please try again.");
       }
-    }
+    } 
+
+    setTimeout(() => {
+      setScanning(false);
+    }, 2000);
   };
 
   if (isPermissionGranted) {
     return (
-      <SafeAreaView edges={["top"]} className="flex-1 bg-white">
+      <SafeAreaView edges={["top"]} className="flex-1">
         <CameraView
           style={StyleSheet.absoluteFillObject}
           facing="back"
           onBarcodeScanned={barcodeScanned}
         />
-        <Button
-          title="Go Back"
-          onPress={() => navigation.goBack()} // หรือ navigation.pop() ก็ได้
-        />
         <Overlay />
-
-        {scannedValue && <Text>Scanned Value: {scannedValue}</Text>}
-        {apiResponse && (
-          <Text style={{ marginTop: 20, color: "blue" }}>
-            API Response: {apiResponse}
-          </Text>
-        )}
+        <Text>{apiResponse}</Text>
       </SafeAreaView>
     );
   }
@@ -81,7 +104,7 @@ const ScanQR = () => {
         <Text style={styles.errorMessage}>
           Please allow camera access to use this feature.
         </Text>
-        <Pressable onPress={requestPermission}>
+        <Pressable onPress={() => requestPermission()}>
           <Text style={styles.buttonStyle}>Request Permission</Text>
         </Pressable>
       </View>

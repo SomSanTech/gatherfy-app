@@ -50,8 +50,6 @@ const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const { authState } = useAuth();
-  const [firstname, setFirstname] = useState<string | null>(null);
-  const [lastname, setLastname] = useState<string | null>(null);
   const [userInfo, setUserInfo] = useState<any>({});
 
   const [isAutoPlay, setIsAutoPlay] = useState(true); // Autoplay state

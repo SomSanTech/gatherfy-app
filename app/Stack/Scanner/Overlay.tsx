@@ -1,5 +1,17 @@
 import { Canvas, DiffRect, rect, rrect } from "@shopify/react-native-skia";
-import { Dimensions, Platform, StyleSheet } from "react-native";
+import {
+  Dimensions,
+  Platform,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Text,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const { width, height } = Dimensions.get("window");
 
@@ -18,16 +30,58 @@ const inner = rrect(
 );
 
 const Overlay = () => {
-  return (
+  const navigation = useNavigation();
 
-    <Canvas
-      style={
-        Platform.OS === "android" ? { flex: 2 } : StyleSheet.absoluteFillObject
-      }
-    >
-      <DiffRect inner={inner} outer={outer} color="black" opacity={0.5} />
-    </Canvas>
+  return (
+    <View style={StyleSheet.absoluteFill}>
+      <Text style={styles.header}>Check-In</Text>
+      <Canvas
+        style={
+          Platform.OS === "android"
+            ? { flex: 2 }
+            : StyleSheet.absoluteFillObject
+        }
+      >
+        <DiffRect inner={inner} outer={outer} color="black" opacity={0.5} />
+      </Canvas>
+
+      {/* ปุ่ม Go Back */}
+      <TouchableOpacity
+        style={styles.goBackButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={styles.goBackText}>Go Back</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  header: {
+    position: "absolute",
+    top: "15%",
+    alignSelf: "center",
+    fontSize: wp("6%"),
+    fontFamily: "Poppins-SemiBold",
+    includeFontPadding: false,
+    color: "white",
+    zIndex: 10,
+  },
+  goBackButton: {
+    position: "absolute",
+    bottom: "20%",
+    alignSelf: "center",
+    backgroundColor: "white",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  goBackText: {
+    fontSize: 16,
+    fontFamily: "Poppins-SemiBold",
+    includeFontPadding: false,
+    color: "black",
+  },
+});
 
 export default Overlay;

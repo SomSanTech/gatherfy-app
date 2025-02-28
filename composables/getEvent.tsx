@@ -39,7 +39,7 @@ export const getEvent = async (
         console.error(`Error: ${response.status} - ${response.statusText}`);
         return [];
       }
-
+      
       const data = await response.json(); // Await here to resolve the promise
 
       return data; // Return the resolved data

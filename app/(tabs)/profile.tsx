@@ -7,8 +7,8 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
+  Alert,
 } from "react-native";
-import UnderConstruction from "@/components/UnderConstruction";
 import { Button } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import { useCameraPermissions } from "expo-camera";
@@ -17,6 +17,10 @@ import { useRouter } from "expo-router";
 import { fetchUserProfile } from "@/composables/useFetchUserProfile";
 import DefaultProfile from "@/assets/images/default-profile.svg";
 import * as SecureStore from "expo-secure-store";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const Profile = () => {
   const navigation = useNavigation<any>();
@@ -25,7 +29,6 @@ const Profile = () => {
   const [permission, requestPermission] = useCameraPermissions();
 
   const { authState, onLogout } = useAuth();
-  const router = useRouter();
 
   const onLogoutPress = () => {
     onLogout!();
@@ -37,8 +40,24 @@ const Profile = () => {
     setUserInfo(user);
   };
   const navigateToScanQR = () => {
-    requestPermission();
-    navigation.navigate("ScanQR");
+    if (permission?.granted === false) {
+      Alert.alert(
+        "Permission Required",
+        "Please allow camera permission to scan QR code."
+      );
+      requestPermission();
+      return;
+    }
+    if (userInfo.users_role === "Attendee") {
+      Alert.alert(
+        "Access Denied",
+        "You do not have permission to feature."
+      );
+      return;
+    } else if (userInfo.users_role === "Organization") {
+      requestPermission();
+      navigation.navigate("ScanQR");
+    }
   };
 
   useEffect(() => {
@@ -68,12 +87,12 @@ const Profile = () => {
         {/* <TouchableOpacity style={styles.menuContainer}>
           <Text style={styles.menuText}>User Detail</Text>
         </TouchableOpacity> */}
-        <Pressable
-          onPress={() => navigation.navigate("ScanQR")}
+        <TouchableOpacity
+          onPress={() => navigateToScanQR()}
           style={styles.menuContainer}
         >
           <Text style={styles.menuText}>Scan QR Code</Text>
-        </Pressable>
+        </TouchableOpacity>
         <View style={styles.container}>
           <Button
             title="Logout"
@@ -101,10 +120,12 @@ const styles = StyleSheet.create({
   },
   menuText: {
     color: "#000000",
-    fontSize: 16,
+    fontSize: wp("4%"),
+    fontFamily: "Poppins-Regular",
     textAlign: "left",
     padding: 20,
     paddingHorizontal: 25,
+    includeFontPadding: false,
   },
   container: {
     flex: 1,

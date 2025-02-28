@@ -31,6 +31,7 @@ const usernameStorage = "username";
 const firstnameStorage = "firstname";
 const lastnameStorage = "lastname";
 const emailStorage = "email";
+const roleStorage = "role";
 
 const API_URL = "https://capstone24.sit.kmutt.ac.th/us1";
 
@@ -242,6 +243,7 @@ export const AuthProvider = ({ children }: any) => {
         userProfile.users_lastname
       );
       await SecureStore.setItemAsync(emailStorage, userProfile.users_email);
+      await SecureStore.setItemAsync(roleStorage, userProfile.users_role);
 
       return result;
     } catch (err: any) {
@@ -269,6 +271,8 @@ export const AuthProvider = ({ children }: any) => {
     await SecureStore.deleteItemAsync(usernameStorage);
     await SecureStore.deleteItemAsync(firstnameStorage);
     await SecureStore.deleteItemAsync(lastnameStorage);
+    await SecureStore.deleteItemAsync(emailStorage);
+    await SecureStore.deleteItemAsync(roleStorage);
 
     //Update TTP Headers
     axios.defaults.headers.common["Authorization"] = "";

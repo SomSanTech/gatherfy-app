@@ -1,5 +1,12 @@
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Pressable,
+} from "react-native";
 import { Button } from "react-native-elements";
 import Svg, { Path } from "react-native-svg";
 import CustomButton from "./CustomButton";
@@ -31,12 +38,22 @@ interface TicketProps {
 
 const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
   const { navigateToReview } = useNavigateToReview();
+  const [rotate, setRotate] = useState(false);
 
   const { navigateToEventDetail } = useNavigateToEventDetail();
   const { navigateToTicketDetail } = useNavigateToTicketDetail();
   const reviewedStrings = reviewed.map((id) => id.toString());
 
   const { eventId, name, image, slug, start_date, end_date, location } = item;
+
+  useEffect(() => {
+    // Force re-render if needed
+    const timer = setTimeout(() => {
+      setRotate(true);
+    }, 0); // Delay to ensure the UI has time to load
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -46,7 +63,7 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
       >
         <View className="flex-row w-full h-52">
           <View
-            className="w-[33%] p-3 h-full relative bg-white justify-center"
+            className="w-[34%] p-3 h-full relative bg-white justify-center"
             style={{ borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }}
           >
             <View className="w-full h-full justify-between items-center">
@@ -56,15 +73,18 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
                 resizeMode="cover"
               />
 
-              <View className="w-full justify-end ">
+              <View className="w-full justify-end">
                 {/* Check if the ticket has been reviewed */}
                 {reviewedStrings.includes(eventId.toString()) ? (
                   <CustomButton
                     title="Reviewed"
                     handlePress={() => {}}
                     containerStyles={{}}
-                    textStyle={{ includeFontPadding: false }}
-                    classNameContainerStyle="flex-row w-full px-2 py-1 bg-white justify-center items-center border border-[#d8d8d8] rounded-lg"
+                    textStyle={{
+                      includeFontPadding: false,
+                      fontSize: wp("3%"),
+                    }}
+                    classNameContainerStyle="flex-row w-full px-3 py-1 bg-white justify-center items-center border border-[#d8d8d8] rounded-lg"
                     classNameTextStyle="font-Poppins-Bold text-regular text-center text-[#d8d8d8] ml-1"
                     IconComponent={
                       <Ionicons
@@ -80,7 +100,10 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
                     title="Review"
                     handlePress={() => navigateToReview(eventId)}
                     containerStyles={{}}
-                    textStyle={{ includeFontPadding: false }}
+                    textStyle={{
+                      includeFontPadding: false,
+                      fontSize: wp("3.5%"),
+                    }}
                     classNameContainerStyle="flex-row w-full px-2 py-1 bg-white justify-center items-center border border-black rounded-lg"
                     classNameTextStyle="font-Poppins-Bold text-regular text-center text-black ml-1"
                     IconComponent={
@@ -103,7 +126,7 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
 
           <View
             style={styles.ticketContent}
-            className="w-[54%] items-start justify-around"
+            className="w-[53%] items-start justify-around"
           >
             <Text
               style={styles.ticketTitle}
@@ -147,16 +170,19 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
               ))}
             </View>
             <Text
-              style={styles.footerTicketText}
+              style={[
+                styles.footerTicketText,
+                { transform: rotate ? [{ rotate: "270deg" }] : [] },
+              ]}
               className="font-Poppins-SemiBold text-white"
             >
               View Ticket
             </Text>
-            <View
-              className="absolute top-[48%] -right-3 z-10 h-5 w-5 -translate-x-1/2 rounded-full bg-white"
-              style={{ borderLeftWidth: 1 }}
-            ></View>
           </TouchableOpacity>
+          <View
+            className="absolute top-[48%] -right-3 z-10 h-5 w-5 -translate-x-1/2 rounded-full bg-white"
+            style={{ borderLeftWidth: 1 }}
+          ></View>
         </View>
       </TouchableOpacity>
     </View>
@@ -167,8 +193,8 @@ export default TicketCard;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
-    marginBottom: 5,
+    padding: 5,
+    marginBottom: 20,
   },
   ticketContainer: {
     position: "relative",
@@ -199,13 +225,6 @@ const styles = StyleSheet.create({
     color: "#000",
     includeFontPadding: false,
     marginBottom: 3,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.17,
-    shadowRadius: 5,
-    elevation: 7,
   },
   footerTicket: {
     justifyContent: "center",
@@ -217,10 +236,16 @@ const styles = StyleSheet.create({
   },
   footerTicketText: {
     position: "absolute",
-    top: "40%",
-    width: "190%",
-    transform: [{ rotate: "270deg" }],
+    top: "44%", // ย้ายข้อความขึ้นไปตรงกลาง
+    right: "-44%", // ย้ายข้อความไปทางขวากลาง
+    width: wp("22%"), // กว้างเท่ากับข้อความ
+    transform: [
+      { translateX: -wp("15%") }, // เลื่อนข้อความกลับไปครึ่งหนึ่งของความกว้างข้อความ
+      { translateY: -hp("2.5%") }, // เลื่อนข้อความกลับไปครึ่งหนึ่งของความสูง
+      { rotate: "270deg" }, // หมุนข้อความ
+    ],
     color: "#fff",
+    fontSize: wp("3.5"),
   },
   dashedLineContainer: {
     position: "absolute",
