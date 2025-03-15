@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sedtabodee.gatherfy",
+      "bundleIdentifier": "com.somsantech.gatherfy",
       "config": {
         "usesNonExemptEncryption": false
       }
@@ -30,7 +30,7 @@
         "android.permission.RECORD_AUDIO"
       ],
       "useCleartextTraffic": true,
-      "package": "com.sedtabodee.gatherfy",
+      "package": "com.somsantech.gatherfy",
       "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
@@ -54,6 +54,12 @@
         {
           "configureAndroidBackup": true,
           "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
+        }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.791441779465-av7535cvtl7h16us08vdvqbikkhl91b3"
         }
       ]
     ],

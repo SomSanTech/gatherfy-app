@@ -32,10 +32,7 @@ const ScanQR = () => {
       const userRole = await SecureStore.getItemAsync("role");
 
       if (userRole === "Attendee") {
-        Alert.alert(
-          "Access Denied",
-          "You do not have permission to feature."
-        );
+        Alert.alert("Access Denied", "You do not have permission to feature.");
         navigation.goBack();
       }
     };
@@ -54,30 +51,23 @@ const ScanQR = () => {
     setScannedValue(data);
 
     if (data) {
-      try {
-        const token = await SecureStore.getItemAsync("my-jwt");
+      const token = await SecureStore.getItemAsync("my-jwt");
 
-        const response = await checkInByQRCode(
-          token,
-          data,
-          "api/v2/check-in",
-          "PUT"
-        );
+      const response = await checkInByQRCode(
+        token,
+        data,
+        "api/v2/check-in",
+        "PUT"
+      );
 
-        if (!response || response.status !== 200) {
-          throw new Error("Check-in failed! Please try again.");
-        }
-
-        setApiResponse("API call successful!");
-
-        alert("Check-in successful!");
-        navigation.goBack();
-      } catch (error) {
-        console.error("API Error:", error);
-        setApiResponse("API call failed!");
-        Alert.alert("Error", "Check-in failed! Please try again.");
+      if (!response || response.status !== 200) {
+        throw new Error("Check-in failed! Please try again.");
       }
-    } 
+
+      setApiResponse("API call successful!");
+
+      alert("Check-in successful!");
+    }
 
     setTimeout(() => {
       setScanning(false);

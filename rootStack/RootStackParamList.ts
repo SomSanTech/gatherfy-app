@@ -9,4 +9,6 @@ export type RootStackParamList = {
   TicketDetail: { eventId: number , slug: string };
   ReviewScreen: { eventId: number };
   ScanQR: undefined;
+  ContactScreen: undefined;
+  ContactDetail: { contactId: number };
 };

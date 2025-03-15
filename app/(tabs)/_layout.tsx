@@ -55,6 +55,8 @@ const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
 
 const Tab = createBottomTabNavigator();
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Contact from "./contact";
+import ContactDetail from "../stack/ContactDetail";
 
 const TabNav = () => {
   const insets = useSafeAreaInsets();
@@ -117,7 +119,7 @@ const TabNav = () => {
             ),
           }}
         />
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Tag"
           component={StackTagNavigation}
           options={{
@@ -131,7 +133,7 @@ const TabNav = () => {
               />
             ),
           }}
-        />
+        /> */}
         <Tab.Screen
           name="Ticket"
           component={StackTicketNavigation}
@@ -140,6 +142,21 @@ const TabNav = () => {
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
                 icon={icons.ticket}
+                color={color}
+                name="Ticket"
+                focused={focused}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Contact"
+          component={StackContactNavigation}
+          options={{
+            title: "Contact",
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon
+                icon={icons.contact}
                 color={color}
                 name="Ticket"
                 focused={focused}
@@ -204,27 +221,27 @@ const StackSearchNavigation = () => {
   );
 };
 
-const StackTagNavigation = () => {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="TagScreen"
-        component={Tag}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="EventTag"
-        component={EventTag}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="EventDetail"
-        component={EventDetail}
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
-  );
-};
+// const StackTagNavigation = () => {
+//   return (
+//     <Stack.Navigator>
+//       <Stack.Screen
+//         name="TagScreen"
+//         component={Tag}
+//         options={{ headerShown: false }}
+//       />
+//       <Stack.Screen
+//         name="EventTag"
+//         component={EventTag}
+//         options={{ headerShown: false }}
+//       />
+//       <Stack.Screen
+//         name="EventDetail"
+//         component={EventDetail}
+//         options={{ headerShown: false }}
+//       />
+//     </Stack.Navigator>
+//   );
+// };
 
 const StackTicketNavigation = () => {
   return (
@@ -247,6 +264,23 @@ const StackTicketNavigation = () => {
       <Stack.Screen
         name="EventDetail"
         component={EventDetail}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const StackContactNavigation = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="ContactScreen"
+        component={Contact}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ContactDetail"
+        component={ContactDetail}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

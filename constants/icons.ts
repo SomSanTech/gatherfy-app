@@ -8,6 +8,7 @@ import tag from "../assets/icons/tag-icon.png";
 import backArrow from "../assets/icons/back-icon.png";
 import ticket from "../assets/icons/ticket-icon.png";
 import filter from "../assets/icons/filter-icon.png";
+import contact from "../assets/icons/contact-icon.png"
 
 // Export it as part of an object
 export default {
@@ -19,5 +20,6 @@ export default {
     tag,
     backArrow,
     ticket,
-    filter
+    filter,
+    contact
 };
