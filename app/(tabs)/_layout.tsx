@@ -17,14 +17,14 @@ import Liked from "./ticket";
 import Profile from "./profile";
 import Search from "./search";
 import Tag from "./tag";
-import EventDetail from "../stack/EventDetail";
-import EventTag from "../stack/EventTag";
-import ScanQR from "../stack/Scanner/ScanQR";
-import Review from "../stack/Review";
+import EventDetail from "../Stack/EventDetail";
+import EventTag from "../Stack/EventTag";
+import ScanQR from "../Stack/Scanner/ScanQR";
+import Review from "../Stack/Review";
 import { RootStackParamList } from "@/rootStack/RootStackParamList";
 import CustomTabBarButton from "@/components/CustomTabBarButton";
 import Ticket from "./ticket";
-import TicketDetail from "@/app/stack/TicketDetail";
+import TicketDetail from "@/app/Stack/TicketDetail";
 import { StatusBar } from "expo-status-bar";
 
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
@@ -56,7 +56,9 @@ const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
 const Tab = createBottomTabNavigator();
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Contact from "./contact";
-import ContactDetail from "../stack/ContactDetail";
+import ContactDetail from "../Stack/ContactDetail";
+import ShareProfile from "../Stack/ShareProfile";
+import ScanQrContact from "../Stack/Scanner/ScanQrContact";
 
 const TabNav = () => {
   const insets = useSafeAreaInsets();
@@ -281,6 +283,16 @@ const StackContactNavigation = () => {
       <Stack.Screen
         name="ContactDetail"
         component={ContactDetail}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ScanQrContact"
+        component={ScanQrContact}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ShareProfile"
+        component={ShareProfile}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

@@ -11,4 +11,6 @@ export type RootStackParamList = {
   ScanQR: undefined;
   ContactScreen: undefined;
   ContactDetail: { contactId: number };
+  ShareProfile: { username: string; };
+  ScanQrContact: undefined
 };
