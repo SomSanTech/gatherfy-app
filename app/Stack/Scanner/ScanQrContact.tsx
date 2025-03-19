@@ -15,34 +15,30 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
 import Overlay from "./Overlay"; // Assuming Overlay is a component that adds additional UI overlay
-import { useNavigation } from "@react-navigation/native";
 import { checkInByQRCode } from "@/composables/useCheckInAttendance";
 import * as SecureStore from "expo-secure-store";
-import { LinearGradient } from "expo-linear-gradient";
-import { Image } from "react-native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "@/rootStack/RootStackParamList";
 import useNavigateToContactDetail from "@/composables/useNavigateToContactDetail";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import ProfileModal from "@/components/ProfileModal";
 
 interface Contact {
-    userProfile: UserProfile 
-    userSocials: Social[]
-  }
+  userProfile: UserProfile
+  userSocials: Social[]
+}
 interface UserProfile {
-contactId: number;
-username: string;
-users_firstname: string;
-users_lastname: string;
-users_image: string;
-users_phone: string;
-users_email: string;
-auth_provider: string;
+  contactId: number;
+  username: string;
+  users_firstname: string;
+  users_lastname: string;
+  users_image: string;
+  users_phone: string;
+  users_email: string;
+  auth_provider: string;
 }
 interface Social {
-    socialLink: string,
-    socialPlatform: string
-  }
+  socialLink: string,
+  socialPlatform: string
+}
 
 
 const ScanQrContact = () => {
@@ -52,11 +48,13 @@ const ScanQrContact = () => {
   const isPermissionGranted = Boolean(permission?.granted);
   const [scanning, setScanning] = useState(false);
   const [contact, setContact] = useState<Contact | null>();
-
-  type NavigationProp = StackNavigationProp<RootStackParamList, "ContactDetail">;
-  const navigation = useNavigation<NavigationProp>();
-  // const navigation = useNavigation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [contactModalType, setContactModalType] = useState('');
+  const [modalType, setModalType] = useState('');
   const { navigateToContactDetail } = useNavigateToContactDetail()
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
 
   // Request camera permission when the component mounts
   useEffect(() => {
@@ -73,7 +71,22 @@ const ScanQrContact = () => {
     // Request permission and check user role
     requestPermission();
     // checkUserRole();
-  }, [requestPermission, navigation]);
+  }, [requestPermission]);
+
+  const openModal = (type: string, detail: Contact) => {
+    console.log("contacts")
+    setSelectedContact(detail);
+    setContactModalType("contacts")
+    setIsModalOpen(true)
+
+    console.log(detail);
+    console.log("isModalOpen: " + isModalOpen)
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedContact(null)
+  }
 
   const barcodeScanned = async ({ data }: { data: string }) => {
     if (scanning) {
@@ -104,12 +117,10 @@ const ScanQrContact = () => {
       setApiResponse("API call successful!");
       console.log("apiResponse: " + apiResponse)
 
-      alert("Save contact!");
+      // alert("Save contact!");
       setContact(response)
-      // bottomSheetRef.current?.expand() // Open the modal
       console.log("navigateToContactDetail:", JSON.stringify(response, null, 2));
-      navigation.navigate("ContactDetail", { contactData: response });
-      navigateToContactDetail({ response }); // ✅ Correct key
+      openModal("contacts", response)
     }
 
     setTimeout(() => {
@@ -126,7 +137,12 @@ const ScanQrContact = () => {
           onBarcodeScanned={barcodeScanned}
         />
         <Overlay />
-        <Text>{apiResponse}</Text>
+        {isModalOpen && (
+          <ProfileModal
+            contactData={selectedContact}
+            contactType={contactModalType}
+            handleClose={handleCloseModal} />
+        )}
       </SafeAreaView>
     );
   }

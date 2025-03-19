@@ -34,7 +34,13 @@ export const fetchContact = async (
       console.error(`Error: ${response.status} - ${response.statusText}`);
       return `Error: ${response.status} - ${response.statusText}`;
     }
-    return await response.json();
+    // Check content-type before deciding how to parse the response
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    } else {
+      return await response.status;
+    }
   } catch (error) {
     console.error("Error fetching data:", error);
     return { error: "Failed to fetch data" };
