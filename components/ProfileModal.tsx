@@ -12,6 +12,7 @@ interface ProfileModalProps {
     contactData: Contact | null | undefined;
     contactType: string
     handleClose: () => void
+    onContactDeleted: () => void
 }
 
 interface UserProfile {
@@ -34,7 +35,7 @@ interface Contact {
     userSocials: Social[]
 }
 
-const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, handleClose }) => {
+const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, handleClose, onContactDeleted }) => {
 
 
     const bottomSheetRef = useRef<BottomSheet>(null);
@@ -89,7 +90,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, h
         Clipboard.setString(text);
     };
 
-
     const openDeleteModal = (contact: Contact) => {
         setDeleteContact(contact)
         setIsDeleteModalOpen(true)
@@ -110,8 +110,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, h
                 setIsDeleteModalOpen(false);
                 setDeleteContact(null)
                 handleClose()
+                onContactDeleted();
             }
-            console.log("Deleting contact:", deleteContact);
         }
     };
 
@@ -230,8 +230,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, h
                                     }
                                 >
                                     <View style={styles.googleImage}>
-                                        <View className="w-36 h-36">
-                                        </View>
+                                        <Image className="w-36 h-36 opacity-60" source={require("@/assets/icons/person-fill-icon.png")} />
                                         <Text className="text-center text-white text-3xl font-semibold">
                                             {
                                                 contactData?.userProfile.username
@@ -265,6 +264,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, h
                                 <Text className="pb-3">Phone</Text>
                                 <TouchableOpacity onPress={() => openCall(contactData.userProfile.users_phone)} className="flex-row items-center">
                                     <Text>{contactData?.userProfile.users_phone}</Text>
+                                    <Image className="w-5 h-5 ml-2 opacity-70" source={require("@/assets/icons/call-outbound-icon.png")} />
                                 </TouchableOpacity>
                             </View>
                         }
@@ -316,10 +316,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, h
                 onCancel={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleDeleteContact}
             />
-
         </Modal>
     )
-
 }
 
 export default ProfileModal

@@ -1,24 +1,16 @@
 import {
-  Linking,
   Pressable,
   StyleSheet,
   Text,
   View,
-  Button,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-  ImageBackground,
   Clipboard,
 } from "react-native";
-import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Camera, CameraView, useCameraPermissions } from "expo-camera";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import Overlay from "./Overlay"; // Assuming Overlay is a component that adds additional UI overlay
 import { checkInByQRCode } from "@/composables/useCheckInAttendance";
 import * as SecureStore from "expo-secure-store";
-import useNavigateToContactDetail from "@/composables/useNavigateToContactDetail";
-import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import ProfileModal from "@/components/ProfileModal";
 
 interface Contact {
@@ -51,36 +43,16 @@ const ScanQrContact = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [contactModalType, setContactModalType] = useState('');
-  const [modalType, setModalType] = useState('');
-  const { navigateToContactDetail } = useNavigateToContactDetail()
-  const bottomSheetRef = useRef<BottomSheet>(null);
-
 
   // Request camera permission when the component mounts
   useEffect(() => {
-    // Check user role when component is mounted
-    // const checkUserRole = async () => {
-    //   const userRole = await SecureStore.getItemAsync("role");
-
-    //   if (userRole === "Attendee") {
-    //     Alert.alert("Access Denied", "You do not have permission to feature.");
-    //     navigation.goBack();
-    //   }
-    // };
-
-    // Request permission and check user role
     requestPermission();
-    // checkUserRole();
   }, [requestPermission]);
 
-  const openModal = (type: string, detail: Contact) => {
-    console.log("contacts")
+  const openModal = (detail: Contact) => {
     setSelectedContact(detail);
     setContactModalType("contacts")
     setIsModalOpen(true)
-
-    console.log(detail);
-    console.log("isModalOpen: " + isModalOpen)
   };
 
   const handleCloseModal = () => {
@@ -117,10 +89,8 @@ const ScanQrContact = () => {
       setApiResponse("API call successful!");
       console.log("apiResponse: " + apiResponse)
 
-      // alert("Save contact!");
       setContact(response)
-      console.log("navigateToContactDetail:", JSON.stringify(response, null, 2));
-      openModal("contacts", response)
+      openModal(response)
     }
 
     setTimeout(() => {

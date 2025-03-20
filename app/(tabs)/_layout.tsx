@@ -56,7 +56,6 @@ const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
 const Tab = createBottomTabNavigator();
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Contact from "./contact";
-import ContactDetail from "../Stack/ContactDetail";
 import ShareProfile from "../Stack/ShareProfile";
 import ScanQrContact from "../Stack/Scanner/ScanQrContact";
 
@@ -278,11 +277,6 @@ const StackContactNavigation = () => {
       <Stack.Screen
         name="ContactScreen"
         component={Contact}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ContactDetail"
-        component={ContactDetail}
         options={{ headerShown: false }}
       />
       <Stack.Screen

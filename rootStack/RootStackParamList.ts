@@ -10,7 +10,6 @@ export type RootStackParamList = {
   ReviewScreen: { eventId: number };
   ScanQR: undefined;
   ContactScreen: undefined;
-  ContactDetail: { contactData: any };
   ShareProfile: { username: string; };
   ScanQrContact: undefined
 };

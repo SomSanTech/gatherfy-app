@@ -27,15 +27,17 @@ const SearchInput: React.FC<{
     >
       <View style={styles.container}>
         <View style={styles.searchInputContainer}>
-          <Ionicons name="search-outline" size={20} color="#000" style={styles.searchIcon} />
+          <Ionicons name="search-outline" size={20} color="#626567" style={styles.searchIcon} />
           <TextInput
-            placeholder="Search..."
+            placeholder="Search"
+            placeholderTextColor={"#626567"}
             onChangeText={onChangeText}
             inlineImageLeft='search_icon'
             value={value}
             onSubmitEditing={onSearchSubmit}
             style={styles.searchInput}
             underlineColorAndroid="transparent"
+            enablesReturnKeyAutomatically={true}
           />
           {value !== "" && (
             <TouchableOpacity
@@ -45,8 +47,8 @@ const SearchInput: React.FC<{
               <Icon
                 name="close-circle-outline"
                 type="ionicon"
-                size={24}
-                color="#000000"
+                size={20}
+                color="#626567"
               />
             </TouchableOpacity>
           )}
@@ -68,22 +70,36 @@ const styles = StyleSheet.create({
   searchIcon: {
     position: "absolute",
     left: 20,
+    zIndex:20
   },
+  // searchInput: {
+  //   fontFamily: "Poppins-Regular",
+  //   fontSize: 16,
+  //   lineHeight: 22,
+  //   height: 55,
+  //   borderColor: "gray",
+  //   borderWidth: 1,
+  //   borderRadius: 10,
+  //   paddingLeft: 50,
+  //   paddingRight: 50,
+  //   paddingVertical: 0, // ลด vertical padding
+  //   textAlignVertical: "center", // จัดข้อความให้อยู่ตรงกลาง
+  //   includeFontPadding: false, // ปิด font padding ใน Android
+  // },
   searchInput: {
     fontFamily: "Poppins-Regular",
     fontSize: 16,
     lineHeight: 22,
-    height: 55,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingLeft: 50,
-    paddingRight: 50,
-    paddingVertical: 0, // ลด vertical padding
+    height: 45,
+    // borderColor: "gray",
+    // borderWidth: 1,
+    borderRadius: 120,
+    paddingHorizontal: 50,
+    paddingVertical: 10, // ลด vertical padding
     textAlignVertical: "center", // จัดข้อความให้อยู่ตรงกลาง
     includeFontPadding: false, // ปิด font padding ใน Android
+    backgroundColor: "#F6F6F6"
   },
-
   clearButton: {
     position: "absolute",
     right: 11,
