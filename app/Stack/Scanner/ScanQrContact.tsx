@@ -4,6 +4,7 @@ import {
   Text,
   View,
   Clipboard,
+  Alert,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -78,8 +79,8 @@ const ScanQrContact = () => {
       );
       console.log("Get response: " + await response)
 
-      if (!response) {
-        console.log("!response")
+      if (!response  || response.status !== 200) {
+        Alert.alert("Token invalid")
         throw new Error("Save contact failed! Please try again.");
       }
 

@@ -2,7 +2,7 @@ import useNavigateToShareProfile from "@/composables/useNavigateToShareProfile";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet"
 import { LinearGradient } from "expo-linear-gradient"
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Alert, Clipboard, Image, ImageBackground, Linking, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Alert, Clipboard, Image, ImageBackground, Linking, Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import * as SecureStore from "expo-secure-store";
 import { fetchContact } from "@/composables/usefetchContact";
@@ -152,7 +152,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, h
                                                     "rgba(255,255,255,0)",
                                                     "rgba(0,0,0,0.65)",
                                                 ]}
-                                                locations={[0.5, 0]}
+                                                locations={Platform.OS === "android" ? [0,0.4, 0.85] : [0.5, 0]}
                                                 style={
                                                     styles.linearBackground
                                                 }
