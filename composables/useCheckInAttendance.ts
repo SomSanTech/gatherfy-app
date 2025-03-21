@@ -8,7 +8,7 @@ const API_BASE_URL =
 // const API_BASE_URL =
 //   Platform.OS === "android" ? "http://10.0.2.2:4040" : "http://localhost:4040";
 
-export const checkInByQRCode = async (
+export const scanTokenByQRCode = async (
   token: any,
   qrToken: any,
   url: string,

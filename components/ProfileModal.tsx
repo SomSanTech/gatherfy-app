@@ -6,21 +6,21 @@ import { Alert, Clipboard, Image, ImageBackground, Linking, Modal, StyleSheet, T
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import * as SecureStore from "expo-secure-store";
 import { fetchContact } from "@/composables/usefetchContact";
-
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 interface ProfileModalProps {
     contactData: Contact | null | undefined;
     contactType: string
     handleClose: () => void
-    onContactDeleted: () => void
+    onContactDeleted?: () => void
 }
 
 interface UserProfile {
     contactId: number;
     username: string;
     users_firstname: string;
-    users_lastname: string;
-    users_image: string;
+    users_lastname?: string;
+    users_image?: string;
     users_phone: string;
     users_email: string;
     auth_provider: string;
@@ -42,7 +42,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, h
     const snapPoints = useMemo(() => ["90%"], []);
     const { navigateToShareProfile } = useNavigateToShareProfile()
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-    const [deleteContact, setDeleteContact] = useState<Contact | null>()
+    const [deleteContact, setDeleteContact] = useState<any | null>()
 
 
     const OpenURLButton = ({ url, children }: { url: string; children: string }) => {
@@ -110,7 +110,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, h
                 setIsDeleteModalOpen(false);
                 setDeleteContact(null)
                 handleClose()
-                onContactDeleted();
+                onContactDeleted?.();
             }
         }
     };
@@ -119,64 +119,29 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, h
 
     return (
         <Modal transparent={true} visible={true} animationType="slide">
-            <BottomSheet
-                ref={bottomSheetRef}
-                index={1}
-                snapPoints={snapPoints}
-                enablePanDownToClose={true} // Allows swiping down to close
-                onClose={handleClose}
-                backgroundStyle={{ height: 0 }}
-            >
-                <BottomSheetScrollView style={styles.modalContainer}>
-                    <View className="pb-10">
-                        {contactData?.userProfile.users_image ?
-                            <View
-                                style={
-                                    styles.modalHeader
-                                }
-                            >
-                                {contactData?.userProfile.auth_provider === "system" ? (
-                                    <ImageBackground
-                                        className="w-full h-full"
-                                        style={
-                                            styles.systemImage
-                                        }
-                                        source={{
-                                            uri: contactData.userProfile.users_image,
-                                        }}
-                                    >
-                                        <LinearGradient
-                                            colors={[
-                                                "transparent",
-                                                "rgba(255,255,255,0)",
-                                                "rgba(0,0,0,0.65)",
-                                            ]}
-                                            locations={[0.5, 0]}
-                                            style={
-                                                styles.linearBackground
-                                            }
-                                        >
-                                            <Text className="text-center text-white text-3xl font-semibold">
-                                                {
-                                                    contactData?.userProfile.username
-                                                }
-                                            </Text>
-                                            <Text className="text-center text-white text-xl pb-7">
-                                                {
-                                                    contactData?.userProfile.users_firstname
-                                                }
-                                                {" "}
-                                                {
-                                                    contactData?.userProfile.users_lastname
-                                                }
-                                            </Text>
-                                        </LinearGradient>
-                                    </ImageBackground>
-                                ) : contactData?.userProfile.auth_provider === "google" && (
-                                    <View style={styles.modalHeader}>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+                <BottomSheet
+                    ref={bottomSheetRef}
+                    index={1}
+                    snapPoints={snapPoints}
+                    enablePanDownToClose={true} // Allows swiping down to close
+                    onClose={handleClose}
+                    backgroundStyle={{ height: 0 }}
+                >
+                    <BottomSheetScrollView style={styles.modalContainer}>
+                        <View className="pb-10">
+                            {contactData?.userProfile.users_image ?
+                                <View
+                                    style={
+                                        styles.modalHeader
+                                    }
+                                >
+                                    {contactData?.userProfile.auth_provider === "system" ? (
                                         <ImageBackground
                                             className="w-full h-full"
-                                            blurRadius={3}
+                                            style={
+                                                styles.systemImage
+                                            }
                                             source={{
                                                 uri: contactData.userProfile.users_image,
                                             }}
@@ -192,130 +157,173 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, h
                                                     styles.linearBackground
                                                 }
                                             >
-                                                <View style={styles.googleImage}>
-
-                                                    <Image source={{ uri: contactData.userProfile.users_image }} className="w-36 h-36 rounded-full" />
-                                                    <Text className="text-center text-white text-3xl font-semibold">
-                                                        {
-                                                            contactData?.userProfile.username
-                                                        }
-                                                    </Text>
-                                                    <Text className="text-center text-white text-xl pb-7">
-                                                        {
-                                                            contactData?.userProfile.users_firstname
-                                                        }
-                                                        {" "}
-                                                        {
-                                                            contactData?.userProfile.users_lastname
-                                                        }
-                                                    </Text>
-                                                </View>
+                                                <Text className="text-center text-white text-3xl font-semibold">
+                                                    {
+                                                        contactData?.userProfile.username
+                                                    }
+                                                </Text>
+                                                <Text className="text-center text-white text-xl pb-7">
+                                                    {
+                                                        contactData?.userProfile.users_firstname
+                                                    }
+                                                    {" "}
+                                                    {
+                                                        contactData?.userProfile.users_lastname
+                                                    }
+                                                </Text>
                                             </LinearGradient>
                                         </ImageBackground>
+                                    ) : contactData?.userProfile.auth_provider === "google" && (
+                                        <View style={styles.modalHeader}>
+                                            <ImageBackground
+                                                className="w-full h-full"
+                                                blurRadius={3}
+                                                source={{
+                                                    uri: contactData.userProfile.users_image,
+                                                }}
+                                            >
+                                                <LinearGradient
+                                                    colors={[
+                                                        "transparent",
+                                                        "rgba(255,255,255,0)",
+                                                        "rgba(0,0,0,0.65)",
+                                                    ]}
+                                                    locations={[0.5, 0]}
+                                                    style={
+                                                        styles.linearBackground
+                                                    }
+                                                >
+                                                    <View style={styles.googleImage}>
+                                                        <Image source={{ uri: contactData.userProfile.users_image }} className="w-36 h-36 rounded-full mb-5" />
+                                                        <Text className="text-center text-white text-3xl font-semibold">
+                                                            {
+                                                                contactData?.userProfile.username
+                                                            }
+                                                        </Text>
+                                                        <Text className="text-center text-white text-xl pb-7">
+                                                            {
+                                                                contactData?.userProfile.users_firstname
+                                                            }
+                                                            {" "}
+                                                            {
+                                                                contactData?.userProfile.users_lastname
+                                                            }
+                                                        </Text>
+                                                    </View>
+                                                </LinearGradient>
+                                            </ImageBackground>
+                                        </View>
+                                    )
+                                    }
+                                </View>
+                                : contactData?.userProfile.users_image === null  &&
+                                <View style={styles.modalHeaderNoImage}>
+                                    <LinearGradient
+                                        colors={[
+                                            "transparent",
+                                            "rgba(255,255,255,0)",
+                                            "rgba(0,0,0,0.5)",
+                                        ]}
+                                        locations={[0.4, 0.4]}
+                                        style={
+                                            styles.linearBackground
+                                        }
+                                    >
+                                        <View style={styles.googleImage}>
+                                            <Image className="w-36 h-36 opacity-60" source={require("@/assets/icons/person-fill-icon.png")} />
+                                            <Text className="text-center text-white text-3xl font-semibold">
+                                                {
+                                                    contactData?.userProfile.username
+                                                }
+                                            </Text>
+                                            <Text className="text-center text-white text-xl pb-7">
+                                                {
+                                                    contactData?.userProfile.users_firstname
+                                                }
+                                                {" "}
+                                                {
+                                                    contactData?.userProfile.users_lastname
+                                                }
+                                            </Text>
+                                        </View>
+                                    </LinearGradient>
+                                </View>
+                            }
+                            {contactType === "myCard" &&
+                                <View style={styles.myCardOptionContainer}>
+                                    <TouchableOpacity style={styles.myCardOptions} >
+                                        <Text>Edit profile</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.myCardOptions} onPress={() => [navigateToShareProfile(), handleClose()]}>
+                                        <Text>Share contact</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            }
+                            {contactData?.userProfile.users_phone !== null &&
+                                <View style={styles.modalDetail}>
+                                    <Text className="pb-3">Phone</Text>
+                                    <TouchableOpacity onPress={() => openCall(contactData.userProfile.users_phone)} className="flex-row items-center">
+                                        <Text>{contactData?.userProfile.users_phone}</Text>
+                                        <Image className="w-5 h-5 ml-2 opacity-70" source={require("@/assets/icons/call-outbound-icon.png")} />
+                                    </TouchableOpacity>
+                                </View>
+                            }
+                            <View style={styles.modalDetail}>
+                                <Text className="pb-3">Email</Text>
+                                <View className="flex-row items-center">
+                                    <TouchableOpacity onPress={() => openMail(contactData?.userProfile.users_email)}>
+                                        <Text className="text-[#3288BD]">{contactData?.userProfile.users_email}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => copyToClipboard(contactData?.userProfile.users_email)}>
+                                        <Image className="w-4 h-4 ml-2" source={require("@/assets/icons/document-copy-icon.png")} />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                            {contactData?.userSocials.length > 0 &&
+                                <View style={styles.modalDetail}>
+                                    <Text className="pb-3">Socials</Text>
+                                    {contactData?.userSocials.map((item, index) => (
+                                        <View key={index} className="flex-row my-2 items-center">
+                                            <Image
+                                                source={
+                                                    item.socialPlatform === "Instagram" ? require("@/assets/icons/instagram-icon.png") :
+                                                        item.socialPlatform === "X" ? require("@/assets/icons/twitter-icon.png") :
+                                                            item.socialPlatform === "LinkedIn" ? require("@/assets/icons/linkedin-icon.png") :
+                                                                item.socialPlatform === "Facebook" ? require("@/assets/icons/facebook-icon.png") :
+                                                                    require("@/assets/icons/internet-icon.png")
+                                                }
+                                                style={styles.platformIcon}
+                                            />
+
+                                            <View style={{ marginLeft: 8 }}>
+                                                <OpenURLButton url={item.socialLink}>{item.socialLink}</OpenURLButton>
+                                            </View>
+                                        </View>
+                                    ))}
+                                </View>
+                            }
+                            {
+                                contactType === "contacts" && (
+                                    <View style={styles.modalDetail}>
+                                        <TouchableOpacity onPress={() => { openDeleteModal(contactData) }}>
+                                            <Text className="text-[#D71515]">Delete Contact</Text>
+                                        </TouchableOpacity>
                                     </View>
                                 )
-                                }
-                            </View>
-                            : contactData?.userProfile.users_image === null &&
-                            <View style={styles.modalHeaderNoImage}>
-                                <LinearGradient
-                                    colors={[
-                                        "transparent",
-                                        "rgba(255,255,255,0)",
-                                        "rgba(0,0,0,0.5)",
-                                    ]}
-                                    locations={[0.4, 0.4]}
-                                    style={
-                                        styles.linearBackground
-                                    }
-                                >
-                                    <View style={styles.googleImage}>
-                                        <Image className="w-36 h-36 opacity-60" source={require("@/assets/icons/person-fill-icon.png")} />
-                                        <Text className="text-center text-white text-3xl font-semibold">
-                                            {
-                                                contactData?.userProfile.username
-                                            }
-                                        </Text>
-                                        <Text className="text-center text-white text-xl pb-7">
-                                            {
-                                                contactData?.userProfile.users_firstname
-                                            }
-                                            {" "}
-                                            {
-                                                contactData?.userProfile.users_lastname
-                                            }
-                                        </Text>
-                                    </View>
-                                </LinearGradient>
-                            </View>
-                        }
-                        {contactType === "myCard" &&
-                            <View style={styles.myCardOptionContainer}>
-                                <TouchableOpacity style={styles.myCardOptions} >
-                                    <Text>Edit profile</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.myCardOptions} onPress={() => [navigateToShareProfile(), handleClose()]}>
-                                    <Text>Share contact</Text>
-                                </TouchableOpacity>
-                            </View>
-                        }
-                        {contactData?.userProfile.users_phone !== null &&
-                            <View style={styles.modalDetail}>
-                                <Text className="pb-3">Phone</Text>
-                                <TouchableOpacity onPress={() => openCall(contactData.userProfile.users_phone)} className="flex-row items-center">
-                                    <Text>{contactData?.userProfile.users_phone}</Text>
-                                    <Image className="w-5 h-5 ml-2 opacity-70" source={require("@/assets/icons/call-outbound-icon.png")} />
-                                </TouchableOpacity>
-                            </View>
-                        }
-                        <View style={styles.modalDetail}>
-                            <Text className="pb-3">Email</Text>
-                            <View className="flex-row items-center">
-                                <TouchableOpacity onPress={() => openMail(contactData?.userProfile.users_email)}>
-                                    <Text className="text-[#3288BD]">{contactData?.userProfile.users_email}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => copyToClipboard(contactData?.userProfile.users_email)}>
-                                    <Image className="w-4 h-4 ml-2" source={require("@/assets/icons/document-copy-icon.png")} />
-                                </TouchableOpacity>
-                            </View>
+                            }
                         </View>
-                        {contactData?.userSocials.length > 0 &&
-                            <View style={styles.modalDetail}>
-                                <Text className="pb-3">Socials</Text>
-                                {contactData?.userSocials.map((item, index) => (
-                                    <View key={index} className="flex-row my-2 items-center">
-                                        <Image
-                                            source={
-                                                item.socialPlatform === "Instagram" ? require("@/assets/icons/instagram-icon.png") :
-                                                    item.socialPlatform === "X" ? require("@/assets/icons/twitter-icon.png") :
-                                                        item.socialPlatform === "LinkedIn" ? require("@/assets/icons/linkedin-icon.png") :
-                                                            item.socialPlatform === "Facebook" ? require("@/assets/icons/facebook-icon.png") :
-                                                                require("@/assets/icons/internet-icon.png")
-                                            }
-                                            style={styles.platformIcon}
-                                        />
-
-                                        <View style={{ marginLeft: 8 }}>
-                                            <OpenURLButton url={item.socialLink}>{item.socialLink}</OpenURLButton>
-                                        </View>
-                                    </View>
-                                ))}
-                            </View>
-                        }
-                        <View style={styles.modalDetail}>
-                            <TouchableOpacity onPress={() => { openDeleteModal(contactData) }}>
-                                <Text className="text-[#D71515]">Delete Contact</Text>
-                            </TouchableOpacity>
-                        </View>
+                    </BottomSheetScrollView>
+                </BottomSheet>
+                {isDeleteModalOpen && (
+                    <View >
+                        <DeleteConfirmModal
+                            isVisible={isDeleteModalOpen}
+                            onCancel={() => setIsDeleteModalOpen(false)}
+                            onConfirm={handleDeleteContact}
+                        />
                     </View>
-
-                </BottomSheetScrollView>
-            </BottomSheet>
-            <DeleteConfirmModal
-                isVisible={isDeleteModalOpen}
-                onCancel={() => setIsDeleteModalOpen(false)}
-                onConfirm={handleDeleteContact}
-            />
+                )}
+            </GestureHandlerRootView>
         </Modal>
     )
 }

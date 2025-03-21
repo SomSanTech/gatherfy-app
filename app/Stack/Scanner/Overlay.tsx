@@ -12,6 +12,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import React from "react";
 
 const { width, height } = Dimensions.get("window");
 
@@ -29,12 +30,18 @@ const inner = rrect(
   50
 );
 
-const Overlay = () => {
+interface Props {
+  title?: string
+}
+
+const Overlay: React.FC<Props> = ({title}) => {
   const navigation = useNavigation();
 
   return (
     <View style={StyleSheet.absoluteFill}>
-      <Text style={styles.header}>Check-In</Text>
+      { title && (
+        <Text style={styles.header}>{title}</Text>
+      )}
       <Canvas
         style={
           Platform.OS === "android"

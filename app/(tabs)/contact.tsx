@@ -21,6 +21,8 @@ import DefaultProfile from "@/assets/images/default-profile.svg";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useCameraPermissions } from "expo-camera";
 import ProfileModal from "@/components/ProfileModal";
+import { useFocusEffect } from "expo-router";
+import Animated from "react-native-reanimated";
 
 const Contact = () => {
   interface Profile {
@@ -60,7 +62,7 @@ const Contact = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [search, setSearch] = useState<string>(""); // ใช้ useState สำหรับ search
-  
+
   // Convert object into an array of sections
   const sections = Object.keys(filterdContacts).map((key: string) => ({
     title: key,
@@ -74,6 +76,7 @@ const Contact = () => {
 
   const fetchProfile = async () => {
     const token = await SecureStore.getItemAsync("my-jwt");
+    console.log(token)
     try {
       const response = await fetchContact(
         token,
@@ -156,7 +159,6 @@ const Contact = () => {
     })
     setFilterdContacts(result)
     console.log(contacts)
-
   }
 
   const refreshContacts = async () => {
@@ -189,25 +191,32 @@ const Contact = () => {
     <SafeAreaView edges={["top"]} className="flex-1 bg-white">
       <Text style={styles.header}>Contacts</Text>
       <TouchableOpacity onPress={() => openModal("myCard", profile)} style={styles.myCardContainer}>
-        <Image
-          source={{ uri: profile?.userProfile.users_image }}
-          style={styles.myCardImage}
-        />
+          {profile?.userProfile.users_image ? (
+              <Image
+                source={{
+                  uri: profile.userProfile
+                    .users_image,
+                }}
+                style={styles.contactImage}
+              />
+            ) : (
+              <Image source={require("@/assets/icons/person-fill-icon.png")}
+                style={styles.contactImage}
+                className="opacity-70"
+              />
+            )}
         <View>
           <Text style={styles.myCardUsername}>
             {profile?.userProfile.username}
           </Text>
           <Text>My Card</Text>
         </View>
-        <TouchableOpacity onPress={() => navigateToScanQrContact()} className="absolute right-4">
-          <ImageBackground style={{ backgroundColor: "transparent" }} className="w-10 h-10 opacity-90" source={require("@/assets/icons/StashQrCodeLight.png")} />
-        </TouchableOpacity>
       </TouchableOpacity>
-        <SearchInput
-          value={search}
-          onChangeText={setSearch} // ส่งฟังก์ชัน setSearch ไปยัง SearchInput
-          onSearchSubmit={handleSearchSubmit}
-        /> 
+      <SearchInput
+        value={search}
+        onChangeText={setSearch} // ส่งฟังก์ชัน setSearch ไปยัง SearchInput
+        onSearchSubmit={handleSearchSubmit}
+      />
       <SectionList
         sections={sections}
         data={contacts}
@@ -253,9 +262,15 @@ const Contact = () => {
         )}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
-              No Results for "{search}"
-            </Text>
+            {
+              search === "" ? (
+                <Text style={styles.emptyText}>
+                  You have no contact
+                </Text>) :
+                <Text style={styles.emptyText}>
+                  No Results for "{search}"
+                </Text>
+            }
           </View>
         }
         refreshControl={

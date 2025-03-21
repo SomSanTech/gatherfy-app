@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Camera, CameraView, useCameraPermissions } from "expo-camera";
 import Overlay from "./Overlay"; // Assuming Overlay is a component that adds additional UI overlay
 import { useNavigation } from "@react-navigation/native";
-import { checkInByQRCode } from "@/composables/useCheckInAttendance";
+import { scanTokenByQRCode } from "@/composables/useCheckInAttendance";
 import * as SecureStore from "expo-secure-store";
 
 const ScanQR = () => {
@@ -53,7 +53,7 @@ const ScanQR = () => {
     if (data) {
       const token = await SecureStore.getItemAsync("my-jwt");
 
-      const response = await checkInByQRCode(
+      const response = await scanTokenByQRCode(
         token,
         data,
         "api/v2/check-in",
@@ -82,7 +82,7 @@ const ScanQR = () => {
           facing="back"
           onBarcodeScanned={barcodeScanned}
         />
-        <Overlay />
+        <Overlay title="Check-in" />
         <Text>{apiResponse}</Text>
       </SafeAreaView>
     );

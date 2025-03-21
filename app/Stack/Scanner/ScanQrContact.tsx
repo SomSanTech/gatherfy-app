@@ -9,7 +9,7 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import Overlay from "./Overlay"; // Assuming Overlay is a component that adds additional UI overlay
-import { checkInByQRCode } from "@/composables/useCheckInAttendance";
+import { scanTokenByQRCode } from "@/composables/useCheckInAttendance";
 import * as SecureStore from "expo-secure-store";
 import ProfileModal from "@/components/ProfileModal";
 
@@ -65,15 +65,12 @@ const ScanQrContact = () => {
       return;
     }
     setScanning(true);
-    console.log("Scanning qr contact")
     setScannedValue(data);
 
     if (data) {
-      console.log("Data: " + data)
-
       const token = await SecureStore.getItemAsync("my-jwt");
 
-      const response = await checkInByQRCode(
+      const response = await scanTokenByQRCode(
         token,
         data,
         "api/v1/saveContact",
@@ -87,7 +84,6 @@ const ScanQrContact = () => {
       }
 
       setApiResponse("API call successful!");
-      console.log("apiResponse: " + apiResponse)
 
       setContact(response)
       openModal(response)
