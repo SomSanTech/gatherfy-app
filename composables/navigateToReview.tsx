@@ -1,7 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
-// กำหนดประเภทของ Stack Navigator
 type RootStackParamList = {
   ReviewScreen: { eventId: number };
 };

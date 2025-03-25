@@ -13,6 +13,7 @@ import { useFetchTicketWithAuth } from "@/composables/useFetchTicket";
 import { getEvent } from "@/composables/getEvent";
 import formatDate from "@/utils/formatDate";
 import { RootStackParamList } from "@/rootStack/RootStackParamList";
+import useNavigateToGoBack from "@/composables/navigateToGoBack";
 
 type EventDetailRouteProp = RouteProp<RootStackParamList, "EventDetail">;
 
@@ -37,7 +38,7 @@ interface EventDetail {
 
 const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const { slug } = route.params;
-  const navigation = useNavigation();
+  const { navigateToGoBack } = useNavigateToGoBack();
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [eventDetail, setEventDetail] = useState<EventDetail>(
     {} as EventDetail
@@ -92,7 +93,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     <Fragment>
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => navigateToGoBack()}>
             <Icon name="arrow-back" size={24} color="#000000" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Event Detail</Text>

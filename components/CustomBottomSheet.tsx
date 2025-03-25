@@ -18,7 +18,7 @@ import { Button } from "@rneui/themed";
 import { CheckBox } from "@rneui/themed";
 import { Easing } from "react-native-reanimated"; // นำเข้า Easing ที่ถูกต้อง
 import Datepicker from "@/components/Datepicker";
-import SortingDropdown from "@/components/Dropdown";
+import { SortingDropdown } from "@/components/Dropdown";
 import EventCard from "./EventCard";
 import icons from "@/constants/icons";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -40,36 +40,6 @@ interface Props {
   isLoading: boolean;
 }
 
-const mockupEvent = [
-  {
-    slug: "event-1",
-    name: "Event 1",
-    start_date: "2022-01-01",
-    end_date: "2022-01-02",
-    tags: ["tag1", "tag2"],
-    image: "https://via.placeholder.com/150",
-    location: "Location 1",
-  },
-  {
-    slug: "event-2",
-    name: "Event 2",
-    start_date: "2022-01-03",
-    end_date: "2022-01-04",
-    tags: ["tag2", "tag3"],
-    image: "https://via.placeholder.com/150",
-    location: "Location 2",
-  },
-  {
-    slug: "event-3",
-    name: "Event 3",
-    start_date: "2022-01-05",
-    end_date: "2022-01-06",
-    tags: ["tag1", "tag3"],
-    image: "https://via.placeholder.com/150",
-    location: "Location 3",
-  },
-];
-
 type Ref = BottomSheet;
 
 const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
@@ -80,8 +50,6 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
     duration: 400, // ปรับเวลาของแอนิเมชันเป็น 500ms
     easing: Easing.out(Easing.quad), // ใช้ easing แบบออกช้า
   });
-
-  const suggestedEvents = mockupEvent;
 
   const handleClose = () => {
     if (ref && typeof ref !== "function" && ref.current) {
@@ -192,10 +160,10 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
                       iconStyle={{ borderColor: "#D71515" }}
                       bounceEffectIn={0.9}
                       bounceEffectOut={1}
-                      bounceVelocityIn = {0.5}
-                      bounceVelocityOut = {0.3}
-                      bouncinessIn = {0.5}
-                      bouncinessOut = {0.5}
+                      bounceVelocityIn={0.5}
+                      bounceVelocityOut={0.3}
+                      bouncinessIn={0.5}
+                      bouncinessOut={0.5}
                       text={tag.tag_title} // ใช้ {} แทน ''
                       isChecked={props.selectedTags.includes(tag.tag_title)}
                       onPress={() => props.handleTagPress(tag.tag_title)}

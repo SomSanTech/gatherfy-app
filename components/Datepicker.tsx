@@ -8,38 +8,63 @@ import { Dimensions } from "react-native";
 interface DatepickerProps {
   date: string | undefined;
   setDate: Dispatch<SetStateAction<string | undefined>>;
+  disabledClear?: boolean | true;
 }
-const Datepicker: React.FC<DatepickerProps> = ({ date, setDate }) => {
+const Datepicker: React.FC<DatepickerProps> = ({
+  date,
+  setDate,
+  disabledClear = false,
+}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.customHeader}>- Select Date -</Text>
       <DateTimePicker
         mode="single"
         date={date ? dayjs(date).toDate() : undefined}
-        height={Dimensions.get("window").height/3.3}
+        height={Dimensions.get("window").height / 3.3}
         onChange={(params) => setDate(dayjs(params.date).format("YYYY-MM-DD"))}
         timePickerContainerStyle={{ backgroundColor: "white" }}
         selectedItemColor="#D71515"
-        selectedTextStyle={{ fontSize: 18, fontFamily: "Poppins-SemiBold" , lineHeight: 24  }} // เปลี่ยนฟอนต์ในวันที่เลือก
-        headerContainerStyle={{ borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5 }}
-
+        selectedTextStyle={{
+          fontSize: 18,
+          fontFamily: "Poppins-SemiBold",
+          lineHeight: 24,
+        }} // เปลี่ยนฟอนต์ในวันที่เลือก
+        headerContainerStyle={{
+          borderRadius: 20,
+          paddingHorizontal: 10,
+          paddingVertical: 5,
+        }}
         headerTextStyle={{
           fontSize: 20,
           fontFamily: "Poppins-SemiBold", // ลองใช้ "Arial" หรือ "Roboto" ดูก่อน
           fontWeight: "600",
           textAlign: "center",
         }}
-        
         headerButtonSize={20}
         headerButtonsPosition="around"
-        weekDaysTextStyle={{ color: "#D71515", fontSize: 18, fontFamily: "Poppins-SemiBold" }} // เปลี่ยนฟอนต์ในวัน
-        calendarTextStyle={{ fontSize: 18, fontFamily: "Poppins-SemiBold" , lineHeight: 24 }} // เปลี่ยนฟอนต์ในตัวเลือกวันที่
+        weekDaysTextStyle={{
+          color: "#D71515",
+          fontSize: 18,
+          fontFamily: "Poppins-SemiBold",
+        }} // เปลี่ยนฟอนต์ในวัน
+        calendarTextStyle={{
+          fontSize: 18,
+          fontFamily: "Poppins-SemiBold",
+          lineHeight: 24,
+        }} // เปลี่ยนฟอนต์ในตัวเลือกวันที่
       />
-      <View className="px-5">
-        <Button onPress={() => setDate(undefined)} buttonStyle={styles.buttonClear} titleStyle={styles.buttonText}>
-          Clear Date
-        </Button>
-      </View>
+      {!disabledClear && (
+        <View className="px-5">
+          <Button
+            onPress={() => setDate(undefined)}
+            buttonStyle={styles.buttonClear}
+            titleStyle={styles.buttonText}
+          >
+            Clear Date
+          </Button>
+        </View>
+      )}
     </View>
   );
 };
@@ -59,18 +84,18 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   buttonText: {
-    fontFamily: "Poppins-SemiBold",  // เปลี่ยนฟอนต์ที่ต้องการ
+    fontFamily: "Poppins-SemiBold", // เปลี่ยนฟอนต์ที่ต้องการ
     fontSize: 18,
     lineHeight: 24,
-    color: "white",  // กำหนดสีข้อความหากต้องการ
+    color: "white", // กำหนดสีข้อความหากต้องการ
   },
   customHeader: {
     fontSize: 20,
-    fontFamily: "Poppins-SemiBold",  // ฟอนต์ที่ต้องการ
+    fontFamily: "Poppins-SemiBold", // ฟอนต์ที่ต้องการ
     marginBottom: 10,
     lineHeight: 30,
-    textAlign: 'center',
-  }
+    textAlign: "center",
+  },
 });
 
 export default Datepicker;

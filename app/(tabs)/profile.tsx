@@ -21,11 +21,12 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import useNavigateToEditProfile from "@/composables/useNavigateToEditProfile";
 
 const Profile = () => {
   const navigation = useNavigation<any>();
   const [userInfo, setUserInfo] = useState<any>({});
-
+  const { navigateToEditProfile } = useNavigateToEditProfile();
   const [permission, requestPermission] = useCameraPermissions();
 
   const { authState, onLogout } = useAuth();
@@ -49,10 +50,7 @@ const Profile = () => {
       return;
     }
     if (userInfo.users_role === "Attendee") {
-      Alert.alert(
-        "Access Denied",
-        "You do not have permission to feature."
-      );
+      Alert.alert("Access Denied", "You do not have permission to feature.");
       return;
     } else if (userInfo.users_role === "Organization") {
       requestPermission();
@@ -87,6 +85,12 @@ const Profile = () => {
         {/* <TouchableOpacity style={styles.menuContainer}>
           <Text style={styles.menuText}>User Detail</Text>
         </TouchableOpacity> */}
+        <TouchableOpacity
+          onPress={() => navigateToEditProfile()}
+          style={styles.menuContainer}
+        >
+          <Text style={styles.menuText}>Edit Profile</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigateToScanQR()}
           style={styles.menuContainer}

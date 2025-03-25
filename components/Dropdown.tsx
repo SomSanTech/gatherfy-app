@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableWithoutFeedback, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+} from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import * as NavigationBar from "expo-navigation-bar";
 import { Button } from "@rneui/base";
@@ -55,7 +61,6 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
         activeColor="rgba(215, 21, 21, 0.5)"
         placeholderStyle={{
           color: "gray",
-          fontFamily: "Poppins-Regular",
           fontSize: 16,
           lineHeight: 30,
           marginTop: 2,
@@ -63,18 +68,17 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
         }} // เปลี่ยนฟอนต์ของ placeholder
         selectedTextStyle={{
           color: "black",
-          fontFamily: "Poppins-Regular",
           lineHeight: 24,
           marginTop: 2,
         }}
         itemTextStyle={{
           color: "black",
-          fontFamily: "Poppins-Regular",
           lineHeight: 24,
           marginTop: 2,
         }}
         itemContainerStyle={{ backgroundColor: "white" }}
         value={selectedSort}
+        fontFamily="Poppins-Regular"
         onChange={(item) => handleSortChange(item.value)}
       />
       <View className="items-end">
@@ -89,12 +93,60 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
   );
 };
 
+interface DropdownProps {
+  options: { label: string; value: string }[];
+  defaultValue: string;
+  indexFromParent: number;
+  clearButton?: boolean;
+  onSelect: (value: string) => void;
+}
+
+const DropdownComponent: React.FC<DropdownProps> = ({
+  options,
+  defaultValue,
+  onSelect,
+}) => {
+  return (
+    <Dropdown
+      style={styles.dropdown}
+      data={options}
+      labelField="label"
+      valueField="value"
+      placeholder="Select Platform"
+      activeColor="rgba(215, 21, 21, 0.5)"
+      placeholderStyle={{
+        color: "gray",
+        fontFamily: "Poppins-Regular",
+        fontSize: 12,
+        lineHeight: 30,
+        marginTop: 2,
+        includeFontPadding: false,
+      }} // เปลี่ยนฟอนต์ของ placeholder
+      selectedTextStyle={{
+        color: "black",
+        fontFamily: "Poppins-Regular",
+        includeFontPadding: false,
+      }}
+      itemTextStyle={{
+        color: "black",
+        fontFamily: "Poppins-Regular",
+        lineHeight: 24,
+        includeFontPadding: false,
+      }}
+      selectedTextProps={{ numberOfLines: 1 }}
+      itemContainerStyle={{ backgroundColor: "white" }}
+      value={defaultValue}
+      onChange={(selectedItem) => onSelect(selectedItem.value)}
+    />
+  );
+};
+
 const styles = StyleSheet.create({
   sortingWrapper: {
     marginBottom: 0,
   },
   dropdown: {
-    height: 50,
+    height: "100%",
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
@@ -111,10 +163,10 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: "Poppins-SemiBold",
     textAlign: "center",
-    fontSize: 16,
+    fontSize: 14,
     lineHeight: 24,
     color: "black",
   },
 });
 
-export default SortingDropdown;
+export { SortingDropdown, DropdownComponent };

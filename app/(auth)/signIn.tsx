@@ -27,7 +27,6 @@ import { backToIndex } from "@/composables/backToIndex";
 import { ActivityIndicator } from "react-native-paper";
 
 const SignIn = () => {
-  const navigation = useNavigation();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

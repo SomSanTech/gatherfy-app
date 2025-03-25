@@ -17,14 +17,20 @@ import Liked from "./ticket";
 import Profile from "./profile";
 import Search from "./search";
 import Tag from "./tag";
-import EventDetail from "../Stack/EventDetail";
-import EventTag from "../Stack/EventTag";
-import ScanQR from "../Stack/Scanner/ScanQR";
-import Review from "../Stack/Review";
+import EventDetail from "../stack/EventDetail";
+import EventTag from "../stack/EventTag";
+import ScanQR from "../stack/Scanner/ScanQR";
+import Review from "../stack/Review";
+import Contact from "./contact";
+import ShareProfile from "../stack/ShareProfile";
+import ScanQrContact from "../stack/Scanner/ScanQrContact";
+import EditProfile from "../stack/EditProfile";
+import EditSocialMedia from "../stack/EditSocialMedia";
+
 import { RootStackParamList } from "@/rootStack/RootStackParamList";
 import CustomTabBarButton from "@/components/CustomTabBarButton";
 import Ticket from "./ticket";
-import TicketDetail from "@/app/Stack/TicketDetail";
+import TicketDetail from "@/app/stack/TicketDetail";
 import { StatusBar } from "expo-status-bar";
 
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
@@ -54,13 +60,8 @@ const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
 };
 
 const Tab = createBottomTabNavigator();
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Contact from "./contact";
-import ShareProfile from "../Stack/ShareProfile";
-import ScanQrContact from "../Stack/Scanner/ScanQrContact";
 
 const TabNav = () => {
-  const insets = useSafeAreaInsets();
   return (
     <GestureHandlerRootView>
       <Tab.Navigator
@@ -68,14 +69,16 @@ const TabNav = () => {
         initialRouteName="Home"
         screenOptions={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? "";
-
           return {
             headerShown: false,
             tabBarShowLabel: false,
             tabBarActiveTintColor: "#D71515",
             tabBarInactiveTintColor: "#CDCDE0",
             tabBarStyle:
-              routeName === "ScanQR"
+              routeName === "ScanQR" ||
+              routeName == "ScanQrContact" ||
+              routeName === "EditProfile" ||
+              routeName === "EditSocialMedia"
                 ? { display: "none" }
                 : {
                     backgroundColor: "white",
@@ -289,6 +292,16 @@ const StackContactNavigation = () => {
         component={ShareProfile}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfile}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditSocialMedia"
+        component={EditSocialMedia}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
@@ -304,6 +317,16 @@ const StackProfileNavigation = () => {
       <Stack.Screen
         name="ScanQR"
         component={ScanQR}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfile}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EditSocialMedia"
+        component={EditSocialMedia}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

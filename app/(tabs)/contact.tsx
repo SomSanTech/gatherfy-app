@@ -9,7 +9,13 @@ import {
   Alert,
   Clipboard,
 } from "react-native";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { fetchContact } from "@/composables/usefetchContact";
 import * as SecureStore from "expo-secure-store";
@@ -26,8 +32,8 @@ import Animated from "react-native-reanimated";
 
 const Contact = () => {
   interface Profile {
-    userProfile: UserProfile
-    userSocials: Social[]
+    userProfile: UserProfile;
+    userSocials: Social[];
   }
   interface UserProfile {
     contactId: number;
@@ -41,12 +47,12 @@ const Contact = () => {
   }
 
   interface Social {
-    socialLink: string,
-    socialPlatform: string
+    socialLink: string;
+    socialPlatform: string;
   }
   interface Contact {
-    userProfile: UserProfile
-    userSocials: Social[]
+    userProfile: UserProfile;
+    userSocials: Social[];
   }
 
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -55,10 +61,10 @@ const Contact = () => {
   const [filterdContacts, setFilterdContacts] = useState<UserProfile[]>([]);
   const [profile, setProfile] = useState<Profile>();
   const navigation = useNavigation<any>(); // ดึง navigation มาใช้ใน component
-  const [modalType, setModalType] = useState('');
+  const [modalType, setModalType] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>();
-  const [contactModalType, setContactModalType] = useState('');
+  const [contactModalType, setContactModalType] = useState("");
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [search, setSearch] = useState<string>(""); // ใช้ useState สำหรับ search
@@ -76,15 +82,10 @@ const Contact = () => {
 
   const fetchProfile = async () => {
     const token = await SecureStore.getItemAsync("my-jwt");
-    console.log(token)
+    console.log(token);
     try {
-      const response = await fetchContact(
-        token,
-        "api/v2/profile",
-        "GET"
-      );
+      const response = await fetchContact(token, "api/v2/profile", "GET");
       setProfile(response);
-      console.log(response)
     } catch (error) {
       console.error("Error fetching profile:", error);
     }
@@ -94,14 +95,10 @@ const Contact = () => {
     const token = await SecureStore.getItemAsync("my-jwt");
     try {
       setIsLoading(true);
-      const response = await fetchContact(
-        token,
-        "api/v2/contacts",
-        "GET"
-      );
+      const response = await fetchContact(token, "api/v2/contacts", "GET");
       if (response) {
         setContacts(response);
-        setFilterdContacts(response)
+        setFilterdContacts(response);
       } else {
         console.error("Unexpected response format:", response);
       }
@@ -129,42 +126,49 @@ const Contact = () => {
   const openModal = (type: string, detail: Contact) => {
     if (type === "myCard") {
       setSelectedContact(detail);
-      setModalType("myCard")
-      setContactModalType("myCard")
-      setIsModalOpen(true)
-
+      setModalType("myCard");
+      setContactModalType("myCard");
+      setIsModalOpen(true);
     } else if (type === "contacts") {
       setSelectedContact(detail);
-      setModalType("contacts")
-      setContactModalType("contacts")
-      setIsModalOpen(true)
+      setModalType("contacts");
+      setContactModalType("contacts");
+      setIsModalOpen(true);
     }
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedContact(null)
-  }
+    setIsModalOpen(false);
+    setSelectedContact(null);
+  };
 
   const handleSearchSubmit = () => {
-    console.log("search key: " + search)
+    console.log("search key: " + search);
     let result = {};
     originalSections.forEach((section) => {
       const filteredUsers = section.data.filter((contact: Contact) => {
-        return contact.userProfile.username.toLowerCase().includes(search.toLowerCase())
-      })
+        return contact.userProfile.username
+          .toLowerCase()
+          .includes(search.toLowerCase());
+      });
       if (filteredUsers.length > 0) {
         result[section.title] = filteredUsers; // Assuming each section has a 'title' key
       }
-    })
-    setFilterdContacts(result)
-    console.log(contacts)
-  }
-
-  const refreshContacts = async () => {
-    fetchContacts()
+    });
+    setFilterdContacts(result);
+    console.log(contacts);
   };
 
+  const refreshContacts = async () => {
+    fetchContacts();
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+      fetchContacts();
+    }, [])
+  );
   useEffect(() => {
     fetchProfile();
     fetchContacts();
@@ -174,11 +178,11 @@ const Contact = () => {
     if (selectedContact && bottomSheetRef.current) {
       bottomSheetRef.current.expand(); // Open the BottomSheet when selectedContact is updated
     }
-  }, [selectedContact])
+  }, [selectedContact]);
 
   useEffect(() => {
-    handleSearchSubmit()
-  }, [search])
+    handleSearchSubmit();
+  }, [search]);
 
   const onRefresh = useCallback(() => {
     if (isLoading) return; // Prevent refresh if already loading
@@ -190,21 +194,24 @@ const Contact = () => {
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-white">
       <Text style={styles.header}>Contacts</Text>
-      <TouchableOpacity onPress={() => openModal("myCard", profile)} style={styles.myCardContainer}>
-          {profile?.userProfile.users_image ? (
-              <Image
-                source={{
-                  uri: profile.userProfile
-                    .users_image,
-                }}
-                style={styles.contactImage}
-              />
-            ) : (
-              <Image source={require("@/assets/icons/person-fill-icon.png")}
-                style={styles.contactImage}
-                className="opacity-70"
-              />
-            )}
+      <TouchableOpacity
+        onPress={() => openModal("myCard", profile)}
+        style={styles.myCardContainer}
+      >
+        {profile?.userProfile.users_image ? (
+          <Image
+            source={{
+              uri: profile.userProfile.users_image,
+            }}
+            style={styles.contactImage}
+          />
+        ) : (
+          <Image
+            source={require("@/assets/icons/person-fill-icon.png")}
+            style={styles.contactImage}
+            className="opacity-70"
+          />
+        )}
         <View>
           <Text style={styles.myCardUsername}>
             {profile?.userProfile.username}
@@ -232,13 +239,13 @@ const Contact = () => {
             {item.userProfile.users_image ? (
               <Image
                 source={{
-                  uri: item.userProfile
-                    .users_image,
+                  uri: item.userProfile.users_image,
                 }}
                 style={styles.contactImage}
               />
             ) : (
-              <Image source={require("@/assets/icons/person-fill-icon.png")}
+              <Image
+                source={require("@/assets/icons/person-fill-icon.png")}
                 style={styles.contactImage}
                 className="opacity-70"
               />
@@ -248,29 +255,19 @@ const Contact = () => {
                 {item.userProfile.username}
               </Text>
               <Text style={styles.contactFullname}>
-                {
-                  item.userProfile
-                    .users_firstname
-                }{" "}
-                {
-                  item.userProfile
-                    .users_lastname
-                }
+                {item.userProfile.users_firstname}{" "}
+                {item.userProfile.users_lastname}
               </Text>
             </View>
           </TouchableOpacity>
         )}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            {
-              search === "" ? (
-                <Text style={styles.emptyText}>
-                  You have no contact
-                </Text>) :
-                <Text style={styles.emptyText}>
-                  No Results for "{search}"
-                </Text>
-            }
+            {search === "" ? (
+              <Text style={styles.emptyText}>You have no contact</Text>
+            ) : (
+              <Text style={styles.emptyText}>No Results for "{search}"</Text>
+            )}
           </View>
         }
         refreshControl={
@@ -284,9 +281,16 @@ const Contact = () => {
         }
       />
       <View className="absolute bottom-2 right-2">
-        <TouchableOpacity onPress={() => navigateToScanQrContact()} style={styles.scanQr}>
+        <TouchableOpacity
+          onPress={() => navigateToScanQrContact()}
+          style={styles.scanQr}
+        >
           {/* <ImageBackground style={{ backgroundColor: "transparent" }} className="w-16 h-16" source={require("@/assets/icons/qr-code-icon.png")} /> */}
-          <ImageBackground style={{ backgroundColor: "transparent" }} className="w-12 h-12 opacity-90" source={require("@/assets/icons/StashQrCodeLight.png")} />
+          <ImageBackground
+            style={{ backgroundColor: "transparent" }}
+            className="w-12 h-12 opacity-90"
+            source={require("@/assets/icons/StashQrCodeLight.png")}
+          />
         </TouchableOpacity>
       </View>
       {isModalOpen && (
@@ -294,8 +298,8 @@ const Contact = () => {
           contactData={selectedContact}
           contactType={contactModalType}
           handleClose={handleCloseModal}
-          onContactDeleted={refreshContacts}>
-        </ProfileModal>
+          onContactDeleted={refreshContacts}
+        ></ProfileModal>
       )}
     </SafeAreaView>
   );
@@ -357,7 +361,7 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     justifyContent: "center",
-    margin: "auto"
+    margin: "auto",
   },
   emptyText: {
     fontWeight: "bold",
@@ -372,7 +376,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     height: "100%",
     borderTopLeftRadius: 25,
-    borderTopRightRadius: 25
+    borderTopRightRadius: 25,
   },
   modalHeader: {
     width: "100%",
@@ -381,7 +385,7 @@ const styles = StyleSheet.create({
   modalHeaderNoImage: {
     width: "100%",
     height: 500,
-    backgroundColor: "#acacac"
+    backgroundColor: "#acacac",
   },
   systemImage: {
     position: "absolute",
@@ -392,14 +396,14 @@ const styles = StyleSheet.create({
     alignContent: "flex-end",
     justifyContent: "flex-end",
     bottom: 0,
-    marginBottom: 0
+    marginBottom: 0,
   },
   emptyImage: {
     alignItems: "center",
     alignContent: "flex-end",
     justifyContent: "flex-end",
     bottom: 0,
-    marginBottom: 0
+    marginBottom: 0,
   },
   linearBackground: {
     flex: 1,
@@ -421,11 +425,9 @@ const styles = StyleSheet.create({
   platformIcon: {
     width: 22,
     height: 22,
-    marginRight: 6
+    marginRight: 6,
   },
-  customBackground: {
-
-  },
+  customBackground: {},
   scanQr: {
     alignItems: "flex-end",
     backgroundColor: "transparent", // Make the background transparent
@@ -434,13 +436,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 20,
-    marginHorizontal: 16
+    marginHorizontal: 16,
   },
   myCardOptions: {
     padding: 16,
     alignItems: "center",
     backgroundColor: "#ffff",
     width: "47%",
-    borderRadius: 20
-  }
+    borderRadius: 20,
+  },
 });

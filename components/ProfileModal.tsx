@@ -1,4 +1,5 @@
 import useNavigateToShareProfile from "@/composables/useNavigateToShareProfile";
+import useNavigateToEditProfile from "@/composables/useNavigateToEditProfile";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet"
 import { LinearGradient } from "expo-linear-gradient"
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -7,6 +8,7 @@ import DeleteConfirmModal from "./DeleteConfirmModal";
 import * as SecureStore from "expo-secure-store";
 import { fetchContact } from "@/composables/usefetchContact";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/native";
 
 interface ProfileModalProps {
     contactData: Contact | null | undefined;
@@ -37,10 +39,10 @@ interface Contact {
 
 const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, handleClose, onContactDeleted }) => {
 
-
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["90%"], []);
     const { navigateToShareProfile } = useNavigateToShareProfile()
+    const { navigateToEditProfile } = useNavigateToEditProfile()
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
     const [deleteContact, setDeleteContact] = useState<any | null>()
 
@@ -251,7 +253,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ contactData, contactType, h
                             }
                             {contactType === "myCard" &&
                                 <View style={styles.myCardOptionContainer}>
-                                    <TouchableOpacity style={styles.myCardOptions} >
+                                    <TouchableOpacity style={styles.myCardOptions} onPress={() => [navigateToEditProfile(), handleClose()]}>
                                         <Text>Edit profile</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.myCardOptions} onPress={() => [navigateToShareProfile(), handleClose()]}>
