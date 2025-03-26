@@ -12,6 +12,7 @@ import {
   ImageBackground,
   Modal,
   Platform,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
@@ -19,7 +20,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import useNavigateToGoBack from "@/composables/navigateToGoBack";
 import * as SecureStore from "expo-secure-store";
-import { fetchUserProfile } from "@/composables/useFetchUserProfile";
+import {
+  fetchUserProfile,
+  saveUserProfile,
+} from "@/composables/useFetchUserProfile";
 import DefaultProfile from "@/assets/images/default-profile.svg";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import {
@@ -30,8 +34,10 @@ import Datepicker from "@/components/Datepicker";
 import formatDate from "@/utils/formatDate";
 import { genderOptions } from "@/utils/genderOptions";
 import { useNavigation } from "@react-navigation/native";
+import { useAuth } from "@/app/context/AuthContext";
 
 const EditProfile = () => {
+  const { updateProfile } = useAuth();
   const { navigateToGoBack } = useNavigateToGoBack();
   const navigation = useNavigation<any>();
   const [username, setUsername] = useState("");
@@ -72,15 +78,66 @@ const EditProfile = () => {
     handleOpenDatePicker();
   };
 
-  const handleSave = () => {
-    console.log("Profile Updated", {
-      username,
-      firstname,
-      lastname,
-      email,
-      password,
-      profileImage,
-    });
+  // const handleSave = async () => {
+  //   try {
+  //     const token = await SecureStore.getItemAsync("my-jwt");
+  //     if (!token) {
+  //       Alert.alert(
+  //         "Error",
+  //         "User authentication failed. Please log in again."
+  //       );
+  //       return;
+  //     }
+
+  //     const dataToUpdate = {
+  //       firstname,
+  //       lastname,
+  //       username,
+  //       email,
+  //       phone,
+  //       birthday: dateOfBirth,
+  //       gender: userGender,
+  //     };
+
+  //     const response = await saveUserProfile(
+  //       token,
+  //       "/v1/profile",
+  //       "PUT",
+  //       dataToUpdate
+  //     );
+
+  //     if (response?.details) {
+  //       const detailsMessages = Object.values(response.details).join("\n"); // รวมข้อความจาก details
+  //       Alert.alert("Unsuccessful", detailsMessages);
+  //     } else {
+  //       Alert.alert("Success", "Profile updated successfully");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating profile:", error);
+  //     Alert.alert("Error", "Something went wrong. Please try again.");
+  //   }
+  // };
+
+  const handleSaveProfile = async () => {
+    if (updateProfile) {
+      const result = await updateProfile(
+        username,
+        firstname,
+        lastname,
+        email,
+        phone,
+        dateOfBirth,
+        userGender || ""
+      );
+
+      if (result.error) {
+        Alert.alert("Error", result.msg);
+      } else {
+        Alert.alert("Success", "Profile updated successfully");
+      }
+    } else {
+      Alert.alert("Error", "Update profile function is unavailable.");
+    }
   };
 
   const pickImage = async () => {
@@ -108,7 +165,7 @@ const EditProfile = () => {
       >
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={navigateToGoBack}>
-            <Icon name="arrow-back" size={24} color="#000000" />
+            <Icon name="chevron-back" size={24} color="#000000" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Edit Profile</Text>
         </View>
@@ -408,7 +465,7 @@ const EditProfile = () => {
                 </View>
               </View>
               <TouchableOpacity
-                onPress={handleSave}
+                onPress={handleSaveProfile}
                 className="bg-primary p-3 rounded-lg items-center"
               >
                 <Text className="text-white font-bold">Save Changes</Text>

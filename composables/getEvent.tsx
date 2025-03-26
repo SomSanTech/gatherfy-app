@@ -76,6 +76,8 @@ export const getEvent = async (
         searchParam
       )}&sort=${sortParam}&date=${dateParam}&tags=${tagParam}`;
 
+      console.log("Fetching search with URL:", url);
+      
       const response = await fetch(url, {
         method: "GET",
         headers: {

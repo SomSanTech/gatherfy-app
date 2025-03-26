@@ -17,7 +17,7 @@ import React, {
   useState,
 } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { fetchContact } from "@/composables/usefetchContact";
+import { fetchContact } from "@/composables/useFetchContact";
 import * as SecureStore from "expo-secure-store";
 import { useNavigation } from "@react-navigation/native";
 import SearchInput from "@/components/SearchInput";
@@ -144,7 +144,7 @@ const Contact = () => {
 
   const handleSearchSubmit = () => {
     console.log("search key: " + search);
-    let result = {};
+    let result: { [key: string]: Contact[] } = {};
     originalSections.forEach((section) => {
       const filteredUsers = section.data.filter((contact: Contact) => {
         return contact.userProfile.username
@@ -195,7 +195,7 @@ const Contact = () => {
     <SafeAreaView edges={["top"]} className="flex-1 bg-white">
       <Text style={styles.header}>Contacts</Text>
       <TouchableOpacity
-        onPress={() => openModal("myCard", profile)}
+        onPress={() => profile && openModal("myCard", profile)}
         style={styles.myCardContainer}
       >
         {profile?.userProfile.users_image ? (

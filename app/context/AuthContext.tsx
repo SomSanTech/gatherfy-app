@@ -22,6 +22,15 @@ interface AuthProps {
     gender: string,
     password: string
   ) => Promise<any>;
+  updateProfile?: (
+    username: string,
+    firstname: string,
+    lastname: string,
+    email: string,
+    phone: string,
+    birthday: string | undefined,
+    gender: string
+  ) => Promise<any>;
   onLogin?: (username: string, password: string) => Promise<any>;
   onLogout?: () => void;
 }
@@ -33,7 +42,12 @@ const lastnameStorage = "lastname";
 const emailStorage = "email";
 const roleStorage = "role";
 
-const API_URL = "https://capstone24.sit.kmutt.ac.th/us1";
+// const API_URL = "https://capstone24.sit.kmutt.ac.th/us1";
+
+
+const API_URL =
+  Constants.expoConfig?.extra?.apiBaseUrl ||
+  "https://capstone24.sit.kmutt.ac.th";
 
 export { API_URL };
 
@@ -206,6 +220,65 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
+  const updateProfile = async (
+    username: string,
+    firstname: string,
+    lastname: string,
+    email: string,
+    phone: string,
+    birthday: string | undefined,
+    gender: string
+  ) => {
+    const urlToFetch = `${API_URL}/api/v1/profile`;
+    console.log("urlToFetch", urlToFetch);
+    try {
+      // Update profile on the backend
+      const response = await axios.put(
+        `${API_URL}/api/v1/profile`,
+        {
+          username,
+          firstname,
+          lastname,
+          email,
+          phone,
+          birthday: dayjs(birthday).format("YYYY-MM-DDTHH:mm:ss"),
+          gender,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authState.token}`,
+          },
+        }
+      );
+
+      if (response.data) {
+        // Update the information in SecureStore
+        await SecureStore.setItemAsync(usernameStorage, username);
+        await SecureStore.setItemAsync(firstnameStorage, firstname);
+        await SecureStore.setItemAsync(lastnameStorage, lastname);
+        await SecureStore.setItemAsync(emailStorage, email);
+
+        // Update the context and authentication state
+        setAuthState((prevState) => ({
+          ...prevState,
+          username,
+          firstname,
+          lastname,
+          email,
+        }));
+
+        console.log("Profile updated successfully.");
+
+        // Return response to the calling function
+        return response;
+      }
+    } catch (err: any) {
+      const errorMsg = err?.response?.data?.message || "Error updating profile";
+      console.error("Error updating profile:", errorMsg);
+      return { error: true, msg: errorMsg };
+    }
+  };
+
   const login = async (username: string, password: string) => {
     try {
       const result = await axios.post(`${API_URL}/api/v1/login`, {
@@ -286,6 +359,7 @@ export const AuthProvider = ({ children }: any) => {
 
   const value = {
     onRegister: register,
+    updateProfile: updateProfile,
     onLogin: login,
     onLogout: logout,
     authState,

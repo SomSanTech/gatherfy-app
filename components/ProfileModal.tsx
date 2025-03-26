@@ -6,7 +6,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { Alert, Clipboard, Image, ImageBackground, Linking, Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import * as SecureStore from "expo-secure-store";
-import { fetchContact } from "@/composables/usefetchContact";
+import { fetchContact } from "@/composables/useFetchContact";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 

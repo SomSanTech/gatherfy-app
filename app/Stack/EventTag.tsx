@@ -11,6 +11,12 @@ import { getEvent } from "@/composables/getEvent";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import EventCard from "@/components/EventCard";
 import Icon from "react-native-vector-icons/Ionicons";
+import NotificationAdd from "@/assets/images/notification-add.svg";
+import * as SecureStore from "expo-secure-store";
+import {
+  fetchSubscribed,
+  saveSubscribe,
+} from "@/composables/useFetchSubscribe";
 
 interface EventDetailProps {
   route: any; // Adjust the type as needed
@@ -18,9 +24,11 @@ interface EventDetailProps {
 
 const EventTag: React.FC<EventDetailProps> = ({ route }) => {
   const { tag } = route.params;
+  const { tagId } = route.params;
   const navigation = useNavigation();
   const [events, setEvents] = useState([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [subscribed, setSubscribed] = useState<boolean>(false);
 
   const fetchEventData = async () => {
     const data = await getEvent(
@@ -35,24 +43,82 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
     setIsLoading(false);
   };
 
+  const loadSubscribed = async () => {
+    const token = await SecureStore.getItemAsync("my-jwt");
+    const responseSub = await fetchSubscribed(token, "GET");
+    console.log(responseSub); // ตรวจสอบค่าที่ได้
+
+    const subscribedList = responseSub.tagId; // [1, 6]
+    console.log(subscribedList);
+
+    if (subscribedList.includes(Number(tagId))) {
+      setSubscribed(true);
+    }
+  };
+
+  const handleChangeSubscribed = () => {
+    setSubscribed(!subscribed);
+    if (!subscribed) {
+      saveSubscription(tagId);
+    } else {
+      deleteSubscription(tagId);
+    }
+  };
+
+  const saveSubscription = async (tagId: number) => {
+    const token = await SecureStore.getItemAsync("my-jwt");
+    const responseSub = await saveSubscribe(token, "POST", `/api/v1/subscribe`, tagId);
+    console.log("response sub post"+responseSub);
+  };
+
+  const deleteSubscription = async (tagId: number) => {
+    const token = await SecureStore.getItemAsync("my-jwt");
+    const responseSub = await saveSubscribe(token, "DELETE",`/api/v1/subscribe/${tagId}`);
+    console.log("response sub delete"+responseSub);
+  };
+
   useEffect(() => {
+    loadSubscribed();
     fetchEventData();
   }, []);
 
   return (
     <SafeAreaView edges={["top"]} style={styles.container}>
-      <View className=" px-4 py-4 space-y-6" style={styles.headerContainer}>
+      <View className=" px-4 py-4 space-y-3" style={styles.headerContainer}>
         <View className="items-center justify-between flex-row">
-          <TouchableOpacity onPress={() => navigation.goBack()} className="">
-            <Icon name="arrow-back" size={24} color="#000000" />
-          </TouchableOpacity>
-          <Text
-            className="text-xl font-Poppins-Bold text-center"
-            style={styles.headerText}
-          >
-            {tag}
-          </Text>
-          <View className="w-6"></View>
+          <View className="flex-row items-center">
+            <TouchableOpacity onPress={() => navigation.goBack()} className="">
+              <Icon name="chevron-back" size={24} color="#000000" />
+            </TouchableOpacity>
+            <Text
+              className="text-xl font-Poppins-Bold text-center ml-5"
+              style={styles.headerText}
+            >
+              {tag}
+            </Text>
+          </View>
+          {subscribed ? (
+            <TouchableOpacity
+              style={styles.subscribeButton}
+              onPress={() => handleChangeSubscribed()}
+            >
+              <Icon
+                name="checkmark"
+                size={23.2}
+                color="#000000"
+                style={{ paddingLeft: 2 }}
+              />
+              <Text style={styles.subscribeButtonText}>Subscribed</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.subscribeButton}
+              onPress={() => handleChangeSubscribed()}
+            >
+              <NotificationAdd />
+              <Text style={styles.subscribeButtonText}>Subscribe</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       {isLoading ? (
@@ -87,6 +153,22 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 21,
+  },
+  subscribeButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 5,
+    paddingRight: 8,
+    backgroundColor: "#f1f1f1",
+    borderRadius: 8,
+  },
+  subscribeButtonText: {
+    includeFontPadding: false,
+    fontSize: 14.2,
+    fontFamily: "Poppins-Bold",
+    color: "#000000",
+    marginLeft: 5,
   },
   loadingContainer: {
     flex: 1,

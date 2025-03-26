@@ -16,6 +16,11 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { Button } from "@rneui/themed";
 import { CheckBox } from "@rneui/themed";
+
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { Easing } from "react-native-reanimated"; // นำเข้า Easing ที่ถูกต้อง
 import Datepicker from "@/components/Datepicker";
 import { SortingDropdown } from "@/components/Dropdown";
@@ -146,7 +151,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
             <View style={styles.sortingWrapper}>
               <SortingDropdown sorting={props.sorting} />
             </View>
-            <View className="mb-5 bg-gray-200 rounded-lg p-5 mt-4">
+            <View className="mb-5 bg-gray-200 rounded-lg p-5 mt-10">
               <Text className="text-center text-lg text-primary font-Poppins-SemiBold">
                 Tags
               </Text>
@@ -172,6 +177,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
                         textDecorationLine: "none",
                         padding: 0,
                         color: "#000000",
+                        fontSize: wp("3.3%"),
                       }}
                     />
                   </View>
@@ -273,7 +279,9 @@ const styles = StyleSheet.create({
     marginBottom: 0, // ไม่มี margin สำหรับแถวสุดท้าย
   },
   sortingWrapper: {
+    height: 30,
     marginTop: 10,
+    marginBottom: 10,
   },
 });
 

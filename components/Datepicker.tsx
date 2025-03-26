@@ -21,7 +21,7 @@ const Datepicker: React.FC<DatepickerProps> = ({
       <DateTimePicker
         mode="single"
         date={date ? dayjs(date).toDate() : undefined}
-        height={Dimensions.get("window").height / 3.3}
+        height={Dimensions.get("window").height / 3.1}
         onChange={(params) => setDate(dayjs(params.date).format("YYYY-MM-DD"))}
         timePickerContainerStyle={{ backgroundColor: "white" }}
         selectedItemColor="#D71515"
@@ -55,7 +55,7 @@ const Datepicker: React.FC<DatepickerProps> = ({
         }} // เปลี่ยนฟอนต์ในตัวเลือกวันที่
       />
       {!disabledClear && (
-        <View className="px-5">
+        <View className="px-5 mt-5">
           <Button
             onPress={() => setDate(undefined)}
             buttonStyle={styles.buttonClear}

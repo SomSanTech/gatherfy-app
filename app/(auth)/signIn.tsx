@@ -74,7 +74,7 @@ const SignIn = () => {
                   onPress={backToIndex}
                   className="bg-primary p-2 rounded-tr-2xl rounded-bl-2xl ml-4"
                 >
-                  <Icon name="arrow-back" size={24} color="#ffffff" />
+                  <Icon name="chevron-back" size={24} color="#ffffff" />
                 </TouchableOpacity>
               </View>
               <View className="flex-row justify-center">

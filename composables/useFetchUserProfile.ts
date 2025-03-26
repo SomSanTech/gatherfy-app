@@ -38,3 +38,51 @@ export const fetchUserProfile = async (
     return { error: "Failed to fetch data" };
   }
 };
+
+export const saveUserProfile = async (
+  token: string,
+  url: string,
+  method: string,
+  data: any
+) => {
+  try {
+    if (!API_BASE_URL) {
+      console.error("API_BASE_URL is not defined in the app's configuration.");
+      return { error: "API base URL is not set." };
+    }
+
+    let urlToFetch = `${API_BASE_URL}/api${url}`;
+
+    console.log("urlToFetch", urlToFetch);
+    
+
+    const response = await fetch(urlToFetch, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    const responseData = await response.json(); // ✅ อ่าน JSON ก่อนเช็ค response.ok
+
+    if (!response.ok) {
+      console.error(
+        `Error: ${response.status} - ${response.statusText}`,
+        responseData
+      );
+      return {
+        error:
+          responseData.error ||
+          `Error: ${response.status} - ${response.statusText}`,
+        details: responseData.details || {},
+      };
+    }
+
+    return responseData; // ✅ คืนค่าปกติเมื่อสำเร็จ
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return { error: "Failed to fetch data" };
+  }
+};

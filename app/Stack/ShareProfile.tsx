@@ -97,7 +97,7 @@ const ShareProfile: React.FC<ProfileProps> = ({ route }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.cardContainer}>
         <TouchableOpacity onPress={() => navigation.goBack()} className="absolute top-4 left-4">
-          <Icon name="arrow-back" size={26} color="#000000" />
+          <Icon name="chevron-back" size={26} color="#000000" />
         </TouchableOpacity>
         <View>
           <Text className="text-center text-xl font-semibold">{ username }</Text>

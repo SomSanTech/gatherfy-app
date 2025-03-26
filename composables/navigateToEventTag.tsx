@@ -1,11 +1,15 @@
 import { useNavigation } from "@react-navigation/native";
+import { useCallback } from "react";
 
-const useNavigateToEventTag = (tag:string) => {
+const useNavigateToEventTag = () => {
   const navigation = useNavigation<any>();
 
-  const navigateToEventTag = (tag: string) => {
-    navigation.navigate("EventTag", { tag });
-  };
+  const navigateToEventTag = useCallback(
+    (tag: string, tagId: number) => {
+      navigation.navigate("EventTag", { tag, tagId });
+    },
+    [navigation]
+  );
 
   return { navigateToEventTag };
 };

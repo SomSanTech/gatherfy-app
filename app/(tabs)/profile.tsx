@@ -22,11 +22,14 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import useNavigateToEditProfile from "@/composables/useNavigateToEditProfile";
+import useNavigateToEmailNotificationSetting from "@/composables/useNavigateToEmailNotificationSetting";
 
 const Profile = () => {
   const navigation = useNavigation<any>();
   const [userInfo, setUserInfo] = useState<any>({});
   const { navigateToEditProfile } = useNavigateToEditProfile();
+  const { navigateToEmailNotificationSetting } =
+    useNavigateToEmailNotificationSetting();
   const [permission, requestPermission] = useCameraPermissions();
 
   const { authState, onLogout } = useAuth();
@@ -90,6 +93,12 @@ const Profile = () => {
           style={styles.menuContainer}
         >
           <Text style={styles.menuText}>Edit Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigateToEmailNotificationSetting()}
+          style={styles.menuContainer}
+        >
+          <Text style={styles.menuText}>Email Notification Setting</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigateToScanQR()}

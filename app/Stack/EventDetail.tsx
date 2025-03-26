@@ -14,6 +14,12 @@ import { getEvent } from "@/composables/getEvent";
 import formatDate from "@/utils/formatDate";
 import { RootStackParamList } from "@/rootStack/RootStackParamList";
 import useNavigateToGoBack from "@/composables/navigateToGoBack";
+import { Colors } from "@/constants/Colors";
+import useNavigateToEventTag from "@/composables/navigateToEventTag";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 type EventDetailRouteProp = RouteProp<RootStackParamList, "EventDetail">;
 
@@ -46,6 +52,8 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const [isRegistered, setIsRegistered] = useState<boolean>(false);
   const [usersInfo, setUsersInfo] = useState<any>([]);
   const [confirmRegister, setConfirmRegister] = useState<boolean>(false);
+
+  const { navigateToEventTag } = useNavigateToEventTag();
 
   const fetchDataDetailAsync = async () => {
     const response = await getEvent("detail", undefined, slug);
@@ -94,7 +102,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={() => navigateToGoBack()}>
-            <Icon name="arrow-back" size={24} color="#000000" />
+            <Icon name="chevron-back" size={24} color="#000000" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Event Detail</Text>
         </View>
@@ -107,14 +115,27 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
             />
           </View>
           <View style={styles.detailContainer}>
-            <View style={styles.tagsContainer}>
+            <Text style={styles.eventName}>{eventDetail.name}</Text>
+            {/* <View style={styles.tagsContainer}>
               {eventDetail.tags?.length > 0 && (
                 <Text style={styles.tagsText}>
                   {eventDetail.tags.map((tag) => tag.tag_title).join(", ")}
                 </Text>
               )}
+            </View> */}
+            <View style={styles.tagsContainer}>
+              {eventDetail.tags?.map((tag) => (
+                <TouchableOpacity
+                  key={tag.tag_id}
+                  style={styles.tagBox}
+                  onPress={() => navigateToEventTag(tag.tag_title , tag.tag_id)}
+                >
+                  <View style={styles.tagTextContainer}>
+                    <Text style={styles.tagText}>{tag.tag_title}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </View>
-            <Text style={styles.eventName}>{eventDetail.name}</Text>
             <View style={styles.dateContainer}>
               <Icon name="calendar-outline" size={20} color="#000000" />
               <Text style={styles.dateText}>
@@ -232,6 +253,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   headerText: {
+    includeFontPadding: false,
     fontSize: 18,
     fontFamily: "Poppins-Bold",
     marginLeft: 10,
@@ -247,22 +269,50 @@ const styles = StyleSheet.create({
   },
   detailContainer: {
     padding: 15,
+    paddingVertical: 20,
     backgroundColor: "#f5f5f5",
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-  },
-  tagsContainer: {
-    marginBottom: 5,
-  },
-  tagsText: {
-    fontSize: 14,
-    fontFamily: "Poppins-Regular",
-    color: "#777777",
+    marginBottom: 25,
   },
   eventName: {
     fontSize: 24,
+    includeFontPadding: false,
     fontFamily: "Poppins-Bold",
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 10,
     marginBottom: 15,
+  },
+  tagBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.white,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3.84,
+    elevation: 6,
+  },
+  tagTextContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    gap: 5,
+  },
+  tagText: {
+    includeFontPadding: false,
+    fontFamily: "Poppins-SemiBold",
+    fontSize: wp(3),
+    color: "#333",
+  },
+  tagIconContainer: {
+    paddingHorizontal: 7,
   },
   dateContainer: {
     flexDirection: "row",

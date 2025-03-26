@@ -141,7 +141,7 @@ const EditSocialMedia = () => {
       >
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={navigateToGoBack}>
-            <Icon name="arrow-back" size={24} color="#000000" />
+            <Icon name="chevron-back" size={24} color="#000000" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Edit Social Media</Text>
         </View>

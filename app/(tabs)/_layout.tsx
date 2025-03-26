@@ -26,6 +26,7 @@ import ShareProfile from "../stack/ShareProfile";
 import ScanQrContact from "../stack/Scanner/ScanQrContact";
 import EditProfile from "../stack/EditProfile";
 import EditSocialMedia from "../stack/EditSocialMedia";
+import EmailNotificationSetting from "../stack/EmailNotificationSetting";
 
 import { RootStackParamList } from "@/rootStack/RootStackParamList";
 import CustomTabBarButton from "@/components/CustomTabBarButton";
@@ -204,6 +205,11 @@ const StackHomeNavigator = () => {
         component={EventDetail}
         options={{ headerShown: false }}
       />
+       <Stack.Screen
+        name="EventTag"
+        component={EventTag}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
@@ -221,31 +227,36 @@ const StackSearchNavigation = () => {
         component={EventDetail}
         options={{ headerShown: false }}
       />
+       <Stack.Screen
+        name="EventTag"
+        component={EventTag}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
 
-// const StackTagNavigation = () => {
-//   return (
-//     <Stack.Navigator>
-//       <Stack.Screen
-//         name="TagScreen"
-//         component={Tag}
-//         options={{ headerShown: false }}
-//       />
-//       <Stack.Screen
-//         name="EventTag"
-//         component={EventTag}
-//         options={{ headerShown: false }}
-//       />
-//       <Stack.Screen
-//         name="EventDetail"
-//         component={EventDetail}
-//         options={{ headerShown: false }}
-//       />
-//     </Stack.Navigator>
-//   );
-// };
+const StackTagNavigation = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="TagScreen"
+        component={Tag}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EventTag"
+        component={EventTag}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EventDetail"
+        component={EventDetail}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 const StackTicketNavigation = () => {
   return (
@@ -268,6 +279,11 @@ const StackTicketNavigation = () => {
       <Stack.Screen
         name="EventDetail"
         component={EventDetail}
+        options={{ headerShown: false }}
+      />
+       <Stack.Screen
+        name="EventTag"
+        component={EventTag}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
@@ -327,6 +343,11 @@ const StackProfileNavigation = () => {
       <Stack.Screen
         name="EditSocialMedia"
         component={EditSocialMedia}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EmailNotificationSetting"
+        component={EmailNotificationSetting}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

@@ -156,7 +156,7 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ route }) => {
         <View style={styles.ticketBox}>
           <View className="items-center justify-between flex-row mb-4">
             <TouchableOpacity onPress={() => navigation.goBack()} className="">
-              <Icon name="arrow-back" size={24} color="#000000" />
+              <Icon name="chevron-back" size={24} color="#000000" />
             </TouchableOpacity>
             <Text className="text-3xl font-Poppins-Bold text-center">
              - Ticket -

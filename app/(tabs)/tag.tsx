@@ -17,7 +17,7 @@ import {
 
 const Tag = () => {
   const [tags, setTags] = useState<
-    { tag_id: string; tag_title: string; tag_code: string }[]
+    { tag_id: number; tag_title: string; tag_code: string }[]
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -32,7 +32,7 @@ const Tag = () => {
     }
   };
 
-  const { navigateToEventTag } = useNavigateToEventTag("defaultTag");
+  const { navigateToEventTag } = useNavigateToEventTag("defaultTag" , 0);
 
   useEffect(() => {
     fetchTagData();
@@ -55,7 +55,7 @@ const Tag = () => {
                 <TouchableOpacity
                   key={tag.tag_id}
                   style={styles.tagButton}
-                  onPress={() => navigateToEventTag(tag.tag_title)}
+                  onPress={() => navigateToEventTag(tag.tag_title , tag.tag_id)}
                 >
                   <View></View>
                   <Text style={styles.tagText} numberOfLines={1}>{tag.tag_title}</Text>

@@ -200,7 +200,7 @@ const SignUp = () => {
             onPress={backToIndex}
             className="bg-primary p-2 rounded-tr-2xl rounded-bl-2xl ml-4"
           >
-            <Icon name="arrow-back" size={24} color="#ffffff" />
+            <Icon name="chevron-back" size={24} color="#ffffff" />
           </TouchableOpacity>
           <Text
             style={styles.headerText}
