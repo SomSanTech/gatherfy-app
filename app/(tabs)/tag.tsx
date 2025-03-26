@@ -32,7 +32,7 @@ const Tag = () => {
     }
   };
 
-  const { navigateToEventTag } = useNavigateToEventTag("defaultTag" , 0);
+  const { navigateToEventTag } = useNavigateToEventTag();
 
   useEffect(() => {
     fetchTagData();

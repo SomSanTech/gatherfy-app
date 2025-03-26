@@ -52,19 +52,43 @@ const EditProfile = () => {
   const [dateOfBirth, setDateOfBirth] = useState<string | undefined>(undefined);
   const [userGender, setUserGender] = useState<string | undefined>(undefined);
 
-  const loadUserProfile = async () => {
-    const token = await SecureStore.getItemAsync("my-jwt");
-    const user = await fetchUserProfile(token, "/v1/profile", "GET");
+  // const loadUserProfile = async () => {
+  //   const token = await SecureStore.getItemAsync("my-jwt");
+  //   const user = await fetchUserProfile(token, "/v1/profile", "GET");
 
-    setUserInfo(user);
-    setUsername(user.username);
-    setFirstname(user.users_firstname);
-    setLastname(user.users_lastname);
-    setPhone(user.users_phone);
-    setDateOfBirth(user.users_birthday);
-    setEmail(user.users_email);
-    setProfileImage(user.users_image);
-    setUserGender(user.users_gender);
+  //   setUserInfo(user);
+  //   setUsername(user.username);
+  //   setFirstname(user.users_firstname);
+  //   setLastname(user.users_lastname);
+  //   setPhone(user.users_phone);
+  //   setDateOfBirth(user.users_birthday);
+  //   setEmail(user.users_email);
+  //   setProfileImage(user.users_image);
+  //   setUserGender(user.users_gender);
+  // };
+
+  const loadUserProfile = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("my-jwt");
+      const user = await fetchUserProfile(token, "/v1/profile", "GET");
+
+      if (!user) {
+        throw new Error("User profile not found.");
+      }
+
+      setUserInfo(user);
+      setUsername(user.username || "");
+      setFirstname(user.users_firstname || "");
+      setLastname(user.users_lastname || "");
+      setPhone(user.users_phone || "");
+      setDateOfBirth(user.users_birthday || "");
+      setEmail(user.users_email || "");
+      setProfileImage(user.users_image || null);
+      setUserGender(user.users_gender || "");
+    } catch (error) {
+      console.error("Failed to load user profile:", error);
+      Alert.alert("Error", "Failed to load user profile.");
+    }
   };
 
   const handleOpenDatePicker = () => {
@@ -118,7 +142,88 @@ const EditProfile = () => {
   //   }
   // };
 
+  if (!updateProfile) {
+    console.error("updateProfile function is not available.");
+  }
+
+  // const handleSaveProfile = async () => {
+  //   if (updateProfile) {
+  //     const result = await updateProfile(
+  //       username,
+  //       firstname,
+  //       lastname,
+  //       email,
+  //       phone,
+  //       dateOfBirth,
+  //       userGender || ""
+  //     );
+
+  //     if (result.error) {
+  //       Alert.alert("Error", result.msg);
+  //     } else {
+  //       Alert.alert("Success", "Profile updated successfully");
+  //     }
+  //   } else {
+  //     Alert.alert("Error", "Update profile function is unavailable.");
+  //   }
+  // };
+
+  // const handleSaveProfile = async () => {
+  //   if (!firstname || !lastname || !username || !email || !phone) {
+  //     Alert.alert("Unsuccess", "Please fill in all required fields.");
+  //     return;
+  //   }
+
+  //   if (!/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+  //     Alert.alert("Unsuccess", "Invalid email format.");
+  //     return;
+  //   }
+
+  //   if (updateProfile) {
+  //     const result = await updateProfile(
+  //       username,
+  //       firstname,
+  //       lastname,
+  //       email,
+  //       phone,
+  //       dateOfBirth,
+  //       userGender || ""
+  //     );
+  //     if (result.error) {
+  //       Alert.alert("Error", result.msg);
+  //     } else {
+  //       Alert.alert("Success", "Profile updated successfully");
+  //     }
+  //   } else {
+  //     Alert.alert("Error", "Update profile function is unavailable.");
+  //   }
+  // };
+
   const handleSaveProfile = async () => {
+    const missingFields = [];
+
+    if (!firstname) missingFields.push("Firstname");
+    if (!lastname) missingFields.push("Lastname");
+    if (!username) missingFields.push("Username");
+    if (!email) missingFields.push("Email");
+    if (!phone) missingFields.push("Phone");
+    if (!dateOfBirth) missingFields.push("Birthday");
+    if (!userGender) missingFields.push("Gender");
+
+    if (missingFields.length > 0) {
+      Alert.alert(
+        "Missing Fields",
+        `Please fill in ${missingFields.join(", ")}`
+      );
+      return;
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (email && !emailRegex.test(email)) {
+      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      return;
+    }
+
     if (updateProfile) {
       const result = await updateProfile(
         username,
@@ -141,6 +246,15 @@ const EditProfile = () => {
   };
 
   const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Denied",
+        "Allow access to gallery to upload image."
+      );
+      return;
+    }
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
@@ -276,6 +390,12 @@ const EditProfile = () => {
                   </View>
                 )
               )}
+              <TouchableOpacity
+                style={styles.editImageContainer}
+                onPress={pickImage}
+              >
+                <Icon name="image-outline" size={30} color="black" />
+              </TouchableOpacity>
             </TouchableOpacity>
             <View style={styles.formContainer}>
               <View className="mb-4">
@@ -637,5 +757,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "Poppins-Bold",
     marginLeft: 10,
+  },
+  editImageContainer: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 25,
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    zIndex: 10, // เพื่อให้แน่ใจว่าอยู่เหนือภาพ
   },
 });

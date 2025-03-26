@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -30,6 +30,7 @@ import { Icon } from "react-native-elements";
 import { useAuth } from "@/app/context/AuthContext";
 import { fetchUserProfile } from "@/composables/useFetchUserProfile";
 import DefaultProfile from "@/assets/images/default-profile.svg";
+import { useFocusEffect } from "expo-router";
 
 interface SlideshowData {
   id: string;
@@ -106,11 +107,14 @@ const Home: React.FC = () => {
     setUserInfo(user);
   };
 
-  useEffect(() => {
-    loadUser();
-    fetchData();
-    fetchSlideshow();
-  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadUser();
+      fetchData();
+      fetchSlideshow();
+    }, [])
+  );
 
   useEffect(() => {}, [authState?.authenticated]);
 
@@ -184,9 +188,7 @@ const Home: React.FC = () => {
                       resizeMode="cover"
                     />
                   ) : (
-                    <DefaultProfile
-                      className="w-12 h-12 object-bottom rounded-full"
-                    />
+                    <DefaultProfile className="w-12 h-12 object-bottom rounded-full" />
                   )}
                 </TouchableOpacity>
               </View>

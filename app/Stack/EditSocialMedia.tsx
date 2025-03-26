@@ -8,7 +8,7 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -101,20 +101,23 @@ const EditSocialMedia = () => {
     });
   };
 
+
   const saveSocialMedia = async () => {
     try {
       const token = await SecureStore.getItemAsync("my-jwt");
-
-      // Create the socialMediaData to send to the backend
-      const socialMediaData = socialLinks.map((item) => ({
-        ...(item.socialId ? { socialId: item.socialId } : {}), // Add socialId if present
-        socialPlatform: item.platform,
-        socialLink: item.link,
-      }));
-
-      // Send the socialMediaData to the backend (implement saveSocialMediaData)
+  
+      // กรองเฉพาะข้อมูลที่ไม่ว่าง และ trim ค่าที่ป้อนเข้ามา
+      const socialMediaData = socialLinks
+        .map((item) => ({
+          ...(item.socialId ? { socialId: item.socialId } : {}),
+          socialPlatform: item.platform.trim(),
+          socialLink: item.link.trim(),
+        }))
+        .filter((item) => item.socialPlatform && item.socialLink); // กรองเฉพาะข้อมูลที่ไม่ว่าง
+  
+      // ส่งข้อมูลไปยัง backend
       const result = await saveSocialMediaData(token, socialMediaData, "PUT");
-
+  
       if (
         typeof result === "object" &&
         "message" in result &&
@@ -210,10 +213,14 @@ const EditSocialMedia = () => {
             </Animated.View>
           }
         />
-
-        <TouchableOpacity style={styles.saveButton} onPress={saveSocialMedia}>
-          <Text style={styles.saveButtonText}>Save</Text>
-        </TouchableOpacity>
+        <Animated.View
+          entering={FadeInDown.delay(200).duration(500).springify()}
+          exiting={FadeOutUp.delay(200).duration(500).springify()}
+        >
+          <TouchableOpacity style={styles.saveButton} onPress={saveSocialMedia}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -277,7 +284,8 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
   },
   saveButton: {
-    backgroundColor: "green",
+    backgroundColor: Colors.primary,
+    marginHorizontal: 15,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
