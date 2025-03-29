@@ -11,7 +11,7 @@ import { getEvent } from "@/composables/getEvent";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import EventCard from "@/components/EventCard";
 import Icon from "react-native-vector-icons/Ionicons";
-import NotificationAdd from "@/assets/images/notification-add.svg";
+import NotificationAdd from "@/assets/icons/notification-add.svg";
 import * as SecureStore from "expo-secure-store";
 import {
   fetchSubscribed,

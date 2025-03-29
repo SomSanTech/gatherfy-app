@@ -21,5 +21,5 @@ export default {
     backArrow,
     ticket,
     filter,
-    contact
+    contact,
 };

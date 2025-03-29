@@ -27,6 +27,7 @@ import ScanQrContact from "../stack/Scanner/ScanQrContact";
 import EditProfile from "../stack/EditProfile";
 import EditSocialMedia from "../stack/EditSocialMedia";
 import EmailNotificationSetting from "../stack/EmailNotificationSetting";
+import ResetPassword from "../stack/ResetPassword";
 
 import { RootStackParamList } from "@/rootStack/RootStackParamList";
 import CustomTabBarButton from "@/components/CustomTabBarButton";
@@ -205,7 +206,7 @@ const StackHomeNavigator = () => {
         component={EventDetail}
         options={{ headerShown: false }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="EventTag"
         component={EventTag}
         options={{ headerShown: false }}
@@ -227,7 +228,7 @@ const StackSearchNavigation = () => {
         component={EventDetail}
         options={{ headerShown: false }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="EventTag"
         component={EventTag}
         options={{ headerShown: false }}
@@ -281,7 +282,7 @@ const StackTicketNavigation = () => {
         component={EventDetail}
         options={{ headerShown: false }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="EventTag"
         component={EventTag}
         options={{ headerShown: false }}
@@ -348,6 +349,11 @@ const StackProfileNavigation = () => {
       <Stack.Screen
         name="EmailNotificationSetting"
         component={EmailNotificationSetting}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ResetPassword"
+        component={ResetPassword}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

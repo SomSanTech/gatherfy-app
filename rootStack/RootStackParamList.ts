@@ -15,4 +15,5 @@ export type RootStackParamList = {
   EditProfile: undefined;
   EditSocialMedia: undefined;
   EmailNotificationSetting: undefined;
+  ResetPassword: undefined;
 };
