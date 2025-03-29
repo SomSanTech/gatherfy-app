@@ -18,6 +18,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeInRight,
+} from "react-native-reanimated";
 import * as SecureStore from "expo-secure-store";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -79,8 +84,6 @@ const ResetPassword = () => {
     }
   }, [confirmPassword, newPassword]);
 
-
-  
   const handleSavePassword = async () => {
     setIsLoading(true);
     const token = await SecureStore.getItemAsync("my-jwt");

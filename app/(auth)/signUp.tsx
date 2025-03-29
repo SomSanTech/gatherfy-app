@@ -29,6 +29,7 @@ import Datepicker from "@/components/Datepicker";
 import formatDate from "@/utils/formatDate";
 import { backToIndex } from "@/composables/backToIndex";
 import { ActivityIndicator } from "react-native-paper";
+import { Colors } from "@/constants/Colors";
 
 const SignUp = () => {
   const navigation = useNavigation();
@@ -55,7 +56,8 @@ const SignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCreated, setIsCreated] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+    useState(false);
 
   const { onRegister, onLogin } = useAuth();
 
@@ -181,7 +183,7 @@ const SignUp = () => {
       setIsLoading(false);
       alert("Create Account Success");
       setIsCreated(true);
-      (navigation as any).navigate("signIn")
+      (navigation as any).navigate("signIn");
     }
   };
 
@@ -228,6 +230,67 @@ const SignUp = () => {
                 showsHorizontalScrollIndicator={false}
               >
                 <View className="form space-y-2 gap-4 pt-8 pb-16">
+                  <View className="flex-row justify-center space-x-2">
+                    <View className="flex-1">
+                      <TouchableOpacity
+                        onPress={() => setUserRole("Attendee")}
+                        className="bg-primary rounded-xl justify-center items-center p-5"
+                        style={{
+                          backgroundColor:
+                            userRole === "Attendee" ? Colors.primary : "#ffffff",
+                          borderWidth: 1,
+                          borderColor: userRole === "Attendee" ? Colors.primary : "#cccccc",
+                        }}
+                      >
+                        <Text
+                          className="text-center"
+                          style={[
+                            styles.RoleText,
+                            {
+                              color:
+                                userRole === "Attendee" ? "#ffffff" : "#000000",
+                            },
+                          ]}
+                        >
+                          Attendee
+                        </Text>
+                      </TouchableOpacity>
+                      <Text style={styles.roleDescription}>
+                        For users who want to explore and join existing events.
+                      </Text>
+                    </View>
+                    <View className="flex-1">
+                      <TouchableOpacity
+                        onPress={() => setUserRole("Organizer")}
+                        className="bg-primary rounded-xl justify-center items-center p-5"
+                        style={{
+                          backgroundColor:
+                            userRole === "Organizer" ? Colors.primary : "#ffffff",
+                          borderWidth: 1,
+                          borderColor:
+                            userRole === "Organizer" ? Colors.primary : "#cccccc",
+                        }}
+                      >
+                        <Text
+                          className="text-center"
+                          style={[
+                            styles.RoleText,
+                            {
+                              color:
+                                userRole === "Organizer"
+                                  ? "#ffffff"
+                                  : "#000000",
+                            },
+                          ]}
+                        >
+                          Organizer
+                        </Text>
+                      </TouchableOpacity>
+                      <Text style={styles.roleDescription}>
+                        For users who want to manage their own events.
+                      </Text>
+                    </View>
+                  </View>
                   <View>
                     <Text style={styles.topicField} className="text-sm">
                       Username
@@ -470,7 +533,9 @@ const SignUp = () => {
                         returnKeyType="done"
                       />
                       <TouchableOpacity
-                        onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
+                        onPress={() =>
+                          setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+                        }
                         className="absolute right-5 top-[30%]"
                       >
                         <Icon
@@ -544,6 +609,19 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontFamily: "Poppins-Regular",
   },
+  RoleText: {
+    fontSize: wp("3.1%"),
+    includeFontPadding: false,
+    fontFamily: "Poppins-Bold",
+  },
+  roleDescription: {
+    fontSize: wp("2.8%"),
+    color: "#000000",
+    fontFamily: "Poppins-Regular",
+    textAlign: "center",
+    marginTop: 5,
+    marginBottom: 5,
+  },
   inputField: {
     fontSize: wp("3.1%"), // ขนาด font เป็น 4% ของหน้าจอ
     fontFamily: "Poppins-Regular",
@@ -571,7 +649,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 20,
     width: wp("95%"), // กำหนดความกว้างเป็น 90% ของหน้าจอ
-    height: hp("55%"), // กำหนดความสูงเป็น 50% ของหน้าจอ
+    height: hp("60%"), 
     padding: 35,
     alignItems: "center",
     shadowColor: "#000",

@@ -117,7 +117,6 @@ const Profile = () => {
               <View style={styles.headerMenu}>
                 <Icon name="person" size={20} color="#000000" />
                 <Text style={styles.headerTypeSetting}>Account Setting</Text>
-                <View style={styles.headerTypeline} />
               </View>
               <View>
                 <TouchableOpacity
@@ -158,7 +157,6 @@ const Profile = () => {
                 <Text style={styles.headerTypeSetting}>
                   Notification Setting
                 </Text>
-                <View style={styles.headerTypeline} />
               </View>
               <View>
                 <TouchableOpacity
@@ -209,7 +207,6 @@ const Profile = () => {
                 <View style={styles.headerMenu}>
                   <Icon name="business" size={20} color="#000000" />
                   <Text style={styles.headerTypeSetting}>Organizer Menu</Text>
-                  <View style={styles.headerTypeline} />
                 </View>
                 <View>
                   <TouchableOpacity
@@ -290,7 +287,7 @@ const styles = StyleSheet.create({
   listLine: {
     width: "100%", // ให้กว้างเต็มพื้นที่ของ parent
     height: 1,
-    backgroundColor: "gray", // สีดำ
+    backgroundColor: "#dadada", // สีดำ
     alignSelf: "stretch", // ทำให้เส้นยืดเต็มความกว้างของ parent
   },
   headerTypeline: {

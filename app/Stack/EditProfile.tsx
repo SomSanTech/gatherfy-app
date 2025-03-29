@@ -35,6 +35,16 @@ import formatDate from "@/utils/formatDate";
 import { genderOptions } from "@/utils/genderOptions";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "@/app/context/AuthContext";
+import Constants from "expo-constants";
+import API from "@/utils/api";
+
+const API_BASE_URL =
+  Constants.expoConfig?.extra?.apiBaseUrl ||
+  "https://capstone24.sit.kmutt.ac.th";
+
+const API_MINIO_URL2 =
+  Constants.expoConfig?.extra?.apiMinioUrl2 ||
+  "http://cp24us1.sit.kmutt.ac.th:7070/profiles/";
 
 const EditProfile = () => {
   const { updateProfile } = useAuth();
@@ -45,6 +55,8 @@ const EditProfile = () => {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [currentImage, setCurrentImage] = useState("");
+  const [uploadImage, setUploadImage] = useState("");
   const [userInfo, setUserInfo] = useState<any>({});
   const [phone, setPhone] = useState("");
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -72,9 +84,15 @@ const EditProfile = () => {
       const token = await SecureStore.getItemAsync("my-jwt");
       const user = await fetchUserProfile(token, "/v1/profile", "GET");
 
+      console.log("User profile data:", user);
+
       if (!user) {
         throw new Error("User profile not found.");
       }
+
+      // const replaceUrlImage = API_BASE_URL+"/";
+      const replaceUrlImage = "http://cp24us1.sit.kmutt.ac.th:7070/profiles/";
+      const imageName = user.users_image?.replace(replaceUrlImage, "") || null;
 
       setUserInfo(user);
       setUsername(user.username || "");
@@ -83,8 +101,11 @@ const EditProfile = () => {
       setPhone(user.users_phone || "");
       setDateOfBirth(user.users_birthday || "");
       setEmail(user.users_email || "");
+      setCurrentImage(imageName || "");
       setProfileImage(user.users_image || null);
       setUserGender(user.users_gender || "");
+
+      console.log("User profile loaded successfully:", currentImage);
     } catch (error) {
       console.error("Failed to load user profile:", error);
       Alert.alert("Error", "Failed to load user profile.");
@@ -102,102 +123,9 @@ const EditProfile = () => {
     handleOpenDatePicker();
   };
 
-  // const handleSave = async () => {
-  //   try {
-  //     const token = await SecureStore.getItemAsync("my-jwt");
-  //     if (!token) {
-  //       Alert.alert(
-  //         "Error",
-  //         "User authentication failed. Please log in again."
-  //       );
-  //       return;
-  //     }
-
-  //     const dataToUpdate = {
-  //       firstname,
-  //       lastname,
-  //       username,
-  //       email,
-  //       phone,
-  //       birthday: dateOfBirth,
-  //       gender: userGender,
-  //     };
-
-  //     const response = await saveUserProfile(
-  //       token,
-  //       "/v1/profile",
-  //       "PUT",
-  //       dataToUpdate
-  //     );
-
-  //     if (response?.details) {
-  //       const detailsMessages = Object.values(response.details).join("\n"); // รวมข้อความจาก details
-  //       Alert.alert("Unsuccessful", detailsMessages);
-  //     } else {
-  //       Alert.alert("Success", "Profile updated successfully");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating profile:", error);
-  //     Alert.alert("Error", "Something went wrong. Please try again.");
-  //   }
-  // };
-
   if (!updateProfile) {
     console.error("updateProfile function is not available.");
   }
-
-  // const handleSaveProfile = async () => {
-  //   if (updateProfile) {
-  //     const result = await updateProfile(
-  //       username,
-  //       firstname,
-  //       lastname,
-  //       email,
-  //       phone,
-  //       dateOfBirth,
-  //       userGender || ""
-  //     );
-
-  //     if (result.error) {
-  //       Alert.alert("Error", result.msg);
-  //     } else {
-  //       Alert.alert("Success", "Profile updated successfully");
-  //     }
-  //   } else {
-  //     Alert.alert("Error", "Update profile function is unavailable.");
-  //   }
-  // };
-
-  // const handleSaveProfile = async () => {
-  //   if (!firstname || !lastname || !username || !email || !phone) {
-  //     Alert.alert("Unsuccess", "Please fill in all required fields.");
-  //     return;
-  //   }
-
-  //   if (!/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-  //     Alert.alert("Unsuccess", "Invalid email format.");
-  //     return;
-  //   }
-
-  //   if (updateProfile) {
-  //     const result = await updateProfile(
-  //       username,
-  //       firstname,
-  //       lastname,
-  //       email,
-  //       phone,
-  //       dateOfBirth,
-  //       userGender || ""
-  //     );
-  //     if (result.error) {
-  //       Alert.alert("Error", result.msg);
-  //     } else {
-  //       Alert.alert("Success", "Profile updated successfully");
-  //     }
-  //   } else {
-  //     Alert.alert("Error", "Update profile function is unavailable.");
-  //   }
-  // };
 
   const handleSaveProfile = async () => {
     const missingFields = [];
@@ -224,6 +152,38 @@ const EditProfile = () => {
       return;
     }
 
+    if (uploadImage) {
+      const token = await SecureStore.getItemAsync("my-jwt");
+      console.log("uploadImage", uploadImage);
+
+      const formData = new FormData();
+      const file = {
+        uri: uploadImage,
+        name: uploadImage.split("/").pop(),
+        type: "image/jpeg",
+      } as any;
+
+      console.log("File data:", file);
+
+      formData.append("file", file);
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/upload`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.error) {
+        Alert.alert("Error", result.msg);
+        return;
+      }
+    }
+
     if (updateProfile) {
       const result = await updateProfile(
         username,
@@ -245,25 +205,95 @@ const EditProfile = () => {
     }
   };
 
+  // const pickImage = async () => {
+  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //   if (status !== "granted") {
+  //     Alert.alert(
+  //       "Permission Denied",
+  //       "Allow access to gallery to upload image."
+  //     );
+  //     return;
+  //   }
+
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ["images"],
+  //     allowsEditing: true,
+  //     aspect: [1, 1],
+  //     quality: 1,
+  //   });
+
+  //   if (!result.canceled) {
+
+  //     console.log(result.assets[0]);
+
+  //     setProfileImage(result.assets[0].uri);
+  //     setUploadImage(result.assets[0].fileName || "");
+  //     console.log("Current image:", uploadImage);
+  //     console.log();
+
+  //   }
+  // };
+
   const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission Denied",
-        "Allow access to gallery to upload image."
-      );
-      return;
-    }
+    try {
+      // ขอ permission ทั้งแกลเลอรีและกล้อง
+      const { status: galleryStatus } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status: cameraStatus } =
+        await ImagePicker.requestCameraPermissionsAsync();
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+      if (galleryStatus !== "granted" || cameraStatus !== "granted") {
+        Alert.alert(
+          "Permission Denied",
+          "Allow access to camera and gallery to upload an image."
+        );
+        return;
+      }
 
-    if (!result.canceled) {
-      setProfileImage(result.assets[0].uri);
+      // ให้ผู้ใช้เลือกว่าจะใช้กล้องหรือแกลเลอรี
+      Alert.alert("Select Image", "Choose an option", [
+        {
+          text: "Camera",
+          onPress: async () => {
+            let result = await ImagePicker.launchCameraAsync({
+              mediaTypes: ["images"],
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 1,
+            });
+
+            if (!result.canceled) {
+              setProfileImage(result.assets[0].uri);
+              setUploadImage(result.assets[0].fileName || "");
+              console.log("Image selected from camera:", result.assets[0].uri);
+            }
+          },
+        },
+        {
+          text: "Gallery",
+          onPress: async () => {
+            let result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ["images"],
+              allowsEditing: true,
+              aspect: [1, 1],
+              quality: 1,
+            });
+
+            if (!result.canceled) {
+              setProfileImage(result.assets[0].uri);
+              setUploadImage(result.assets[0].fileName || "");
+              console.log("Image selected from gallery:", result.assets[0].uri);
+            }
+          },
+        },
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+      ]);
+    } catch (error) {
+      console.error("Image picking error:", error);
+      Alert.alert("Error", "Something went wrong while selecting an image.");
     }
   };
 
