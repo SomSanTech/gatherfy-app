@@ -77,8 +77,8 @@
     "platforms": ["ios", "android", "web"],
     "newArchEnabled": true,
     "extra": {
-      // "apiBaseUrl": "https://capstone24.sit.kmutt.ac.th/us1",
-      "apiBaseUrl": "http://cp24us1.sit.kmutt.ac.th:543",
+      "apiBaseUrl": "https://capstone24.sit.kmutt.ac.th/us1",
+      // "apiBaseUrl": "http://cp24us1.sit.kmutt.ac.th:543",
       "router": {
         "origin": false
       },

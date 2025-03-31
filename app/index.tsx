@@ -1,35 +1,3 @@
-// import "../gesture/gesture-handler.native";
-// import "react-native-gesture-handler";
-// import TabNav from "./(tabs)/_layout";
-
-// import { useCallback, useEffect, useState } from "react";
-// import Entypo from "@expo/vector-icons/Entypo";
-// import * as SplashScreen from "expo-splash-screen";
-// import * as Font from "expo-font";
-
-// import {
-//   ScrollView,
-//   Text,
-//   TextInput,
-//   View,
-//   Image,
-//   ActivityIndicator,
-//   Button,
-//   StyleSheet,
-// } from "react-native";
-
-// import { NavigationIndependentTree } from "@react-navigation/native";
-
-// export default function App() {
-//   return (
-//     <NavigationIndependentTree>
-//       <TabNav />
-//     </NavigationIndependentTree>
-//   );
-// }
-
-// const styles = StyleSheet.create({});
-
 import "../gesture/gesture-handler.native";
 import "react-native-gesture-handler";
 import TabNav from "./(tabs)/_layout";
@@ -64,6 +32,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { StatusBar } from "expo-status-bar";
 import Animated, { FadeInDown, FadeInRight } from "react-native-reanimated";
 import { useAuth } from "./context/AuthContext";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 // import {
 //   GoogleSignin,
 //   GoogleSigninButton,
@@ -85,7 +57,8 @@ export default function App() {
   const { authState } = useAuth();
 
   useEffect(() => {
-    if (authState?.authenticated === true) {
+    if (authState?.authenticated === true && authState.verifyEmail === true) {
+      console.log("Redirecting to /home");
       router.replace("/(tabs)/home");
     }
   }, []);
@@ -138,7 +111,7 @@ export default function App() {
                     }
                   />
                 </Animated.View>
-                <Animated.View
+                {/* <Animated.View
                   entering={FadeInDown.delay(600).duration(400).springify()}
                 >
                   <CustomButton
@@ -148,7 +121,7 @@ export default function App() {
                     textStyle={styles.buttonText}
                     IconComponent={<Google width={20} height={20} />}
                   />
-                </Animated.View>
+                </Animated.View> */}
               </View>
               <View
                 style={{
@@ -160,14 +133,14 @@ export default function App() {
                 <Animated.View
                   entering={FadeInDown.delay(1000).duration(400).springify()}
                 >
-                  <Text style={styles.loginText}>
+                  <Text style={styles.signUpText}>
                     Don't have an account?{" "}
                     <Link href={"/signUp"}>
-                      <Text style={styles.loginTextSpan}>Sign Up</Text>
+                      <Text style={styles.signUpTextSpan}>Sign Up</Text>
                     </Link>
                   </Text>
                 </Animated.View>
-                <Animated.View
+                {/* <Animated.View
                   entering={FadeInDown.delay(1200).duration(400).springify()}
                 >
                   <TouchableOpacity
@@ -186,7 +159,7 @@ export default function App() {
                       style={{ opacity: 0.5 }}
                     />
                   </TouchableOpacity>
-                </Animated.View>
+                </Animated.View> */}
               </View>
             </View>
           </LinearGradient>
@@ -217,19 +190,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 34,
+    fontSize: wp(7.5),
+    textAlign: "center",
     color: Colors.black,
     letterSpacing: 2.4,
     fontFamily: "OoohBaby-Regular",
     marginBottom: 5,
   },
-
   description: {
-    fontSize: 14,
+    fontSize: wp(2.8),
     color: Colors.gray,
     letterSpacing: 1.2,
     lineHeight: 30,
     fontFamily: "Poppins-Regular",
+    textAlign: "center",
     marginBottom: 20,
   },
   socialLoginWrapper: {
@@ -243,41 +217,29 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",
+    textAlign: "center",
     gap: 5,
     marginBottom: 15,
   },
   buttonText: {
     color: Colors.black,
-    fontSize: 14,
+    fontSize: wp(3.3),
     fontWeight: "600",
     fontFamily: "Poppins-SemiBold",
     includeFontPadding: false,
   },
-  loginText: {
+  signUpText: {
     marginTop: 25,
-    fontSize: 14,
+    fontSize: wp(2.9),
     color: Colors.black,
     fontFamily: "Poppins-Light",
     includeFontPadding: false,
   },
-  loginTextSpan: {
+  signUpTextSpan: {
     color: Colors.primary,
-    fontSize: 16,
+    fontSize: wp(2.9),
     fontFamily: "Poppins-SemiBold",
     lineHeight: 24,
     includeFontPadding: false,
   },
 });
-
-// import { View, Text } from 'react-native'
-// import React from 'react'
-
-// const Page = () => {
-//   return (
-//     <View>
-//       <Text>Page</Text>
-//     </View>
-//   )
-// }
-
-// export default Page

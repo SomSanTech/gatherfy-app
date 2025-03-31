@@ -22,12 +22,16 @@ import Animated, {
   FadeInDown,
   FadeInRight,
 } from "react-native-reanimated";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { useAuth } from "@/app/context/AuthContext";
 import { backToIndex } from "@/composables/backToIndex";
 import { ActivityIndicator } from "react-native-paper";
+import { Colors } from "@/constants/Colors";
 
 const SignIn = () => {
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +41,26 @@ const SignIn = () => {
 
   const { onLogin } = useAuth();
 
-  const onSignInPress = async () => {
+  // const onSignInPress = async () => {
+  //   setIsLoading(true);
+
+  //   if (!username.trim() || !password.trim()) {
+  //     setIsLoading(false);
+  //     alert("Please fill in all fields.");
+  //     return;
+  //   }
+
+  //   const result = await onLogin!(username.trim(), password);
+
+  //   if (result.error) {
+  //     setIsLoading(false);
+  //     alert(result.msg);
+  //   } else {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+    const onSignInPress = async () => {
     setIsLoading(true);
 
     if (!username.trim() || !password.trim()) {
@@ -137,18 +160,18 @@ const SignIn = () => {
                       />
                     </TouchableOpacity>
                   </View>
-                  <TouchableOpacity className="flex items-end mb-5">
+                  {/* <TouchableOpacity className="flex items-end mb-5">
                     <Text className="text-gray-600 font-Poppins-Light">
                       Forgot Password?
                     </Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                   <View>
                     <CustomButton
                       title="Login"
                       handlePress={onSignInPress}
                       containerStyles={{}}
                       textStyle={styles.inputField}
-                      classNameContainerStyle="w-full py-3 bg-primary rounded-xl flex-row justify-center items-center"
+                      classNameContainerStyle="w-full mt-5 py-3 bg-primary rounded-xl flex-row justify-center items-center"
                       classNameTextStyle="font-Poppins-Bold text-lg text-center text-white"
                       IconComponent={
                         isLoading ? (
@@ -162,12 +185,19 @@ const SignIn = () => {
                     />
                   </View>
                   <Animated.View
-                    entering={FadeInDown.delay(800).duration(400).springify()}
+                    entering={FadeInDown.delay(450).duration(400).springify()}
                   >
-                    <Text className="text-gray-600 mt-6 text-center font-Poppins-Light">
+                    <Text
+                      className="text-gray-600 mt-6 text-center font-Poppins-Light"
+                      style={styles.signUpText}
+                    >
                       Don't have an account?{" "}
                       <Link href={"/signUp"}>
-                        <Text className="font-Poppins-Bold">Sign Up</Text>
+                        <Text
+                          style={styles.signUpTextSpan}
+                        >
+                          Sign Up
+                        </Text>
                       </Link>
                     </Text>
                   </Animated.View>
@@ -195,6 +225,18 @@ const styles = StyleSheet.create({
   inputField: {
     fontFamily: "Poppins-Regular",
     includeFontPadding: false,
+  },
+  signUpText: {
+    marginTop: 25,
+    fontSize: wp(2.9),
+    fontFamily: "Poppins-Light",
+    includeFontPadding: false,
+  },
+  signUpTextSpan: {
+    fontSize: wp(2.9),
+    fontFamily: "Poppins-Bold",
+    includeFontPadding: false,
+    color: Colors.black,
   },
 });
 

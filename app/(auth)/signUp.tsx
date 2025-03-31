@@ -218,7 +218,7 @@ const SignUp = () => {
 
         <Animated.View
           entering={FadeInDown.delay(200).duration(500).springify()}
-          className="flex-1 bg-white px-8 pt-0 mt-5 "
+          className="flex-1 bg-white pt-0 mt-5 "
           style={{ borderTopLeftRadius: 50, borderTopRightRadius: 50 }}
         >
           <KeyboardAvoidingView
@@ -232,7 +232,7 @@ const SignUp = () => {
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
               >
-                <View className="form space-y-2 gap-4 pt-8 pb-16">
+                <View className="form space-y-2 gap-4 pt-8 pb-10 px-8">
                   <View className="flex-row justify-center space-x-2">
                     <View className="flex-1">
                       <TouchableOpacity
@@ -253,7 +253,7 @@ const SignUp = () => {
                         <Text
                           className="text-center"
                           style={[
-                            styles.RoleText,
+                            styles.roleText,
                             {
                               color:
                                 userRole === "Attendee" ? "#ffffff" : "#000000",
@@ -286,7 +286,7 @@ const SignUp = () => {
                         <Text
                           className="text-center"
                           style={[
-                            styles.RoleText,
+                            styles.roleText,
                             {
                               color:
                                 userRole === "Organizer"
@@ -466,6 +466,7 @@ const SignUp = () => {
                             textStyle={{
                               fontFamily: "Poppins-Regular",
                               textDecorationLine: "none",
+                              fontSize: wp("3.3%"),
                               padding: 0,
                               color: "#000000",
                             }}
@@ -507,7 +508,7 @@ const SignUp = () => {
                       >
                         <Icon
                           name={isPasswordVisible ? "eye-off" : "eye"}
-                          size={20}
+                          size={22}
                           color="gray"
                         />
                       </TouchableOpacity>
@@ -552,7 +553,7 @@ const SignUp = () => {
                       >
                         <Icon
                           name={isConfirmPasswordVisible ? "eye-off" : "eye"}
-                          size={20}
+                          size={22}
                           color="gray"
                         />
                       </TouchableOpacity>
@@ -593,10 +594,18 @@ const SignUp = () => {
                   <Animated.View
                     entering={FadeInDown.delay(800).duration(400).springify()}
                   >
-                    <Text className="text-gray-600 mt-1 text-center font-Poppins-Light">
+                    <Text
+                      className="text-gray-600 font-Poppins-Light"
+                      style={styles.loginText}
+                    >
                       Already have an account?{" "}
                       <Link href={"/signIn"}>
-                        <Text className="font-Poppins-Bold">Log In</Text>
+                        <Text
+                          className="font-Poppins-Bold"
+                          style={styles.loginTextSpan}
+                        >
+                          Log In
+                        </Text>
                       </Link>
                     </Text>
                   </Animated.View>
@@ -615,20 +624,21 @@ const styles = StyleSheet.create({
     fontSize: wp("5.5%"), // ขนาด font เป็น 5% ของหน้าจอ
     color: "#000000",
     fontFamily: "Poppins-Bold",
+    includeFontPadding: false,
   },
   topicField: {
     color: "#000000",
     marginBottom: 12,
     fontFamily: "Poppins-Regular",
   },
-  RoleText: {
+  roleText: {
     fontSize: wp("3.1%"),
     includeFontPadding: false,
     fontFamily: "Poppins-Bold",
   },
   roleDescription: {
-    fontSize: wp("2.8%"),
-    color: "#000000",
+    fontSize: wp("2.6%"),
+    color: Colors.gray,
     fontFamily: "Poppins-Regular",
     textAlign: "center",
     marginTop: 5,
@@ -689,11 +699,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderRadius: 10,
   },
-
   checkboxContainer: {
     width: "48%", // ทำให้มี 2 อันต่อแถว (แบ่งพื้นที่ 48% ของแต่ละอัน)
     marginBottom: 18,
     borderWidth: 0,
+  },
+
+  loginText: {
+    marginTop: 15,
+    fontSize: wp(3),
+    textAlign: "center",
+    fontFamily: "Poppins-Light",
+    includeFontPadding: false,
+  },
+  loginTextSpan: {
+    color: Colors.black,
+    fontSize: wp(3),
+    fontFamily: "Poppins-Bold",
+    lineHeight: 24,
+    includeFontPadding: false,
   },
 });
 

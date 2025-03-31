@@ -5,11 +5,13 @@ import { Platform } from "react-native";
 import dayjs from "dayjs";
 import { jwtDecode } from "jwt-decode";
 import Constants from "expo-constants";
+import { set } from "lodash";
 
 interface AuthProps {
   authState?: {
     token: string | null;
     authenticated: boolean | null;
+    verifyEmail?: boolean | null | undefined;
   };
   onRegister?: (
     role: string,
@@ -32,6 +34,7 @@ interface AuthProps {
     gender: string,
     image?: string
   ) => Promise<any>;
+  onVerifiedEmail?: (check: boolean) => Promise<void>;
   onLogin?: (username: string, password: string) => Promise<any>;
   onLogout?: () => void;
 }
@@ -42,6 +45,7 @@ const firstnameStorage = "firstname";
 const lastnameStorage = "lastname";
 const emailStorage = "email";
 const roleStorage = "role";
+const isVerifiedStorage = "is_verified";
 
 // const API_URL = "https://capstone24.sit.kmutt.ac.th/us1";
 
@@ -62,14 +66,17 @@ export const AuthProvider = ({ children }: any) => {
   const [authState, setAuthState] = useState<{
     token: string | null;
     authenticated: boolean | null;
+    verifyEmail?: boolean | null;
   }>({
     token: null,
     authenticated: null,
+    verifyEmail: null,
   });
 
   useEffect(() => {
     const loadToken = async () => {
       const token = await SecureStore.getItemAsync(TOKEN_KEY);
+      const isVerified = await SecureStore.getItemAsync(isVerifiedStorage);
       console.log("store-token: ", token);
 
       if (token) {
@@ -84,9 +91,12 @@ export const AuthProvider = ({ children }: any) => {
 
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
+        console.log("sdsaoijd", isVerified ? JSON.parse(isVerified) : false);
+
         setAuthState({
           token,
           authenticated: true,
+          verifyEmail: isVerified ? JSON.parse(isVerified) : false, // Convert string to boolean
         });
       }
     };
@@ -303,10 +313,12 @@ export const AuthProvider = ({ children }: any) => {
 
       // Assuming the API returns user data in the response
       const userProfile = profileResponse.data;
+      console.log("User Profile:", userProfile.users_email);
 
       setAuthState({
         token: result.data.accessToken,
         authenticated: true,
+        verifyEmail: userProfile.is_verified,
       });
 
       axios.defaults.headers.common[
@@ -325,6 +337,10 @@ export const AuthProvider = ({ children }: any) => {
       );
       await SecureStore.setItemAsync(emailStorage, userProfile.users_email);
       await SecureStore.setItemAsync(roleStorage, userProfile.users_role);
+      await SecureStore.setItemAsync(
+        isVerifiedStorage,
+        JSON.stringify(userProfile.is_verified)
+      );
 
       return result;
     } catch (err: any) {
@@ -362,14 +378,34 @@ export const AuthProvider = ({ children }: any) => {
     setAuthState({
       token: null,
       authenticated: false,
+      verifyEmail: false,
     });
   };
+
+  const verifiedEmail = async (check: boolean) => {
+    if (!check) {
+      console.log("Email not verified");
+      return;
+    }
+    console.log("Email verified");
+    await SecureStore.setItemAsync(isVerifiedStorage, check ? "true" : "false");
+    setAuthState((prevState) => ({
+      ...prevState,
+      verifyEmail: true,
+    }));
+  };
+
+  // ใช้ useEffect เพื่อติดตามการเปลี่ยนแปลง
+  useEffect(() => {
+    console.log("verifyEmail", authState.verifyEmail);
+  }, [authState.verifyEmail]); // ติดตามการเปลี่ยนแปลงของ verifyEmail
 
   const value = {
     onRegister: register,
     updateProfile: updateProfile,
     onLogin: login,
     onLogout: logout,
+    onVerifiedEmail: verifiedEmail,
     authState,
   };
 
