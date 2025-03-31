@@ -148,7 +148,6 @@ export default function App() {
                     textStyle={styles.buttonText}
                     IconComponent={<Google width={20} height={20} />}
                   />
-              
                 </Animated.View>
               </View>
               <View
@@ -167,6 +166,26 @@ export default function App() {
                       <Text style={styles.loginTextSpan}>Sign Up</Text>
                     </Link>
                   </Text>
+                </Animated.View>
+                <Animated.View
+                  entering={FadeInDown.delay(1200).duration(400).springify()}
+                >
+                  <TouchableOpacity
+                    onPress={() => router.push("/otpScreen")}
+                    style={{
+                      position: "absolute",
+                      top: 10,
+                      right: 20,
+                      padding: 5,
+                    }}
+                  >
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={30}
+                      color={Colors.black}
+                      style={{ opacity: 0.5 }}
+                    />
+                  </TouchableOpacity>
                 </Animated.View>
               </View>
             </View>

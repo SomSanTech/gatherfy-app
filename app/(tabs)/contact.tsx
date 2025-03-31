@@ -201,7 +201,7 @@ const Contact = () => {
         {profile?.userProfile.users_image ? (
           <Image
             source={{
-              uri: profile.userProfile.users_image,
+              uri: profile.userProfile.users_image ,
             }}
             style={styles.contactImage}
           />

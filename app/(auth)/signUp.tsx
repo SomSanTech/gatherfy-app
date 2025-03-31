@@ -59,7 +59,7 @@ const SignUp = () => {
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
 
-  const { onRegister, onLogin } = useAuth();
+  const { onRegister } = useAuth();
 
   const handleOpenDatePicker = () => {
     setOpen(!open);
@@ -183,7 +183,10 @@ const SignUp = () => {
       setIsLoading(false);
       alert("Create Account Success");
       setIsCreated(true);
-      (navigation as any).navigate("signIn");
+      (navigation as any).reset({
+        index: 0,
+        routes: [{ name: "otpScreen", params: { email } }],
+      });
     }
   };
 
@@ -237,9 +240,14 @@ const SignUp = () => {
                         className="bg-primary rounded-xl justify-center items-center p-5"
                         style={{
                           backgroundColor:
-                            userRole === "Attendee" ? Colors.primary : "#ffffff",
+                            userRole === "Attendee"
+                              ? Colors.primary
+                              : "#ffffff",
                           borderWidth: 1,
-                          borderColor: userRole === "Attendee" ? Colors.primary : "#cccccc",
+                          borderColor:
+                            userRole === "Attendee"
+                              ? Colors.primary
+                              : "#cccccc",
                         }}
                       >
                         <Text
@@ -265,10 +273,14 @@ const SignUp = () => {
                         className="bg-primary rounded-xl justify-center items-center p-5"
                         style={{
                           backgroundColor:
-                            userRole === "Organizer" ? Colors.primary : "#ffffff",
+                            userRole === "Organizer"
+                              ? Colors.primary
+                              : "#ffffff",
                           borderWidth: 1,
                           borderColor:
-                            userRole === "Organizer" ? Colors.primary : "#cccccc",
+                            userRole === "Organizer"
+                              ? Colors.primary
+                              : "#cccccc",
                         }}
                       >
                         <Text
@@ -649,7 +661,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 20,
     width: wp("95%"), // กำหนดความกว้างเป็น 90% ของหน้าจอ
-    height: hp("60%"), 
+    height: hp("60%"),
     padding: 35,
     alignItems: "center",
     shadowColor: "#000",

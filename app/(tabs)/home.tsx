@@ -9,7 +9,6 @@ import {
   StyleSheet,
   Platform,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
 import EventCard from "../../components/EventCard";
 import images from "../../constants/icons";
 import { SafeAreaView } from "react-native-safe-area-context";

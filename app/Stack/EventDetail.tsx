@@ -10,7 +10,7 @@ import CustomButton from "@/components/CustomButton";
 import * as SecureStore from "expo-secure-store";
 import { fetchUserProfile } from "@/composables/useFetchUserProfile";
 import { useFetchTicketWithAuth } from "@/composables/useFetchTicket";
-import { getEvent } from "@/composables/getEvent";
+import { countViewById, getEvent } from "@/composables/getEvent";
 import formatDate from "@/utils/formatDate";
 import { RootStackParamList } from "@/rootStack/RootStackParamList";
 import useNavigateToGoBack from "@/composables/navigateToGoBack";
@@ -79,10 +79,16 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
         )
       );
     };
+
     fetchRegistration();
     fetchDataDetailAsync();
     getUsersInfo();
-  }, [eventDetail.slug, confirmRegister]);
+
+    // Only call countViewById when eventDetail.eventId is available
+    if (eventDetail.eventId) {
+      countViewById(`/api/v1/countView/${eventDetail.eventId}`);
+    }
+  }, [eventDetail.slug, confirmRegister, eventDetail.eventId]); // Add eventDetail.eventId to the dependency array
 
   const startDate = eventDetail.start_date
     ? formatDate(eventDetail.start_date, true, true, true).date
@@ -128,7 +134,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                 <TouchableOpacity
                   key={tag.tag_id}
                   style={styles.tagBox}
-                  onPress={() => navigateToEventTag(tag.tag_title , tag.tag_id)}
+                  onPress={() => navigateToEventTag(tag.tag_title, tag.tag_id)}
                 >
                   <View style={styles.tagTextContainer}>
                     <Text style={styles.tagText}>{tag.tag_title}</Text>

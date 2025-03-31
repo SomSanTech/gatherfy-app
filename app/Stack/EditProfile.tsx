@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -37,6 +37,8 @@ import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "@/app/context/AuthContext";
 import Constants from "expo-constants";
 import API from "@/utils/api";
+import { useFetchDelete, useFetchUpload } from "@/composables/useFetchFile";
+import { Colors } from "@/constants/Colors";
 
 const API_BASE_URL =
   Constants.expoConfig?.extra?.apiBaseUrl ||
@@ -54,58 +56,39 @@ const EditProfile = () => {
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [currentImage, setCurrentImage] = useState("");
-  const [uploadImage, setUploadImage] = useState("");
   const [userInfo, setUserInfo] = useState<any>({});
   const [phone, setPhone] = useState("");
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+
   const [open, setOpen] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState<string | undefined>(undefined);
   const [userGender, setUserGender] = useState<string | undefined>(undefined);
 
-  // const loadUserProfile = async () => {
-  //   const token = await SecureStore.getItemAsync("my-jwt");
-  //   const user = await fetchUserProfile(token, "/v1/profile", "GET");
-
-  //   setUserInfo(user);
-  //   setUsername(user.username);
-  //   setFirstname(user.users_firstname);
-  //   setLastname(user.users_lastname);
-  //   setPhone(user.users_phone);
-  //   setDateOfBirth(user.users_birthday);
-  //   setEmail(user.users_email);
-  //   setProfileImage(user.users_image);
-  //   setUserGender(user.users_gender);
-  // };
+  const [selectedImage, setSelectedImage] = useState<
+    ImagePicker.ImagePickerAsset | undefined
+  >(undefined);
+  const [currentImage, setCurrentImage] = useState<string | undefined>(
+    undefined
+  );
 
   const loadUserProfile = async () => {
     try {
       const token = await SecureStore.getItemAsync("my-jwt");
       const user = await fetchUserProfile(token, "/v1/profile", "GET");
 
-      console.log("User profile data:", user);
-
       if (!user) {
         throw new Error("User profile not found.");
       }
-
-      // const replaceUrlImage = API_BASE_URL+"/";
-      const replaceUrlImage = "http://cp24us1.sit.kmutt.ac.th:7070/profiles/";
-      const imageName = user.users_image?.replace(replaceUrlImage, "") || null;
 
       setUserInfo(user);
       setUsername(user.username || "");
       setFirstname(user.users_firstname || "");
       setLastname(user.users_lastname || "");
       setPhone(user.users_phone || "");
+      setCurrentImage(user.users_image || "");
       setDateOfBirth(user.users_birthday || "");
       setEmail(user.users_email || "");
-      setCurrentImage(imageName || "");
-      setProfileImage(user.users_image || null);
       setUserGender(user.users_gender || "");
-
-      console.log("User profile loaded successfully:", currentImage);
     } catch (error) {
       console.error("Failed to load user profile:", error);
       Alert.alert("Error", "Failed to load user profile.");
@@ -127,173 +110,234 @@ const EditProfile = () => {
     console.error("updateProfile function is not available.");
   }
 
-  const handleSaveProfile = async () => {
-    const missingFields = [];
+  const openImagePicker = async (type: "camera" | "gallery") => {
+    let result: ImagePicker.ImagePickerResult;
 
-    if (!firstname) missingFields.push("Firstname");
-    if (!lastname) missingFields.push("Lastname");
-    if (!username) missingFields.push("Username");
-    if (!email) missingFields.push("Email");
-    if (!phone) missingFields.push("Phone");
-    if (!dateOfBirth) missingFields.push("Birthday");
-    if (!userGender) missingFields.push("Gender");
-
-    if (missingFields.length > 0) {
-      Alert.alert(
-        "Missing Fields",
-        `Please fill in ${missingFields.join(", ")}`
-      );
-      return;
-    }
-
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (email && !emailRegex.test(email)) {
-      Alert.alert("Invalid Email", "Please enter a valid email address.");
-      return;
-    }
-
-    if (uploadImage) {
-      const token = await SecureStore.getItemAsync("my-jwt");
-      console.log("uploadImage", uploadImage);
-
-      const formData = new FormData();
-      const file = {
-        uri: uploadImage,
-        name: uploadImage.split("/").pop(),
-        type: "image/jpeg",
-      } as any;
-
-      console.log("File data:", file);
-
-      formData.append("file", file);
-
-      const response = await fetch(`${API_BASE_URL}/api/v1/upload`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
+    if (type === "camera") {
+      result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        quality: 1,
       });
-
-      const result = await response.json();
-
-      if (result.error) {
-        Alert.alert("Error", result.msg);
-        return;
-      }
-    }
-
-    if (updateProfile) {
-      const result = await updateProfile(
-        username,
-        firstname,
-        lastname,
-        email,
-        phone,
-        dateOfBirth,
-        userGender || ""
-      );
-
-      if (result.error) {
-        Alert.alert("Error", result.msg);
-      } else {
-        Alert.alert("Success", "Profile updated successfully");
-      }
     } else {
-      Alert.alert("Error", "Update profile function is unavailable.");
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        quality: 1,
+      });
     }
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0]);
+    }
+    setModalVisible(false);
   };
 
-  // const pickImage = async () => {
-  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //   if (status !== "granted") {
-  //     Alert.alert(
-  //       "Permission Denied",
-  //       "Allow access to gallery to upload image."
-  //     );
-  //     return;
-  //   }
+  // const handleSaveProfile = async () => {
+  //   try {
+  //     const missingFields = [];
 
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ["images"],
-  //     allowsEditing: true,
-  //     aspect: [1, 1],
-  //     quality: 1,
-  //   });
+  //     if (!firstname) missingFields.push("Firstname");
+  //     if (!lastname) missingFields.push("Lastname");
+  //     if (!username) missingFields.push("Username");
+  //     if (!email) missingFields.push("Email");
+  //     if (!phone) missingFields.push("Phone");
+  //     if (!dateOfBirth) missingFields.push("Birthday");
+  //     if (!userGender) missingFields.push("Gender");
 
-  //   if (!result.canceled) {
+  //     if (missingFields.length > 0) {
+  //       Alert.alert(
+  //         "Missing Fields",
+  //         `Please fill in ${missingFields.join(", ")}`
+  //       );
+  //       return;
+  //     }
 
-  //     console.log(result.assets[0]);
+  //     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  //     if (email && !emailRegex.test(email)) {
+  //       Alert.alert("Invalid Email", "Please enter a valid email address.");
+  //       return;
+  //     }
 
-  //     setProfileImage(result.assets[0].uri);
-  //     setUploadImage(result.assets[0].fileName || "");
-  //     console.log("Current image:", uploadImage);
-  //     console.log();
+  //     let newImageFileName = currentImage; // ค่าดีฟอลต์เป็นรูปเดิม
 
+  //     if (selectedImage) {
+  //       const token = await SecureStore.getItemAsync("my-jwt");
+
+  //       // ลบรูปเก่าถ้ามี
+  //       if (currentImage) {
+  //         const currentImageName = currentImage.split("/").pop(); // แยกชื่อไฟล์จาก URL
+  //         console.log("Deleting old image:", currentImageName);
+  //         await useFetchDelete(
+  //           `v1/files/delete/${currentImageName}?bucket=profiles`,
+  //           token
+  //         );
+  //       }
+
+  //       console.log("Uploading new image:", selectedImage.uri);
+
+  //       // อัปโหลดรูปใหม่
+  //       const response = await useFetchUpload(
+  //         "v1/files/upload",
+  //         selectedImage,
+  //         "profiles",
+  //         token
+  //       );
+
+  //       setUploadImageName(response.fileName); // ตั้งชื่อไฟล์ใหม่จาก API
+
+  //       // ตรวจสอบว่าอัปโหลดสำเร็จ
+  //       if (response?.error) {
+  //         console.error("Upload failed:", response.error);
+  //         Alert.alert("Upload Failed", "Failed to upload profile image.");
+  //         return;
+  //       }
+
+  //     }
+
+  //     // ส่งข้อมูลไปอัปเดต
+  //     if (updateProfile) {
+  //       console.log("New uploaded image filename:", uploadImageName);
+  //       const result = await updateProfile(
+  //         username,
+  //         firstname,
+  //         lastname,
+  //         email,
+  //         phone,
+  //         uploadImageName || "", // Ensure it is always a string
+  //         dateOfBirth,
+  //         userGender || ""
+  //       );
+
+  //       if (result.error) {
+  //         Alert.alert("Error", result.msg);
+  //       } else {
+  //         console.log(
+  //           "Profile updated successfully with image:",
+  //           newImageFileName
+  //         );
+  //         Alert.alert("Success", "Profile updated successfully");
+  //         setCurrentImage(newImageFileName); // อัปเดต state ของรูปภาพใหม่
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating profile:", error);
+  //     Alert.alert("Error", "Something went wrong while updating profile.");
   //   }
   // };
 
-  const pickImage = async () => {
+  const handleSaveProfile = async () => {
     try {
-      // ขอ permission ทั้งแกลเลอรีและกล้อง
-      const { status: galleryStatus } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      const { status: cameraStatus } =
-        await ImagePicker.requestCameraPermissionsAsync();
+      const missingFields = [];
 
-      if (galleryStatus !== "granted" || cameraStatus !== "granted") {
+      // ตรวจสอบค่าที่จำเป็น
+      if (!firstname) missingFields.push("Firstname");
+      if (!lastname) missingFields.push("Lastname");
+      if (!username) missingFields.push("Username");
+      if (!email) missingFields.push("Email");
+      if (!phone) missingFields.push("Phone");
+      if (!dateOfBirth) missingFields.push("Birthday");
+      if (!userGender) missingFields.push("Gender");
+
+      if (missingFields.length > 0) {
         Alert.alert(
-          "Permission Denied",
-          "Allow access to camera and gallery to upload an image."
+          "Missing Fields",
+          `Please fill in ${missingFields.join(", ")}`
         );
         return;
       }
 
-      // ให้ผู้ใช้เลือกว่าจะใช้กล้องหรือแกลเลอรี
-      Alert.alert("Select Image", "Choose an option", [
-        {
-          text: "Camera",
-          onPress: async () => {
-            let result = await ImagePicker.launchCameraAsync({
-              mediaTypes: ["images"],
-              allowsEditing: true,
-              aspect: [1, 1],
-              quality: 1,
-            });
+      // ตรวจสอบรูปแบบของอีเมล
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (email && !emailRegex.test(email)) {
+        Alert.alert("Invalid Email", "Please enter a valid email address.");
+        return;
+      }
 
-            if (!result.canceled) {
-              setProfileImage(result.assets[0].uri);
-              setUploadImage(result.assets[0].fileName || "");
-              console.log("Image selected from camera:", result.assets[0].uri);
-            }
-          },
-        },
-        {
-          text: "Gallery",
-          onPress: async () => {
-            let result = await ImagePicker.launchImageLibraryAsync({
-              mediaTypes: ["images"],
-              allowsEditing: true,
-              aspect: [1, 1],
-              quality: 1,
-            });
+      let newImageFileName = currentImage; // ใช้ภาพเดิมหากไม่มีการเลือกภาพใหม่
 
-            if (!result.canceled) {
-              setProfileImage(result.assets[0].uri);
-              setUploadImage(result.assets[0].fileName || "");
-              console.log("Image selected from gallery:", result.assets[0].uri);
-            }
-          },
-        },
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-      ]);
+      // ถ้ามีการเลือกภาพใหม่
+      if (selectedImage) {
+        const token = await SecureStore.getItemAsync("my-jwt");
+
+        // ลบรูปเก่าถ้ามี
+        if (currentImage) {
+          const currentImageName = currentImage.split("/").pop(); // ดึงชื่อไฟล์จาก URL
+          console.log("Deleting old image:", currentImageName);
+          await useFetchDelete(
+            `v1/files/delete/${currentImageName}?bucket=profiles`,
+            token
+          );
+        }
+
+        // อัปโหลดรูปใหม่
+        const uploadResponse = await useFetchUpload(
+          "v1/files/upload",
+          selectedImage,
+          "profiles", // bucket ที่ต้องการเก็บไฟล์
+          token
+        );
+
+        if (!uploadResponse || uploadResponse.error) {
+          console.error("Upload failed:", uploadResponse?.error);
+          Alert.alert("Upload Failed", "Failed to upload profile image.");
+          return;
+        }
+
+        // ใช้ชื่อไฟล์ใหม่จาก API
+        newImageFileName = uploadResponse.fileName;
+      }
+
+      // ส่งข้อมูลไปอัปเดต
+      if (updateProfile) {
+        console.log("Updating profile with image filename:", newImageFileName);
+        console.log(selectedImage);
+        
+        if (selectedImage) {
+          console.log("with selected");
+          
+          const result = await updateProfile(
+            username,
+            firstname,
+            lastname,
+            email,
+            phone,
+            dateOfBirth,
+            userGender || "",
+            newImageFileName || "" // ตรวจสอบให้เป็น string เสมอ
+          );
+          if (result.error) {
+            Alert.alert("Error", result.msg);
+          } else {
+            console.log(
+              "Profile updated successfully with image:",
+              newImageFileName
+            );
+            Alert.alert("Success", "Profile updated successfully");
+
+            setCurrentImage(newImageFileName); // อัปเดตรูปที่แสดงใน UI
+          }
+        } else {
+          console.log("without selected");
+          const result = await updateProfile(
+            username,
+            firstname,
+            lastname,
+            email,
+            phone,
+            dateOfBirth,
+            userGender || "",
+          );
+          if (result.error) {
+            Alert.alert("Error", result.msg);
+          } else {
+            console.log("Profile updated successfully without image");
+            Alert.alert("Success", "Profile updated successfully");
+          }
+        }
+      }
     } catch (error) {
-      console.error("Image picking error:", error);
-      Alert.alert("Error", "Something went wrong while selecting an image.");
+      console.error("Error updating profile:", error);
+      Alert.alert("Error", "Something went wrong while updating profile.");
     }
   };
 
@@ -302,336 +346,390 @@ const EditProfile = () => {
   }, []);
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-white">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
-      >
-        <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={navigateToGoBack}>
-            <Icon name="chevron-back" size={24} color="#000000" />
-          </TouchableOpacity>
-          <Text style={styles.headerText}>Edit Profile</Text>
-        </View>
-        <TouchableWithoutFeedback>
-          <ScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-          >
-            <TouchableOpacity onPress={pickImage}>
-              {/* {profileImage ? (
-                <Image
-                  source={{ uri: profileImage }}
-                  className="w-52 h-52 rounded-full"
-                  resizeMode="cover"
-                />
-              ) : (
-                <DefaultProfile className="w-52 h-52 rounded-full" />
-              )} */}
-              {userInfo?.users_image ? (
-                <View style={styles.modalHeader}>
-                  {userInfo?.auth_provider === "system" ? (
-                    <ImageBackground
-                      className="w-full h-full"
-                      style={styles.systemImage}
-                      source={{
-                        uri: profileImage || userInfo?.users_image,
-                      }}
-                    >
+    <Fragment>
+      <SafeAreaView edges={["top"]} className="flex-1 bg-white">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ flex: 1 }}
+        >
+          <View style={styles.headerContainer}>
+            <TouchableOpacity onPress={navigateToGoBack}>
+              <Icon name="chevron-back" size={24} color="#000000" />
+            </TouchableOpacity>
+            <Text style={styles.headerText}>Edit Profile</Text>
+          </View>
+          <TouchableWithoutFeedback>
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1 }}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+            >
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                {userInfo?.users_image ? (
+                  <View style={styles.imageProfile}>
+                    {userInfo?.auth_provider === "system" ? (
+                      <ImageBackground
+                        className="w-full h-full"
+                        style={styles.systemImage}
+                        source={{
+                          uri: selectedImage?.uri || currentImage,
+                        }}
+                      >
+                        <LinearGradient
+                          colors={[
+                            "transparent",
+                            "rgba(255,255,255,0)",
+                            "rgba(0,0,0,0.65)",
+                          ]}
+                          locations={
+                            Platform.OS === "android"
+                              ? [0, 0.4, 0.85]
+                              : [0.5, 0]
+                          }
+                          style={styles.linearBackground}
+                        ></LinearGradient>
+                      </ImageBackground>
+                    ) : (
+                      userInfo?.auth_provider === "google" && (
+                        <View style={styles.imageProfile}>
+                          <ImageBackground
+                            className="w-full h-full"
+                            blurRadius={3}
+                            source={{
+                              uri: userInfo.users_image,
+                            }}
+                          >
+                            <LinearGradient
+                              colors={[
+                                "transparent",
+                                "rgba(255,255,255,0)",
+                                "rgba(0,0,0,0.65)",
+                              ]}
+                              locations={[0.5, 0]}
+                              style={styles.linearBackground}
+                            >
+                              <View style={styles.googleImage}>
+                                <Image
+                                  source={{
+                                    uri: userInfo.users_image,
+                                  }}
+                                  className="w-36 h-36 rounded-full mb-5"
+                                />
+                                <Text className="text-center text-white text-3xl font-semibold">
+                                  {userInfo?.username}
+                                </Text>
+                                <Text className="text-center text-white text-xl pb-7">
+                                  {userInfo?.userProfile.users_firstname}{" "}
+                                  {userInfo?.userProfile.users_lastname}
+                                </Text>
+                              </View>
+                            </LinearGradient>
+                          </ImageBackground>
+                        </View>
+                      )
+                    )}
+                  </View>
+                ) : (
+                  userInfo?.users_image === null && (
+                    <View style={styles.modalHeaderNoImage}>
                       <LinearGradient
                         colors={[
                           "transparent",
                           "rgba(255,255,255,0)",
-                          "rgba(0,0,0,0.65)",
+                          "rgba(0,0,0,0.5)",
                         ]}
-                        locations={
-                          Platform.OS === "android" ? [0, 0.4, 0.85] : [0.5, 0]
-                        }
+                        locations={[0.4, 0.4]}
                         style={styles.linearBackground}
-                      ></LinearGradient>
-                    </ImageBackground>
-                  ) : (
-                    userInfo?.auth_provider === "google" && (
-                      <View style={styles.modalHeader}>
-                        <ImageBackground
-                          className="w-full h-full"
-                          blurRadius={3}
-                          source={{
-                            uri: userInfo.users_image,
-                          }}
-                        >
-                          <LinearGradient
-                            colors={[
-                              "transparent",
-                              "rgba(255,255,255,0)",
-                              "rgba(0,0,0,0.65)",
-                            ]}
-                            locations={[0.5, 0]}
-                            style={styles.linearBackground}
-                          >
-                            <View style={styles.googleImage}>
-                              <Image
-                                source={{
-                                  uri: userInfo.users_image,
-                                }}
-                                className="w-36 h-36 rounded-full mb-5"
-                              />
-                              <Text className="text-center text-white text-3xl font-semibold">
-                                {userInfo?.username}
-                              </Text>
-                              <Text className="text-center text-white text-xl pb-7">
-                                {userInfo?.userProfile.users_firstname}{" "}
-                                {userInfo?.userProfile.users_lastname}
-                              </Text>
-                            </View>
-                          </LinearGradient>
-                        </ImageBackground>
-                      </View>
-                    )
-                  )}
-                </View>
-              ) : (
-                userInfo?.users_image === null && (
-                  <View style={styles.modalHeaderNoImage}>
-                    <LinearGradient
-                      colors={[
-                        "transparent",
-                        "rgba(255,255,255,0)",
-                        "rgba(0,0,0,0.5)",
-                      ]}
-                      locations={[0.4, 0.4]}
-                      style={styles.linearBackground}
-                    >
-                      <View style={styles.googleImage}>
-                        <Image
-                          className="w-36 h-36 opacity-60"
-                          source={require("@/assets/icons/person-fill-icon.png")}
-                        />
-                        <Text className="text-center text-white text-3xl font-semibold">
-                          {userInfo?.userProfile.username}
-                        </Text>
-                        <Text className="text-center text-white text-xl pb-7">
-                          {userInfo?.userProfile.users_firstname}{" "}
-                          {userInfo?.userProfile.users_lastname}
-                        </Text>
-                      </View>
-                    </LinearGradient>
-                  </View>
-                )
-              )}
-              <TouchableOpacity
-                style={styles.editImageContainer}
-                onPress={pickImage}
-              >
-                <Icon name="image-outline" size={30} color="black" />
+                      >
+                        <View style={styles.googleImage}>
+                          <Image
+                            className="w-36 h-36 opacity-60"
+                            source={require("@/assets/icons/person-fill-icon.png")}
+                          />
+                          <Text className="text-center text-white text-3xl font-semibold">
+                            {userInfo?.userProfile.username}
+                          </Text>
+                          <Text className="text-center text-white text-xl pb-7">
+                            {userInfo?.userProfile.users_firstname}{" "}
+                            {userInfo?.userProfile.users_lastname}
+                          </Text>
+                        </View>
+                      </LinearGradient>
+                    </View>
+                  )
+                )}
+                <TouchableOpacity
+                  style={styles.editImageContainer}
+                  onPress={() => setModalVisible(true)}
+                >
+                  <Icon name="image-outline" size={30} color="black" />
+                </TouchableOpacity>
               </TouchableOpacity>
-            </TouchableOpacity>
-            <View style={styles.formContainer}>
-              <View className="mb-4">
-                <View style={styles.formBoxContainer}>
-                  <Text style={styles.fieldName}>Firstname</Text>
-                  <TextInput
-                    placeholder="Firstname"
-                    value={firstname}
-                    numberOfLines={1}
-                    maxLength={40}
-                    onChangeText={setFirstname}
-                    style={styles.inputField}
-                  />
-                </View>
-                <View style={styles.formBoxContainer}>
-                  <Text style={styles.fieldName}>Lastname</Text>
-                  <TextInput
-                    placeholder="Lastname"
-                    value={lastname}
-                    numberOfLines={1}
-                    maxLength={40}
-                    onChangeText={setLastname}
-                    style={styles.inputField}
-                  />
-                </View>
-                <View style={styles.formBoxContainer}>
-                  <Text style={styles.fieldName}>Username</Text>
-                  <TextInput
-                    placeholder="Username"
-                    value={username}
-                    className="bg-gray-100 text-gray-800 rounded-xl"
-                    style={styles.inputField}
-                    numberOfLines={1}
-                    maxLength={40}
-                    onChangeText={setUsername}
-                  />
-                </View>
-                <View style={styles.formBoxContainer}>
-                  <Text style={styles.fieldName}>Email</Text>
-                  <TextInput
-                    placeholder="Email"
-                    value={email}
-                    numberOfLines={1}
-                    maxLength={40}
-                    onChangeText={setEmail}
-                    style={styles.inputField}
-                    keyboardType="email-address"
-                  />
-                </View>
-                <View style={styles.formBoxContainer}>
-                  <Text style={styles.fieldName}>Phone</Text>
-                  <TextInput
-                    placeholder="Phone Number"
-                    value={phone}
-                    keyboardType={"phone-pad"}
-                    numberOfLines={1}
-                    maxLength={40}
-                    onChangeText={setPhone}
-                    style={styles.inputField}
-                  />
-                </View>
-                <View style={styles.formBoxContainer}>
-                  <Text style={styles.fieldName}>Birthday</Text>
-                  <TouchableOpacity
-                    onPress={handleOpenDatePicker}
-                    style={styles.datePickerButton} // เพิ่มสไตล์ให้ดูเป็นช่องกรอก
-                  >
-                    <View style={styles.dateContainer}>
-                      <Text
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                        style={[
-                          styles.datePickerText,
-                          {
-                            color: dateOfBirth ? "#000" : "#777777",
-                            flex: 1,
-                            textAlign: "center",
-                          },
-                        ]}
-                      >
-                        {dateOfBirth
-                          ? formatDate(dateOfBirth, true, false, false, "day")
-                              .date
-                          : "DD"}
-                      </Text>
-                      <Text style={{ flex: 0.1, textAlign: "center" }}>/</Text>
-                      <Text
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                        style={[
-                          styles.datePickerText,
-                          {
-                            color: dateOfBirth ? "#000" : "#777777",
-                            flex: 1,
-                            textAlign: "center",
-                          },
-                        ]}
-                      >
-                        {dateOfBirth
-                          ? formatDate(dateOfBirth, true, false, false, "month")
-                              .date
-                          : "MM"}
-                      </Text>
-                      <Text style={{ flex: 0.1, textAlign: "center" }}>/</Text>
-                      <Text
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                        style={[
-                          styles.datePickerText,
-                          {
-                            color: dateOfBirth ? "#000" : "#777777",
-                            flex: 1,
-                            textAlign: "center",
-                          },
-                        ]}
-                      >
-                        {dateOfBirth
-                          ? formatDate(dateOfBirth, true, false, false, "year")
-                              .date
-                          : "YYYY"}
-                      </Text>
-                    </View>
-                    <View style={styles.IconContainer}>
-                      <Icon name="calendar-outline" size={24} color="#000" />
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                <Modal animationType="slide" transparent={true} visible={open}>
-                  <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                      <Datepicker
-                        date={dateOfBirth}
-                        setDate={handleChangeDate}
-                        disabledClear={true}
-                      />
-                      <TouchableOpacity
-                        onPress={() => handleOpenDatePicker()}
-                        className="mt-3"
-                      >
-                        <Text style={styles.closeButtonModal}>Close</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </Modal>
-                <View style={styles.formBoxContainer}>
-                  <Text style={styles.fieldName}>Gender</Text>
-                  <View style={styles.checkboxWrapper}>
-                    {genderOptions.map((gender, index) => (
-                      <View key={index} style={styles.checkboxContainer}>
-                        <BouncyCheckbox
-                          size={22}
-                          fillColor="#D71515"
-                          unFillColor="#FFFFFF"
-                          iconStyle={{ borderColor: "#D71515" }}
-                          bounceEffectIn={0.9}
-                          bounceEffectOut={1}
-                          bounceVelocityIn={0.5}
-                          bounceVelocityOut={0.3}
-                          bouncinessIn={0.5}
-                          bouncinessOut={0.5}
-                          text={gender} // ใช้ {} แทน ''
-                          isChecked={userGender === gender}
-                          onPress={() => setUserGender(gender)}
-                          textStyle={{
-                            fontFamily: "Poppins-Regular",
-                            textDecorationLine: "none",
-                            padding: 0,
-                            color: "#000000",
-                          }}
-                        />
-                      </View>
-                    ))}
-                  </View>
-                </View>
-                <View style={styles.formBoxContainer}>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("EditSocialMedia")}
-                    style={styles.socialMediaContainer}
-                  >
-                    <Text style={styles.fieldName}>Social Media</Text>
-                    <Icon
-                      name="chevron-forward-outline"
-                      size={24}
-                      color="#000"
+              <View style={styles.formContainer}>
+                <View className="mb-4">
+                  <View style={styles.formBoxContainer}>
+                    <Text style={styles.fieldName}>Firstname</Text>
+                    <TextInput
+                      placeholder="Firstname"
+                      value={firstname}
+                      numberOfLines={1}
+                      maxLength={40}
+                      onChangeText={setFirstname}
+                      style={styles.inputField}
                     />
-                  </TouchableOpacity>
+                  </View>
+                  <View style={styles.formBoxContainer}>
+                    <Text style={styles.fieldName}>Lastname</Text>
+                    <TextInput
+                      placeholder="Lastname"
+                      value={lastname}
+                      numberOfLines={1}
+                      maxLength={40}
+                      onChangeText={setLastname}
+                      style={styles.inputField}
+                    />
+                  </View>
+                  <View style={styles.formBoxContainer}>
+                    <Text style={styles.fieldName}>Username</Text>
+                    <TextInput
+                      placeholder="Username"
+                      value={username}
+                      className="bg-gray-100 text-gray-800 rounded-xl"
+                      style={styles.inputField}
+                      numberOfLines={1}
+                      maxLength={40}
+                      onChangeText={setUsername}
+                    />
+                  </View>
+                  <View style={styles.formBoxContainer}>
+                    <Text style={styles.fieldName}>Email</Text>
+                    <TextInput
+                      placeholder="Email"
+                      value={email}
+                      numberOfLines={1}
+                      maxLength={40}
+                      onChangeText={setEmail}
+                      style={styles.inputField}
+                      keyboardType="email-address"
+                    />
+                  </View>
+                  <View style={styles.formBoxContainer}>
+                    <Text style={styles.fieldName}>Phone</Text>
+                    <TextInput
+                      placeholder="Phone Number"
+                      value={phone}
+                      keyboardType={"phone-pad"}
+                      numberOfLines={1}
+                      maxLength={40}
+                      onChangeText={setPhone}
+                      style={styles.inputField}
+                    />
+                  </View>
+                  <View style={styles.formBoxContainer}>
+                    <Text style={styles.fieldName}>Birthday</Text>
+                    <TouchableOpacity
+                      onPress={handleOpenDatePicker}
+                      style={styles.datePickerButton} // เพิ่มสไตล์ให้ดูเป็นช่องกรอก
+                    >
+                      <View style={styles.dateContainer}>
+                        <Text
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                          style={[
+                            styles.datePickerText,
+                            {
+                              color: dateOfBirth ? "#000" : "#777777",
+                              flex: 1,
+                              textAlign: "center",
+                            },
+                          ]}
+                        >
+                          {dateOfBirth
+                            ? formatDate(dateOfBirth, true, false, false, "day")
+                                .date
+                            : "DD"}
+                        </Text>
+                        <Text style={{ flex: 0.1, textAlign: "center" }}>
+                          /
+                        </Text>
+                        <Text
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                          style={[
+                            styles.datePickerText,
+                            {
+                              color: dateOfBirth ? "#000" : "#777777",
+                              flex: 1,
+                              textAlign: "center",
+                            },
+                          ]}
+                        >
+                          {dateOfBirth
+                            ? formatDate(
+                                dateOfBirth,
+                                true,
+                                false,
+                                false,
+                                "month"
+                              ).date
+                            : "MM"}
+                        </Text>
+                        <Text style={{ flex: 0.1, textAlign: "center" }}>
+                          /
+                        </Text>
+                        <Text
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                          style={[
+                            styles.datePickerText,
+                            {
+                              color: dateOfBirth ? "#000" : "#777777",
+                              flex: 1,
+                              textAlign: "center",
+                            },
+                          ]}
+                        >
+                          {dateOfBirth
+                            ? formatDate(
+                                dateOfBirth,
+                                true,
+                                false,
+                                false,
+                                "year"
+                              ).date
+                            : "YYYY"}
+                        </Text>
+                      </View>
+                      <View style={styles.IconContainer}>
+                        <Icon name="calendar-outline" size={24} color="#000" />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                  <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={open}
+                  >
+                    <View style={styles.centeredView}>
+                      <View style={styles.modalView}>
+                        <Datepicker
+                          date={dateOfBirth}
+                          setDate={handleChangeDate}
+                          disabledClear={true}
+                        />
+                        <TouchableOpacity
+                          onPress={() => handleOpenDatePicker()}
+                          className="mt-3"
+                        >
+                          <Text style={styles.closeButtonModal}>Close</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </Modal>
+                  <View style={styles.formBoxContainer}>
+                    <Text style={styles.fieldName}>Gender</Text>
+                    <View style={styles.checkboxWrapper}>
+                      {genderOptions.map((gender, index) => (
+                        <View key={index} style={styles.checkboxContainer}>
+                          <BouncyCheckbox
+                            size={22}
+                            fillColor="#D71515"
+                            unFillColor="#FFFFFF"
+                            iconStyle={{ borderColor: "#D71515" }}
+                            bounceEffectIn={0.9}
+                            bounceEffectOut={1}
+                            bounceVelocityIn={0.5}
+                            bounceVelocityOut={0.3}
+                            bouncinessIn={0.5}
+                            bouncinessOut={0.5}
+                            text={gender}
+                            isChecked={userGender === gender}
+                            onPress={() => setUserGender(gender)}
+                            textStyle={{
+                              fontFamily: "Poppins-Regular",
+                              textDecorationLine: "none",
+                              padding: 0,
+                              color: "#000000",
+                            }}
+                          />
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                  <View style={styles.formBoxContainer}>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("EditSocialMedia")}
+                      style={styles.socialMediaContainer}
+                    >
+                      <Text style={styles.fieldName}>Social Media</Text>
+                      <Icon
+                        name="chevron-forward-outline"
+                        size={24}
+                        color="#000"
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
+                <TouchableOpacity
+                  onPress={handleSaveProfile}
+                  className="bg-primary p-3 rounded-lg items-center"
+                >
+                  <Text className="text-white font-bold">Save Changes</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+      <Modal transparent={true} visible={modalVisible} animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Choose an option</Text>
+              <View style={styles.modalContentList}>
+                <TouchableOpacity
+                  style={styles.optionButton}
+                  onPress={() => openImagePicker("camera")}
+                >
+                  <Icon
+                    name="camera-outline"
+                    size={30}
+                    color="#000"
+                    style={{ marginBottom: 5 }}
+                  />
+                  <Text style={styles.optionText}>Take a Photo</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.optionButton}
+                  onPress={() => openImagePicker("gallery")}
+                >
+                  <Icon
+                    name="images-outline"
+                    size={30}
+                    color="#000"
+                    style={{ marginBottom: 5 }}
+                  />
+                  <Text style={styles.optionText}>Choose from Gallery</Text>
+                </TouchableOpacity>
               </View>
               <TouchableOpacity
-                onPress={handleSaveProfile}
-                className="bg-primary p-3 rounded-lg items-center"
+                style={styles.cancelButton}
+                onPress={() => setModalVisible(false)}
               >
-                <Text className="text-white font-bold">Save Changes</Text>
+                <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
             </View>
-          </ScrollView>
+          </View>
         </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </Modal>
+    </Fragment>
   );
 };
 
 export default EditProfile;
 
 const styles = StyleSheet.create({
-  modalHeader: {
+  imageProfile: {
     width: "100%",
     height: 500,
   },
@@ -797,4 +895,152 @@ const styles = StyleSheet.create({
     right: 20,
     zIndex: 10, // เพื่อให้แน่ใจว่าอยู่เหนือภาพ
   },
+  modalContainer: {
+    flex: 1,
+    padding: 8,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    paddingBottom: 10,
+    borderRadius: 15,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: "Poppins-Bold",
+    includeFontPadding: false,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  modalContentList: {
+    flexDirection: "row", // จัดเรียงปุ่มในแนวนอน
+    justifyContent: "space-around", // จัดระยะห่างระหว่างปุ่ม
+    width: "100%",
+    borderBottomColor: "#ccc",
+    marginBottom: 10,
+  },
+  optionButtonContainer: {
+    flexDirection: "row", // จัดเรียงปุ่มในแนวนอน
+    justifyContent: "space-around", // จัดระยะห่างระหว่างปุ่ม
+    width: "100%", // ให้ container กว้าง 100% ของหน้าจอ
+  },
+  optionButton: {
+    padding: 30,
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    flex: 1, // ใช้ flex เพื่อให้ปุ่มขยายได้
+    marginHorizontal: 5, // ให้มีช่องว่างระหว่างปุ่ม
+    marginTop: 10, // ให้มีช่องว่างระหว่างปุ่ม
+    justifyContent: "center", // จัดให้ข้อความอยู่ตรงกลาง
+  },
+  optionText: {
+    fontSize: 16,
+    textAlign: "center",
+    fontFamily: "Poppins-Regular",
+    includeFontPadding: false,
+  },
+  cancelButton: {
+    padding: 15,
+    alignItems: "center",
+  },
+  cancelText: {
+    fontSize: 16,
+    color: Colors.black,
+    fontFamily: "Poppins-Regular",
+    includeFontPadding: false,
+  },
 });
+
+// import React, { useState } from "react";
+// import { View, Button, Image } from "react-native";
+// import * as ImagePicker from "expo-image-picker";
+// import { SafeAreaView } from "react-native-safe-area-context";
+// import * as SecureStore from "expo-secure-store";
+
+// const FileUploadScreen = () => {
+//   const [previewImage, setPreviewImage] = useState<string | null>(null);
+//   const [fileToUpload, setFileToUpload] = useState<any>(null);
+
+//   const handleFileUpload = async () => {
+//     // Request permission (Only for Expo)
+//     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+//     if (status !== "granted") {
+//       alert("Permission to access media library is required!");
+//       return;
+//     }
+
+//     // Open the image picker
+//     const result = await ImagePicker.launchImageLibraryAsync({
+//       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+//       allowsEditing: true,
+//       quality: 1,
+//     });
+
+//     if (!result.canceled) {
+//       const file = result.assets[0]; // Extract file details
+//       setPreviewImage(file.uri);
+//       setFileToUpload(file);
+//       console.log(fileToUpload);
+//     }
+//   };
+
+//   const uploadFile = async () => {
+//     if (!fileToUpload) {
+//       alert("No file selected!");
+//       return;
+//     }
+
+//     const token = await SecureStore.getItemAsync("my-jwt");
+//     const formData = new FormData();
+//     formData.append("file", {
+//       uri: fileToUpload.uri,
+//       type: fileToUpload.mimeType || "image/jpeg",
+//       name: fileToUpload.fileName || "upload.jpg",
+//     } as any);
+//     console.log("formdataaaaa", fileToUpload);
+//     console.log("token", token);
+//     console.log("form data", formData);
+
+//     try {
+//       const response = await fetch(
+//         "http://cp24us1.sit.kmutt.ac.th:543/api/v1/files/upload?bucket=profiles",
+//         {
+//           method: "POST",
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//           },
+//           body: formData,
+//         }
+//       );
+
+//       const data = await response.json();
+//       console.log("Upload success:", data);
+//     } catch (error) {
+//       console.error("Upload failed:", error);
+//     }
+//   };
+
+//   return (
+//     <SafeAreaView>
+//       <Button title="Pick an image" onPress={handleFileUpload} />
+//       {previewImage && (
+//         <Image
+//           source={{ uri: previewImage }}
+//           style={{ width: 100, height: 100 }}
+//         />
+//       )}
+//       <Button
+//         title="Upload Image"
+//         onPress={uploadFile}
+//         disabled={!fileToUpload}
+//       />
+//     </SafeAreaView>
+//   );
+// };
+
+// export default FileUploadScreen;

@@ -8,7 +8,11 @@ import {
   TouchableOpacity,
   Pressable,
   Alert,
+  StatusBar,
 } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
+import { StatusBarProps } from "react-native";
+
 import { useFocusEffect } from "expo-router";
 import { Button } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
@@ -28,7 +32,6 @@ import useNavigateToEditProfile from "@/composables/useNavigateToEditProfile";
 import useNavigateToEmailNotificationSetting from "@/composables/useNavigateToEmailNotificationSetting";
 import useNavigateToResetPassword from "@/composables/useNavigateToResetPassword";
 import { ScrollView } from "react-native-gesture-handler";
-import { StatusBar } from "expo-status-bar";
 import CustomButton from "@/components/CustomButton";
 
 const Profile = () => {
@@ -41,6 +44,12 @@ const Profile = () => {
 
   const { authState, onLogout } = useAuth();
 
+  function FocusAwareStatusBar(props: StatusBarProps) {
+    const isFocused = useIsFocused();
+
+    return isFocused ? <StatusBar {...props} /> : null;
+  }
+
   const onLogoutPress = () => {
     onLogout!();
   };
@@ -52,6 +61,7 @@ const Profile = () => {
   };
 
   const navigateToScanQR = () => {
+    
     if (permission?.granted === false) {
       Alert.alert(
         "Permission Required",
@@ -63,7 +73,7 @@ const Profile = () => {
     if (userInfo.users_role === "Attendee") {
       Alert.alert("Access Denied", "You do not have permission to feature.");
       return;
-    } else if (userInfo.users_role === "Organization") {
+    } else if (userInfo.users_role === "Organizer") {
       requestPermission();
       navigation.navigate("ScanQR");
     }
@@ -79,8 +89,11 @@ const Profile = () => {
 
   return (
     <Fragment>
-      <StatusBar backgroundColor="transparent" style="dark" />
-      <SafeAreaView edges={["top"]} className="flex-1 bg-[#002642]">
+      <FocusAwareStatusBar
+        barStyle="dark-content"
+        backgroundColor="transparent"
+      />
+      <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <ScrollView
           className="bg-white"
           showsVerticalScrollIndicator={false}
@@ -89,33 +102,42 @@ const Profile = () => {
           <View style={styles.container}>
             {userInfo.users_image ? (
               <View className="justify-center items-center">
-                <Image
-                  source={{ uri: userInfo.users_image }}
+                <View
                   style={{
                     width: 208, // เทียบเท่ากับ w-52
                     height: 208, // เทียบเท่ากับ h-52
                     borderRadius: 104, // ทำให้เป็นวงกลม
                     borderWidth: 4, // ความหนาของเส้นขอบ
-                    borderColor: "#fff", // สีขอบ (gray-300)
+                    borderColor: "#cdcdcd", // สีขอบ (gray-300)
                     alignSelf: "center", // เทียบเท่ากับ mx-auto
+                    elevation: 4, // เงา
+                    shadowColor: "#000", // สีเงา
                   }}
-                  resizeMode="cover"
-                />
+                >
+                  <Image
+                    source={{ uri: userInfo.users_image }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: 104, // ทำให้เป็นวงกลม
+                    }}
+                    resizeMode="cover"
+                  />
+                </View>
               </View>
             ) : (
               <DefaultProfile className="w-52 h-52 rounded-full mx-auto mt-10" />
             )}
-            <Text className="text-center mt-8 font-Poppins-Regular text-xl text-white">
+            <Text className="text-center mt-8 font-Poppins-Regular text-xl text-black">
               {userInfo.users_firstname} {userInfo.users_lastname}
             </Text>
-            <Text className="text-center mt-2 font-Poppins-Regular text-lg text-white">
+            <Text className="text-center mt-2 font-Poppins-Regular text-lg text-black">
               {userInfo.username}
             </Text>
           </View>
           <View style={styles.menuContainer}>
             <View style={styles.menuListContainer}>
               <View style={styles.headerMenu}>
-                <Icon name="person" size={20} color="#000000" />
                 <Text style={styles.headerTypeSetting}>Account Setting</Text>
               </View>
               <View>
@@ -153,7 +175,6 @@ const Profile = () => {
             </View>
             <View style={styles.menuListContainer}>
               <View style={styles.headerMenu}>
-                <Icon name="notifications" size={20} color="#000000" />
                 <Text style={styles.headerTypeSetting}>
                   Notification Setting
                 </Text>
@@ -178,34 +199,10 @@ const Profile = () => {
                 </TouchableOpacity>
               </View>
             </View>
-            {/* <View style={styles.menuListContainer}>
-            <View style={styles.headerMenu}>
-              <Icon name="lock-closed-outline" size={20} color="#000000" />
-              <Text style={styles.headerTypeSetting}>Security</Text>
-              <View style={styles.headerTypeline} />
-            </View>
-            <View>
-              <TouchableOpacity
-                onPress={() => navigateToEmailNotificationSetting()}
-                style={styles.menuList}
-              >
-                <Icon
-                  name="key-outline"
-                  size={20}
-                  color="#000000"
-                  style={{ marginRight: 10 }}
-                />
-                <View className="flex-row justify-between items-center flex-1">
-                  <Text style={styles.menuText}>Reset Password</Text>
-                  <Icon name="chevron-forward" size={20} color="#000000" />
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View> */}
+          
             {userInfo.users_role === "Organizer" && (
               <View style={styles.menuListContainer}>
                 <View style={styles.headerMenu}>
-                  <Icon name="business" size={20} color="#000000" />
                   <Text style={styles.headerTypeSetting}>Organizer Menu</Text>
                 </View>
                 <View>
@@ -237,8 +234,8 @@ const Profile = () => {
                 backgroundColor: "#002642",
                 width: 200,
                 alignSelf: "center",
-                marginTop: 20,
-                marginBottom: 40,
+                marginTop: 10,
+                marginBottom: 20,
               }}
               textStyle={{
                 color: "white",
@@ -266,12 +263,12 @@ const Profile = () => {
 const styles = StyleSheet.create({
   container: {
     justifyContent: "center", // จัดตำแหน่งแนวตั้ง
-    backgroundColor: "#002642", // สีพื้นหลัง (ปรับได้ตามต้องการ)
-    paddingVertical: 50, // ระยะห่างขอบจอ
+    alignItems: "center", // จัดตำแหน่งแนวนอน
+    paddingTop: 50// ระยะห่างขอบจอ
   },
   menuContainer: {
-    marginTop: 20,
     padding: 20,
+
     paddingBottom: 0,
   },
   headerMenu: {
