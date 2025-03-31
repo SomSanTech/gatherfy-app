@@ -200,8 +200,8 @@ const Review: React.FC<ReviewProps> = ({ route }) => {
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-white">
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()} className="w-6">
-          <Icon name="chevron-back" size={24} color="#000000" />
+        <TouchableOpacity onPress={() => navigation.goBack()} className="w-6 ml-2">
+          <Icon name="chevron-back" size={26} color="#000000" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Event Feedback</Text>
         <View className="w-6"></View>

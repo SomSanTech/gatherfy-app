@@ -145,9 +145,9 @@ const ResetPassword = () => {
       >
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={navigateToGoBack}>
-            <Icon name="chevron-back" size={24} color="#000000" />
+            <Icon name="chevron-back" size={26} color="#000000" />
           </TouchableOpacity>
-          <Text style={styles.headerText}>Reset Password</Text>
+          <Text style={styles.headerText}>Change Password</Text>
         </View>
         <TouchableWithoutFeedback>
           <ScrollView

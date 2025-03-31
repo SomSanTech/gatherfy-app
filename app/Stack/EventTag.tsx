@@ -88,7 +88,7 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
         <View className="items-center justify-between flex-row">
           <View className="flex-row items-center">
             <TouchableOpacity onPress={() => navigation.goBack()} className="">
-              <Icon name="chevron-back" size={24} color="#000000" />
+              <Icon name="chevron-back" size={26} color="#000000" />
             </TouchableOpacity>
             <Text
               className="text-xl font-Poppins-Bold text-center ml-5"

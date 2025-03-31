@@ -108,7 +108,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={() => navigateToGoBack()}>
-            <Icon name="chevron-back" size={24} color="#000000" />
+            <Icon name="chevron-back" size={26} color="#000000" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Event Detail</Text>
         </View>

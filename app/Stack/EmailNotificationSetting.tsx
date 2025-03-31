@@ -22,6 +22,10 @@ import {
   fetchUserProfile,
   saveUserProfile,
 } from "@/composables/useFetchUserProfile";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const EmailNotificationSetting = () => {
   const { navigateToGoBack } = useNavigateToGoBack();
@@ -112,7 +116,7 @@ const EmailNotificationSetting = () => {
       >
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={navigateToGoBack}>
-            <Icon name="chevron-back" size={24} color="#000000" />
+            <Icon name="chevron-back" size={26} color="#000000" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Email Notification Settings</Text>
         </View>
@@ -156,33 +160,38 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 }) => {
   return (
     <View style={styles.notificationContainer}>
-      <View>
+      <View className="flex-1">
         <Text style={styles.notificationHeader}>{title}</Text>
         <Text style={styles.notificationDetail}>{detail}</Text>
       </View>
-      <Switch
-        value={value}
-        onValueChange={onToggle}
-        disabled={false}
-        circleSize={29}
-        barHeight={30}
-        circleBorderWidth={3}
-        backgroundActive={"#00b894"}
-        backgroundInactive={"#dfe6e9"}
-        circleActiveColor={"#30a566"}
-        circleInActiveColor={"#636e72"}
-        switchWidthMultiplier={2}
-        switchBorderRadius={30}
-        renderActiveText={false}
-        renderInActiveText={false}
-        renderInsideCircle={() =>
-          value ? (
-            <MaterialIcons name="check" size={20} color="white" />
-          ) : (
-            <MaterialIcons name="close" size={20} color="white" />
-          )
-        }
-      />
+      <View>
+        <Switch
+          value={value}
+          onValueChange={onToggle}
+          disabled={false}
+          circleSize={29}
+          barHeight={30}
+          circleBorderWidth={3}
+          backgroundActive={"#00b894"}
+          backgroundInactive={"#dfe6e9"}
+          circleActiveColor={"#30a566"}
+          circleInActiveColor={"#636e72"}
+          switchWidthMultiplier={2}
+          switchBorderRadius={30}
+          renderActiveText={false}
+          renderInActiveText={false}
+          containerStyle={{
+            marginLeft: 10,
+          }}
+          renderInsideCircle={() =>
+            value ? (
+              <MaterialIcons name="check" size={20} color="white" />
+            ) : (
+              <MaterialIcons name="close" size={20} color="white" />
+            )
+          }
+        />
+      </View>
     </View>
   );
 };
@@ -203,7 +212,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     includeFontPadding: false,
-    fontSize: 18,
+    fontSize: wp(4),
     fontFamily: "Poppins-Bold",
     marginLeft: 10,
   },
@@ -222,12 +231,12 @@ const styles = StyleSheet.create({
   },
   notificationHeader: {
     includeFontPadding: false,
-    fontSize: 16,
+    fontSize: wp(4),
     fontFamily: "Poppins-Bold",
   },
   notificationDetail: {
     includeFontPadding: false,
-    fontSize: 14,
+    fontSize: wp(2.8),
     fontFamily: "Poppins-Regular",
     color: "#636e72",
   },

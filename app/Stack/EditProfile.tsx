@@ -353,7 +353,7 @@ const EditProfile = () => {
         >
           <View style={styles.headerContainer}>
             <TouchableOpacity onPress={navigateToGoBack}>
-              <Icon name="chevron-back" size={24} color="#000000" />
+              <Icon name="chevron-back" size={26} color="#000000" />
             </TouchableOpacity>
             <Text style={styles.headerText}>Edit Profile</Text>
           </View>
@@ -452,6 +452,7 @@ const EditProfile = () => {
                       maxLength={40}
                       onChangeText={setEmail}
                       style={styles.disabledInputField}
+                      
                       keyboardType="email-address"
                       autoCapitalize="none"
                     />
@@ -615,9 +616,9 @@ const EditProfile = () => {
                 </View>
                 <TouchableOpacity
                   onPress={handleSaveProfile}
-                  className="bg-primary p-3 rounded-lg items-center"
+                  className="bg-primary p-3 rounded-lg items-center mb-3"
                 >
-                  <Text className="text-white font-bold">Save Changes</Text>
+                  <Text className="text-white" style={styles.buttonSave}>Save Changes</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -717,24 +718,24 @@ const styles = StyleSheet.create({
   },
   fieldName: {
     fontFamily: "Poppins-Regular",
-    fontSize: wp("3.5%"),
+    fontSize: wp("3.2%"),
     color: "#555",
     includeFontPadding: false,
     paddingHorizontal: 8,
     flex: 1, // ให้ fieldName กว้างกว่า inputField
   },
   inputField: {
-    fontSize: wp("3.5%"),
+    fontSize: wp("3.3%"),
     padding: 15,
     paddingVertical: wp("3%"),
     backgroundColor: "#F6F6F6",
     borderRadius: 15,
-    flex: 2.5,
+    flex: 2.4,
     fontFamily: "Poppins-Regular",
     includeFontPadding: false,
   },
   disabledInputField: {
-    fontSize: wp("3.5%"),
+    fontSize: wp("3%"),
     padding: 15,
     paddingVertical: wp("3%"),
     backgroundColor: "#d4d4d4",
@@ -906,6 +907,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.black,
     fontFamily: "Poppins-Regular",
+    includeFontPadding: false,
+  },
+  buttonSave: {
+    backgroundColor: "#D71515",
+    borderRadius: 10,
+    paddingVertical: 3,
+    fontFamily: "Poppins-SemiBold",
     includeFontPadding: false,
   },
 });

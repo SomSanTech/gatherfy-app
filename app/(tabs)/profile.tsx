@@ -165,7 +165,7 @@ const Profile = () => {
                     style={{ marginRight: 10 }}
                   />
                   <View className="flex-row justify-between items-center flex-1">
-                    <Text style={styles.menuText}>Reset Password</Text>
+                    <Text style={styles.menuText}>Change Password</Text>
                     <Icon name="chevron-forward" size={20} color="#000000" />
                   </View>
                 </TouchableOpacity>

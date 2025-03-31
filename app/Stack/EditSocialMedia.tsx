@@ -20,6 +20,10 @@ import {
 import * as SecureStore from "expo-secure-store";
 import Icon from "react-native-vector-icons/Ionicons";
 import useNavigateToGoBack from "@/composables/navigateToGoBack";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { Dropdown } from "react-native-element-dropdown";
 
 import Animated, {
@@ -172,7 +176,7 @@ const EditSocialMedia = () => {
       >
         <View style={styles.headerContainer}>
           <TouchableOpacity onPress={navigateToGoBack}>
-            <Icon name="chevron-back" size={24} color="#000000" />
+            <Icon name="chevron-back" size={26} color="#000000" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Edit Social Media</Text>
         </View>
@@ -321,9 +325,11 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    fontFamily: "Poppins-Regular",
+    fontSize: wp(3.8),
+    fontFamily: "Poppins-SemiBold",
+    includeFontPadding: false,
+    textAlign: "center",
+    paddingHorizontal: 4,
   },
   headerContainer: {
     flexDirection: "row",

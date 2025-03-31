@@ -30,6 +30,7 @@ import formatDate from "@/utils/formatDate";
 import { backToIndex } from "@/composables/backToIndex";
 import { ActivityIndicator } from "react-native-paper";
 import { Colors } from "@/constants/Colors";
+import { set } from "lodash";
 
 const SignUp = () => {
   const navigation = useNavigation();
@@ -98,7 +99,6 @@ const SignUp = () => {
     if (password !== confirmPassword) {
       errors = "Password and confirm password do not match.";
     }
-    setIsLoading(false);
     return errors;
   };
 
@@ -115,14 +115,15 @@ const SignUp = () => {
       !confirmPassword
     ) {
       alert("Please fill in all the fields.");
-      setIsLoading(false);
+
       return false;
     }
     if (password !== confirmPassword) {
       alert("Password and confirm password do not match.");
-      setIsLoading(false);
+      setIsLoading(false)
       return false;
     }
+    setIsLoading(true)
     return true;
   };
 
@@ -137,6 +138,7 @@ const SignUp = () => {
   };
 
   const onSignUpPress = async () => {
+
     setIsLoading(true);
     if (!validateFields()) {
       return;
@@ -160,7 +162,7 @@ const SignUp = () => {
 
     if (!validateEmail(email)) {
       alert("Invalid email format. Please enter a valid email.");
-      setIsLoading(false);
+
       return;
     }
 
@@ -181,8 +183,8 @@ const SignUp = () => {
       setErrorMsg(result.msg); // แสดงข้อความ error ถ้ามี
     } else {
       setIsLoading(false);
-      alert("Create Account Success");
       setIsCreated(true);
+      alert("Create Account Success");
       (navigation as any).reset({
         index: 0,
         routes: [{ name: "otpScreen", params: { email } }],

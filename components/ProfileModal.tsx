@@ -275,15 +275,19 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                 <View style={styles.myCardOptionContainer}>
                   <TouchableOpacity
                     style={styles.myCardOptions}
+                    className="justify-center items-center"
                     onPress={() => [navigateToEditProfile(), handleClose()]}
                   >
                     <Text style={[styles.text]}>Edit profile</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.myCardOptions}
+                    className="justify-center items-center"
                     onPress={() => [navigateToShareProfile(), handleClose()]}
                   >
-                    <Text style={[styles.text]}>Share contact</Text>
+                    <Text style={[styles.text, { textAlign: "center" }]}>
+                      Share contact
+                    </Text>
                   </TouchableOpacity>
                 </View>
               )}

@@ -16,6 +16,10 @@ import Animated, {
   useSharedValue,
   Extrapolation,
 } from "react-native-reanimated";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const OFFSET = 45; // Define OFFSET with an appropriate value
 const Item_width = Dimensions.get("window").width - OFFSET * 2;
@@ -129,9 +133,11 @@ const ParallaxCarouselCard: React.FC<ParallaxCarouselCardProps> = ({
               <Button
                 title="Register Now"
                 titleStyle={{
-                  fontSize: 14,
+                  fontSize: wp(2.6),
                   color: "#D71515",
                   fontFamily: "Poppins-SemiBold",
+                  textAlign: "center",
+                  includeFontPadding: false,
                 }}
                 buttonStyle={{
                   backgroundColor: "rgba(255, 255, 255, 0.8)",

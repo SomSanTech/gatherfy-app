@@ -12,6 +12,10 @@ import {
   Text,
 } from "react-native";
 import { Icon } from "react-native-elements";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const SearchInput: React.FC<{
   value: string;
@@ -88,7 +92,7 @@ const styles = StyleSheet.create({
   // },
   searchInput: {
     fontFamily: "Poppins-Regular",
-    fontSize: 16,
+    fontSize: wp("3.6%"),
     lineHeight: 22,
     height: 45,
     // borderColor: "gray",

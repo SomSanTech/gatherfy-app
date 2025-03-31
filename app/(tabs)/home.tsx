@@ -1,4 +1,10 @@
-import React, { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   View,
   Text,
@@ -21,6 +27,10 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import * as SecureStore from "expo-secure-store";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import ParallaxCarouselPagination from "@/components/parallax-carousel/ParallaxCarouselPagination";
 import { useNavigation } from "@react-navigation/native";
 import groupEventsByDate from "@/utils/groupEventsByDate";
@@ -106,7 +116,6 @@ const Home: React.FC = () => {
     setUserInfo(user);
   };
 
-
   useFocusEffect(
     useCallback(() => {
       loadUser();
@@ -142,14 +151,19 @@ const Home: React.FC = () => {
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <View>
           <View className="px-5 h-24 justify-center" style={styles.header}>
-            <View className="items-center justify-between flex-row">
-              <View className="flex-row items-center">
-                <View className="flex-col">
+            <View className="items-center justify-between flex-row ">
+              <View className="flex-row items-center flex-1">
+                <View className="">
                   <Text
                     className="text-2xl font-Poppins-SemiBold text-black "
                     numberOfLines={1}
                     ellipsizeMode="tail"
-                    style={{ textTransform: "capitalize" }}
+                    style={{
+                      textTransform: "capitalize",
+                      fontSize: wp("4.4"),
+                      includeFontPadding: false,
+                      paddingRight: 10,
+                    }}
                   >
                     Hello, {userInfo.users_firstname}
                   </Text>
@@ -221,12 +235,9 @@ const Home: React.FC = () => {
                 return (
                   <View className="mb-3 mt-5">
                     <Text
-                      className={`text-center ${
-                        Platform.OS === "android"
-                          ? "text-[30px] leading-9"
-                          : "text-3xl"
-                      } font-Poppins-Regular mt-4 mb-3`}
-                      style={{ lineHeight: 38 }}
+                      className={`text-center 
+                        font-Poppins-Regular mt-4 mb-3`}
+                      style={{ lineHeight: 38, fontSize: wp("6.4") }}
                     >
                       Recommended
                     </Text>
@@ -270,7 +281,7 @@ const Home: React.FC = () => {
                 return (
                   <Fragment key={item.type}>
                     <View className="bg-gray-200 py-5 mx-2 mb-3 rounded-2xl">
-                      <Text className="font-Poppins-Regular text-2xl p-4 py-3 pt-0 text-primary">
+                      <Text className="font-Poppins-Regular text-2xl p-4 py-3 pt-0 text-primary" style={{ fontSize: wp("4.8") }}>
                         Explore by date
                       </Text>
                       {Object.entries(groupedEvents).map(
@@ -284,6 +295,10 @@ const Home: React.FC = () => {
                                 className={`text-lg font-Poppins-Regular text-black mb-3 ${
                                   index === 0 ? "mt-0" : "mt-4"
                                 } px-4`}
+                                style={{
+                                  fontSize: wp("3.8"),
+                                  textTransform: "capitalize",
+                                }}
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
                               >
