@@ -115,7 +115,7 @@ const SignUp = () => {
       !confirmPassword
     ) {
       alert("Please fill in all the fields.");
-
+      setIsLoading(false)
       return false;
     }
     if (password !== confirmPassword) {
