@@ -8,36 +8,69 @@ const API_BASE_URL =
 // const API_BASE_URL =
 //   Platform.OS === "android" ? "http://10.0.2.2:4040" : "http://localhost:4040";
 
+// export const scanTokenByQRCode = async (
+//   token: any,
+//   qrToken: any,
+//   url: string,
+//   method: string
+// ) => {
+//   try {
+//     if (!API_BASE_URL) {
+//       console.error("API_BASE_URL is not defined in the app's configuration.");
+//       return [];
+//     }
+
+//     let urlToFetch = `${API_BASE_URL}/${url}`;
+
+//     const response = await fetch(urlToFetch, {
+//       method: method,
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//       body: JSON.stringify({ qrToken: qrToken }),
+//     });
+//     if (!response.ok) {
+//       //   console.error(`Error: ${response.status} - ${response.statusText}`);
+//       return `Error: ${response.status} - ${response.statusText}`;
+//     }
+
+//     return response.json();
+//   } catch (error) {
+//     console.error("Error check-in:", error);
+//     return { error: "Failed to check-in" };
+//   }
+// };
+
 export const scanTokenByQRCode = async (
-  token: any,
-  qrToken: any,
+  token: string | null,
+  qrToken: string,
   url: string,
   method: string
 ) => {
   try {
     if (!API_BASE_URL) {
       console.error("API_BASE_URL is not defined in the app's configuration.");
-      return [];
+      return null;
     }
 
     let urlToFetch = `${API_BASE_URL}/${url}`;
+    console.log("URL to fetch:", urlToFetch);
+    console.log("Token:", token);
     
-    
+
     const response = await fetch(urlToFetch, {
-      method: method,
+      method,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ qrToken: qrToken }),
+      body: JSON.stringify({ qrToken }),
     });
-    if (!response.ok) {
-    //   console.error(`Error: ${response.status} - ${response.statusText}`);
-      return `Error: ${response.status} - ${response.statusText}`;
-    }
-    return response.json();
+
+    return response; // ส่ง `Response` กลับไป
   } catch (error) {
     console.error("Error check-in:", error);
-    return { error: "Failed to check-in" };
+    return null; // คืนค่า `null` ถ้ามีข้อผิดพลาด
   }
 };

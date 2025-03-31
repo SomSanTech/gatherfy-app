@@ -184,10 +184,19 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                         }
                         style={styles.linearBackground}
                       >
-                        <Text className="text-center text-white text-3xl font-semibold">
+                        <Text
+                          className="text-center text-white text-3xl"
+                          style={styles.text}
+                        >
                           {contactData?.userProfile.username}
                         </Text>
-                        <Text className="text-center text-white text-xl pb-7">
+                        <Text
+                          className="text-center text-white text-xl pb-7"
+                          style={[
+                            styles.text,
+                            { fontFamily: "Poppins-Regular" },
+                          ]}
+                        >
                           {contactData?.userProfile.users_firstname}{" "}
                           {contactData?.userProfile.users_lastname}
                         </Text>
@@ -219,7 +228,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                                 }}
                                 className="w-36 h-36 rounded-full mb-5"
                               />
-                              <Text className="text-center text-white text-3xl font-semibold">
+                              <Text className="text-center text-white text-3xl font-Poppins-SemiBold">
                                 {contactData?.userProfile.username}
                               </Text>
                               <Text className="text-center text-white text-xl pb-7">
@@ -268,26 +277,32 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                     style={styles.myCardOptions}
                     onPress={() => [navigateToEditProfile(), handleClose()]}
                   >
-                    <Text>Edit profile</Text>
+                    <Text style={[styles.text]}>Edit profile</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.myCardOptions}
                     onPress={() => [navigateToShareProfile(), handleClose()]}
                   >
-                    <Text>Share contact</Text>
+                    <Text style={[styles.text]}>Share contact</Text>
                   </TouchableOpacity>
                 </View>
               )}
               {contactData?.userProfile.users_phone !== null && (
                 <View style={styles.modalDetail}>
-                  <Text className="pb-3">Phone</Text>
+                  <Text className="pb-3" style={styles.text}>
+                    Phone
+                  </Text>
                   <TouchableOpacity
                     onPress={() =>
                       openCall(contactData.userProfile.users_phone)
                     }
                     className="flex-row items-center"
                   >
-                    <Text>{contactData?.userProfile.users_phone}</Text>
+                    <Text
+                      style={[styles.text, { fontFamily: "Poppins-Regular" }]}
+                    >
+                      {contactData?.userProfile.users_phone}
+                    </Text>
                     <Image
                       className="w-5 h-5 ml-2 opacity-70"
                       source={require("@/assets/icons/call-outbound-icon.png")}
@@ -296,14 +311,19 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                 </View>
               )}
               <View style={styles.modalDetail}>
-                <Text className="pb-3">Email</Text>
+                <Text className="pb-3" style={styles.text}>
+                  Email
+                </Text>
                 <View className="flex-row items-center">
                   <TouchableOpacity
                     onPress={() =>
                       openMail(contactData?.userProfile.users_email)
                     }
                   >
-                    <Text className="text-[#3288BD]">
+                    <Text
+                      className="text-[#3288BD]"
+                      style={[styles.text, { fontFamily: "Poppins-Regular" }]}
+                    >
                       {contactData?.userProfile.users_email}
                     </Text>
                   </TouchableOpacity>
@@ -321,7 +341,9 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
               </View>
               {contactData?.userSocials.length > 0 && (
                 <View style={styles.modalDetail}>
-                  <Text className="pb-3">Socials</Text>
+                  <Text className="pb-3" style={styles.text}>
+                    Socials
+                  </Text>
                   {contactData?.userSocials.map((item, index) => (
                     <View key={index} className="flex-row my-2 items-center">
                       <Image
@@ -355,7 +377,9 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                       openDeleteModal(contactData);
                     }}
                   >
-                    <Text className="text-[#D71515]">Delete Contact</Text>
+                    <Text className="text-[#D71515]" style={styles.text}>
+                      Delete Contact
+                    </Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -379,58 +403,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 export default ProfileModal;
 
 const styles = StyleSheet.create({
-  sectionHeader: {
-    marginTop: 10,
-    paddingHorizontal: 16,
-    color: "#9B9B9B",
-    fontSize: 14,
-  },
-  myCardContainer: {
-    flexDirection: "row",
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-    alignItems: "center",
-  },
-  myCardUsername: {
-    fontSize: 18,
-    fontFamily: "Poppins-SemiBold",
-  },
-  myCardImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 25,
-    marginRight: 16,
-  },
-  header: {
-    fontSize: 24,
-    fontFamily: "Poppins-Bold",
-    margin: 16,
-  },
-  contactItem: {
-    flexDirection: "row",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    // borderBottomWidth: 1,
-    // borderBottomColor: "#ccc",
-    alignContent: "center",
-  },
-  contactImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 16,
-  },
-  contactName: {
-    fontSize: 16,
-    fontFamily: "Poppins-Bold",
-  },
-  contactFullname: {
-    fontSize: 14,
-    fontFamily: "Poppins-Regular",
-  },
-  emptyText: {
-    margin: 16,
-  },
   modalContainer: {
     backgroundColor: "#F6F6F6",
     shadowColor: "black",
@@ -524,5 +496,9 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "rgba(255,255,255,0.8)",
     borderRadius: 10,
+  },
+  text: {
+    fontFamily: "Poppins-SemiBold",
+    includeFontPadding: false,
   },
 });

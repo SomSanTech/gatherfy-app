@@ -17,8 +17,6 @@ export const fetchQuestionReview = async (eventId: any, method: string) => {
 
     let url = `${API_BASE_URL}/api/v1/questions/event/${eventId}`;
 
-    console.log("question url", url);
-
     const response = await fetch(url, {
       method: method,
       headers: {
@@ -53,9 +51,7 @@ export const sendQuestionReview = async (
     }
 
     let url = `${API_BASE_URL}${urlToFetch}`;
-    console.log("Sending request to:", url);
-    console.log("body:", body);
-    console.log("token:", token);
+
 
     const response = await fetch(url, {
       method: method,

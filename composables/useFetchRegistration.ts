@@ -15,7 +15,7 @@ export const useFetchRegistration = async (body: any , token: any) => {
       return [];
     }
 
-    let url = `${API_BASE_URL}/api/v1/registrations`;
+    let url = `${API_BASE_URL}/api/v2/registrations`;
 
     const response = await fetch(url, {
       method: "POST",
@@ -26,22 +26,34 @@ export const useFetchRegistration = async (body: any , token: any) => {
       },
       body: JSON.stringify(body),
     });
-
+    
+    let errorMessage = "Error during registration. Please try again."; // ข้อความ error เริ่มต้น
+    
     if (!response.ok) {
-      if (response.status === 409) {
-        alert("Already Registered for the Event");
-      } else {
-        console.error(`Error: ${response.status} - ${response.statusText}`);
-        alert("Error during registration. Please try again.");
+      let errorData;
+      try {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          errorData = await response.json();
+          errorMessage = errorData.message || errorMessage; // เอาข้อความจาก backend
+        } else {
+          errorData = await response.text();
+          errorMessage = errorData || errorMessage; // ถ้าเป็น text ก็ใช้แทน
+        }
+      } catch (err) {
+        console.error("Failed to parse error response:", err);
       }
+    
+      alert(errorMessage);
+      console.error(`Error: ${response.status} - ${errorMessage}`);
       return [];
-    } else {
-      alert("Thank you for registration");
     }
-
-    const data = await response.json(); // Await here to resolve the promise
-
-    return data; // Return the resolved data
+    
+    alert("Thank you for registration");
+    
+    const data = await response.json(); // อ่าน response เมื่อสำเร็จ
+    return data;
+    
   } catch (error) {
     console.error(error);
     return [];

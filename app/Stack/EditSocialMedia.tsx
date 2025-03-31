@@ -102,28 +102,55 @@ const EditSocialMedia = () => {
   };
 
 
+  // const saveSocialMedia = async () => {
+  //   try {
+  //     const token = await SecureStore.getItemAsync("my-jwt");
+  
+  //     // กรองเฉพาะข้อมูลที่ไม่ว่าง และ trim ค่าที่ป้อนเข้ามา
+  //     const socialMediaData = socialLinks
+  //       .map((item) => ({
+  //         ...(item.socialId ? { socialId: item.socialId } : {}),
+  //         socialPlatform: item.platform.trim(),
+  //         socialLink: item.link.trim(),
+  //       }))
+  //       .filter((item) => item.socialPlatform && item.socialLink); // กรองเฉพาะข้อมูลที่ไม่ว่าง
+  
+  //     // ส่งข้อมูลไปยัง backend
+  //     const result = await saveSocialMediaData(token, socialMediaData, "PUT");
+  
+  //     if (
+  //       typeof result === "object" &&
+  //       "message" in result &&
+  //       result.message === "Social links updated successfully"
+  //     ) {
+  //       Alert.alert("Success", "Social media saved successfully");
+  //     } else {
+  //       Alert.alert("Unsuccess", "Failed to save social media");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error saving social media:", error);
+  //   }
+  // };
+
   const saveSocialMedia = async () => {
     try {
       const token = await SecureStore.getItemAsync("my-jwt");
   
-      // กรองเฉพาะข้อมูลที่ไม่ว่าง และ trim ค่าที่ป้อนเข้ามา
+      // ✅ กรองข้อมูลที่ไม่ว่าง
       const socialMediaData = socialLinks
         .map((item) => ({
           ...(item.socialId ? { socialId: item.socialId } : {}),
           socialPlatform: item.platform.trim(),
           socialLink: item.link.trim(),
         }))
-        .filter((item) => item.socialPlatform && item.socialLink); // กรองเฉพาะข้อมูลที่ไม่ว่าง
+        .filter((item) => item.socialPlatform && item.socialLink);
   
-      // ส่งข้อมูลไปยัง backend
+      // ✅ ส่งข้อมูลไป backend
       const result = await saveSocialMediaData(token, socialMediaData, "PUT");
   
-      if (
-        typeof result === "object" &&
-        "message" in result &&
-        result.message === "Social links updated successfully"
-      ) {
+      if (Array.isArray(result) && result.length > 0) {
         Alert.alert("Success", "Social media saved successfully");
+        console.log("Saved social media:", result); // ✅ Log response array
       } else {
         Alert.alert("Unsuccess", "Failed to save social media");
       }
@@ -131,6 +158,7 @@ const EditSocialMedia = () => {
       console.error("Error saving social media:", error);
     }
   };
+  
 
   useEffect(() => {
     loadSocialMedia();

@@ -42,37 +42,92 @@ const ScanQR = () => {
     checkUserRole();
   }, [requestPermission, navigation]);
 
+  // const barcodeScanned = async ({ data }: { data: string }) => {
+  //   if (scanning) {
+  //     return;
+  //   }
+
+  //   setScanning(true);
+  //   setScannedValue(data);
+
+  //   if (data) {
+  //     const token = await SecureStore.getItemAsync("my-jwt");
+
+  //     const response = await scanTokenByQRCode(
+  //       token,
+  //       data,
+  //       "api/v2/check-in",
+  //       "PUT"
+  //     );
+
+  //     if (!response || response.status !== 200) {
+  //       throw new Error("Check-in failed! Please try again.");
+  //     }
+
+  //     setApiResponse("API call successful!");
+
+  //     alert("Check-in successful!");
+  //   }
+
+  //   setTimeout(() => {
+  //     setScanning(false);
+  //   }, 2000);
+  // };
+
   const barcodeScanned = async ({ data }: { data: string }) => {
     if (scanning) {
       return;
     }
-
+  
     setScanning(true);
     setScannedValue(data);
-
-    if (data) {
-      const token = await SecureStore.getItemAsync("my-jwt");
-
-      const response = await scanTokenByQRCode(
-        token,
-        data,
-        "api/v2/check-in",
-        "PUT"
-      );
-
-      if (!response || response.status !== 200) {
-        throw new Error("Check-in failed! Please try again.");
+  
+    try {
+      if (data) {
+        const token = await SecureStore.getItemAsync("my-jwt");
+  
+        const response = await scanTokenByQRCode(
+          token,
+          data,
+          "api/v2/check-in",
+          "PUT"
+        );
+  
+        if (!response) {
+          throw new Error("No response from server.");
+        }
+  
+        console.log("Response Status:", response.status);
+        console.log("Response Headers:", response.headers.get("content-type"));
+  
+        let responseData;
+        const contentType = response.headers.get("content-type");
+  
+        if (contentType && contentType.includes("application/json")) {
+          responseData = await response.json();
+        } else {
+          responseData = await response.text(); // รับเป็น text ถ้าไม่ใช่ JSON
+        }
+  
+        if (!response.ok) {
+          throw new Error(responseData || "Check-in failed! Please try again.");
+        }
+  
+        setApiResponse("API call successful!");
+        alert("Check-in successful!");
+  
+        console.log("Check-in response:", responseData);
       }
-
-      setApiResponse("API call successful!");
-
-      alert("Check-in successful!");
+    } catch (error: any) {
+      console.error("Check-in error:", error);
+      alert(error.message || "An unexpected error occurred.");
     }
-
+  
     setTimeout(() => {
       setScanning(false);
     }, 2000);
   };
+  
 
   if (isPermissionGranted) {
     return (

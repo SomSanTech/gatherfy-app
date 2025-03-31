@@ -101,58 +101,6 @@ const StackLayout = () => {
   const segments = useSegments();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     const TOKEN_KEY = "my-jwt";
-  //     const token = await SecureStore.getItemAsync(TOKEN_KEY);
-  //   };
-
-  //   checkAuth();
-
-  //   const inAuthGroup = segments[0] === "(tabs)";
-
-  //   if (!authState?.authenticated && inAuthGroup) {
-  //     console.log("Redirecting to /");
-  //     router.replace("/");
-  //   } else if (authState?.authenticated === true) {
-  //     // Check if the email is verified
-  //     if (!authState.verifyEmail) {
-  //       console.log("Email not verified, redirecting to OTP screen...");
-  //       router.replace("/(auth)/otpScreen"); // Assuming the OTP screen is called 'otp-verification'
-  //     } else if (segments[0] !== "(tabs)") {
-  //       console.log("Redirecting to /home");
-  //       router.replace("/(tabs)/home");
-  //     }
-  //   }
-  // }, [authState, segments, router]);
-
-  // useEffect(() => {
-  //   const handleAppStateChange = async (nextAppState: string) => {
-  //     if (nextAppState === "inactive" || nextAppState === "background") {
-  //       console.log("App is closing...");
-
-  //       // ถ้ายังไม่ได้ verify email ให้เคลียร์ค่าและกลับไป login
-  //       if (authState?.authenticated && !authState.verifyEmail) {
-  //         console.log(
-  //           "Email not verified, clearing auth and redirecting to login..."
-  //         );
-
-  //         onLogout!();
-  //       }
-  //     }
-  //   };
-
-  //   // Subscribe to AppState changes
-  //   const subscription = AppState.addEventListener(
-  //     "change",
-  //     handleAppStateChange
-  //   );
-
-  //   return () => {
-  //     subscription.remove(); // Cleanup when component unmounts
-  //   };
-  // }, [authState]);
-
   useEffect(() => {
     const checkAuth = async () => {
       const TOKEN_KEY = "my-jwt";

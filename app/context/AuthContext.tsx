@@ -91,8 +91,6 @@ export const AuthProvider = ({ children }: any) => {
 
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        console.log("sdsaoijd", isVerified ? JSON.parse(isVerified) : false);
-
         setAuthState({
           token,
           authenticated: true,
@@ -394,11 +392,6 @@ export const AuthProvider = ({ children }: any) => {
       verifyEmail: true,
     }));
   };
-
-  // ใช้ useEffect เพื่อติดตามการเปลี่ยนแปลง
-  useEffect(() => {
-    console.log("verifyEmail", authState.verifyEmail);
-  }, [authState.verifyEmail]); // ติดตามการเปลี่ยนแปลงของ verifyEmail
 
   const value = {
     onRegister: register,

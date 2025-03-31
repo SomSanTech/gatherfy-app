@@ -32,6 +32,54 @@ export const fetchSocialmedia = async (token: any, method: string) => {
   }
 };
 
+// export const saveSocialMediaData = async (
+//   token: any,
+//   data: any,
+//   method: string
+// ) => {
+//   try {
+//     if (!API_BASE_URL) {
+//       console.error("API_BASE_URL is not defined in the app's configuration.");
+//       return;
+//     }
+
+//     let urlToFetch = `${API_BASE_URL}/api/v1/socials`;
+
+//     console.log("Data to send:", data);
+//     console.log("Method:", method);
+//     console.log("URL:", urlToFetch);
+//     console.log("Token:", token);
+    
+//     const response = await fetch(urlToFetch, {
+//       method: method,
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//       body: JSON.stringify({
+//         socialLinks: data,
+//       }),
+//     });
+
+//     // Check if the response is OK (status code 2xx)
+//     if (!response.ok) {
+//       console.error(`Error: ${response.status} - ${response.statusText}`);
+//       return `Error: ${response.status} - ${response.statusText}`;
+//     }
+
+//     // Fetch the raw response text (plain text)
+//     const rawResponse = await response.text();
+//     console.log("Raw Response:", rawResponse); // Log the raw response
+
+//     // Return the raw text as the response
+//     return { message: rawResponse }; // Return plain text message as response
+
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     return { error: "Failed to fetch data" };
+//   }
+// };
+
 export const saveSocialMediaData = async (
   token: any,
   data: any,
@@ -49,7 +97,7 @@ export const saveSocialMediaData = async (
     console.log("Method:", method);
     console.log("URL:", urlToFetch);
     console.log("Token:", token);
-    
+
     const response = await fetch(urlToFetch, {
       method: method,
       headers: {
@@ -61,23 +109,19 @@ export const saveSocialMediaData = async (
       }),
     });
 
-    // Check if the response is OK (status code 2xx)
     if (!response.ok) {
       console.error(`Error: ${response.status} - ${response.statusText}`);
-      return `Error: ${response.status} - ${response.statusText}`;
+      return { error: `Error: ${response.status} - ${response.statusText}` };
     }
 
-    // Fetch the raw response text (plain text)
-    const rawResponse = await response.text();
-    console.log("Raw Response:", rawResponse); // Log the raw response
+    // ✅ เปลี่ยนจาก text() เป็น json()
+    const responseData = await response.json();
+    console.log("Response Data:", responseData);
 
-    // Return the raw text as the response
-    return { message: rawResponse }; // Return plain text message as response
-
+    return responseData; // ✅ ส่ง JSON ที่ backend ส่งกลับมา
   } catch (error) {
     console.error("Error fetching data:", error);
     return { error: "Failed to fetch data" };
   }
 };
-
 

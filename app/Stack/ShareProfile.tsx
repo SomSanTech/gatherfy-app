@@ -29,7 +29,6 @@ type ProfileProps = {
   route: ShareProfileRouteProp;
 };
 
-
 const ShareProfile: React.FC<ProfileProps> = ({ route }) => {
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -59,9 +58,8 @@ const ShareProfile: React.FC<ProfileProps> = ({ route }) => {
         `api/v1/shareContact`,
         "Post"
       );
-      
 
-      console.log("qrResponse" + qrResponse)
+      console.log("qrResponse" + qrResponse);
       if (!qrResponse) {
         setError("Please try again later");
         return;
@@ -71,7 +69,6 @@ const ShareProfile: React.FC<ProfileProps> = ({ route }) => {
       setError("Failed to generate QR code");
     } finally {
       setLoading(false);
-      console.log(qrToken)
     }
   };
   useEffect(() => {
@@ -96,25 +93,37 @@ const ShareProfile: React.FC<ProfileProps> = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.cardContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()} className="absolute top-4 left-4">
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          className="absolute top-4 left-4"
+        >
           <Icon name="chevron-back" size={26} color="#000000" />
         </TouchableOpacity>
         <View>
-          <Text className="text-center text-xl font-semibold">{ username }</Text>
+          <Text
+            className="text-center text-xl font-semibold"
+            style={styles.username}
+          >
+            {username}
+          </Text>
           <View style={styles.qrContainer}>
             {loading ? (
               <ActivityIndicator size="large" color={Colors.primary} />
             ) : error ? (
               <Text style={styles.errorText}>{error}</Text>
             ) : qrToken ? (
-              <QRCode value={qrToken} size={height * 0.3} ecl="L"   />
+              <QRCode value={qrToken} size={height * 0.3} ecl="L" />
             ) : (
               <Text style={styles.errorText}>No Data</Text>
             )}
           </View>
-          <Text className="mt-5 text-center opacity-60">Show this QR code to friends to let them save you</Text>
+          <Text
+            className="mt-5 text-center opacity-60"
+            style={styles.description}
+          >
+            Show this QR code to friends to let them save you
+          </Text>
         </View>
-
       </View>
     </SafeAreaView>
   );
@@ -138,7 +147,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffff",
     borderRadius: 20,
     padding: 25,
-    justifyContent: "center"
+    justifyContent: "center",
+  },
+  username: {
+    fontFamily: "Poppins-SemiBold",
+    color: "#000000",
+    includeFontPadding: false,
   },
   qrContainer: {
     alignItems: "center",
@@ -148,5 +162,8 @@ const styles = StyleSheet.create({
     color: "red",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  description: {
+    fontFamily: "Poppins-Light",
   },
 });

@@ -80,7 +80,8 @@ const TabNav = () => {
               routeName === "ScanQR" ||
               routeName == "ScanQrContact" ||
               routeName === "EditProfile" ||
-              routeName === "EditSocialMedia"
+              routeName === "EditSocialMedia"||
+              routeName === "ShareProfile" 
                 ? { display: "none" }
                 : {
                     backgroundColor: "white",

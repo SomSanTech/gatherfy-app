@@ -36,7 +36,6 @@ import { genderOptions } from "@/utils/genderOptions";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "@/app/context/AuthContext";
 import Constants from "expo-constants";
-import API from "@/utils/api";
 import { useFetchDelete, useFetchUpload } from "@/composables/useFetchFile";
 import { Colors } from "@/constants/Colors";
 
@@ -291,10 +290,10 @@ const EditProfile = () => {
       if (updateProfile) {
         console.log("Updating profile with image filename:", newImageFileName);
         console.log(selectedImage);
-        
+
         if (selectedImage) {
           console.log("with selected");
-          
+
           const result = await updateProfile(
             username,
             firstname,
@@ -325,7 +324,7 @@ const EditProfile = () => {
             email,
             phone,
             dateOfBirth,
-            userGender || "",
+            userGender || ""
           );
           if (result.error) {
             Alert.alert("Error", result.msg);
@@ -365,99 +364,40 @@ const EditProfile = () => {
               showsHorizontalScrollIndicator={false}
             >
               <TouchableOpacity onPress={() => setModalVisible(true)}>
-                {userInfo?.users_image ? (
-                  <View style={styles.imageProfile}>
-                    {userInfo?.auth_provider === "system" ? (
-                      <ImageBackground
-                        className="w-full h-full"
-                        style={styles.systemImage}
-                        source={{
-                          uri: selectedImage?.uri || currentImage,
-                        }}
-                      >
-                        <LinearGradient
-                          colors={[
-                            "transparent",
-                            "rgba(255,255,255,0)",
-                            "rgba(0,0,0,0.65)",
-                          ]}
-                          locations={
-                            Platform.OS === "android"
-                              ? [0, 0.4, 0.85]
-                              : [0.5, 0]
-                          }
-                          style={styles.linearBackground}
-                        ></LinearGradient>
-                      </ImageBackground>
-                    ) : (
-                      userInfo?.auth_provider === "google" && (
-                        <View style={styles.imageProfile}>
-                          <ImageBackground
-                            className="w-full h-full"
-                            blurRadius={3}
-                            source={{
-                              uri: userInfo.users_image,
-                            }}
-                          >
-                            <LinearGradient
-                              colors={[
-                                "transparent",
-                                "rgba(255,255,255,0)",
-                                "rgba(0,0,0,0.65)",
-                              ]}
-                              locations={[0.5, 0]}
-                              style={styles.linearBackground}
-                            >
-                              <View style={styles.googleImage}>
-                                <Image
-                                  source={{
-                                    uri: userInfo.users_image,
-                                  }}
-                                  className="w-36 h-36 rounded-full mb-5"
-                                />
-                                <Text className="text-center text-white text-3xl font-semibold">
-                                  {userInfo?.username}
-                                </Text>
-                                <Text className="text-center text-white text-xl pb-7">
-                                  {userInfo?.userProfile.users_firstname}{" "}
-                                  {userInfo?.userProfile.users_lastname}
-                                </Text>
-                              </View>
-                            </LinearGradient>
-                          </ImageBackground>
-                        </View>
-                      )
-                    )}
-                  </View>
-                ) : (
-                  userInfo?.users_image === null && (
-                    <View style={styles.modalHeaderNoImage}>
-                      <LinearGradient
-                        colors={[
-                          "transparent",
-                          "rgba(255,255,255,0)",
-                          "rgba(0,0,0,0.5)",
-                        ]}
-                        locations={[0.4, 0.4]}
-                        style={styles.linearBackground}
-                      >
-                        <View style={styles.googleImage}>
-                          <Image
-                            className="w-36 h-36 opacity-60"
-                            source={require("@/assets/icons/person-fill-icon.png")}
-                          />
-                          <Text className="text-center text-white text-3xl font-semibold">
-                            {userInfo?.userProfile.username}
-                          </Text>
-                          <Text className="text-center text-white text-xl pb-7">
-                            {userInfo?.userProfile.users_firstname}{" "}
-                            {userInfo?.userProfile.users_lastname}
-                          </Text>
-                        </View>
-                      </LinearGradient>
-                    </View>
-                  )
-                )}
+                <View style={styles.imageProfile}>
+                  {userInfo?.auth_provider === "system" ? (
+                    <>
+                      {selectedImage?.uri || currentImage ? (
+                        <ImageBackground
+                          className="w-full h-full"
+                          style={styles.systemImage}
+                          source={{
+                            uri: selectedImage?.uri || currentImage,
+                          }}
+                        >
+                          <LinearGradient
+                            colors={[
+                              "transparent",
+                              "rgba(255,255,255,0)",
+                              "rgba(0,0,0,0.65)",
+                            ]}
+                            locations={
+                              Platform.OS === "android"
+                                ? [0, 0.4, 0.85]
+                                : [0.5, 0]
+                            }
+                            style={styles.linearBackground}
+                          ></LinearGradient>
+                        </ImageBackground>
+                      ) : (
+                        <DefaultProfile className=" rounded-full mx-auto " />
+                      )}
+                    </>
+                  ) : (
+                    <DefaultProfile className="w-52 h-52 rounded-full mx-auto mt-10" />
+                  )}
+                </View>
+
                 <TouchableOpacity
                   style={styles.editImageContainer}
                   onPress={() => setModalVisible(true)}
@@ -504,13 +444,16 @@ const EditProfile = () => {
                   <View style={styles.formBoxContainer}>
                     <Text style={styles.fieldName}>Email</Text>
                     <TextInput
+                      editable={false}
                       placeholder="Email"
                       value={email}
+                      selectTextOnFocus={false}
                       numberOfLines={1}
                       maxLength={40}
                       onChangeText={setEmail}
-                      style={styles.inputField}
+                      style={styles.disabledInputField}
                       keyboardType="email-address"
+                      autoCapitalize="none"
                     />
                   </View>
                   <View style={styles.formBoxContainer}>
@@ -789,6 +732,17 @@ const styles = StyleSheet.create({
     flex: 2.5,
     fontFamily: "Poppins-Regular",
     includeFontPadding: false,
+  },
+  disabledInputField: {
+    fontSize: wp("3.5%"),
+    padding: 15,
+    paddingVertical: wp("3%"),
+    backgroundColor: "#d4d4d4",
+    borderRadius: 15,
+    flex: 2.5,
+    fontFamily: "Poppins-Regular",
+    includeFontPadding: false,
+    color: "#7e7e7e",
   },
   datePickerButton: {
     padding: 14,

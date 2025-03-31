@@ -20,7 +20,6 @@ export const fetchContact = async (
     }
 
     let urlToFetch = `${API_BASE_URL}/${url}`;
-    console.log(urlToFetch);
     
     const response = await fetch(urlToFetch, {
       method: method,

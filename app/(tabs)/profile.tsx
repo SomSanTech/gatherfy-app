@@ -14,11 +14,9 @@ import { useIsFocused } from "@react-navigation/native";
 import { StatusBarProps } from "react-native";
 
 import { useFocusEffect } from "expo-router";
-import { Button } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import { useCameraPermissions } from "expo-camera";
 import { useAuth } from "@/app/context/AuthContext";
-import { useRouter } from "expo-router";
 import { fetchUserProfile } from "@/composables/useFetchUserProfile";
 import DefaultProfile from "@/assets/images/default-profile.svg";
 import * as SecureStore from "expo-secure-store";

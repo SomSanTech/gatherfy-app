@@ -85,24 +85,17 @@ const OTPScreen = ({ navigation }: { navigation: OTPScreenNavigationProp }) => {
       setSending(false);
       return;
     }
-
     // หาก email ยังไม่ได้มาใน props หรือ route.params ให้ดึงจาก SecureStore
     if (!email) {
       await SecureStore.getItemAsync("email");
     }
-
-    console.log("Entered OTP:", fillOTP);
     setSending(true);
-
     // ส่ง OTP ไปตรวจสอบ
     const response = await useSendOTP(`/api/v1/verify-otp`, fillOTP, email);
-
-    console.log("useSendOTP response:", response);
 
     if (response.success) {
       console.log("OTP verification successful:", response.data);
 
-      // ตั้งค่า verifyEmail เป็น true
       await onVerifiedEmail!(true);
 
       // ตรวจสอบว่า email มาจาก route.params หรือไม่
@@ -126,7 +119,6 @@ const OTPScreen = ({ navigation }: { navigation: OTPScreenNavigationProp }) => {
   };
 
   const handleResendOTP = async () => {
-    console.log(email);
 
     if (!email) {
       Alert.alert("Error", "Email is missing.");

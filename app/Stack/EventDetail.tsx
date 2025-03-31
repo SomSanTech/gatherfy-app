@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.5,
     shadowRadius: 3.84,
-    elevation: 6,
+    elevation: 3,
   },
   tagTextContainer: {
     flexDirection: "row",

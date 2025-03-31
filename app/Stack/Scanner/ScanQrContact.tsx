@@ -15,8 +15,8 @@ import * as SecureStore from "expo-secure-store";
 import ProfileModal from "@/components/ProfileModal";
 
 interface Contact {
-  userProfile: UserProfile
-  userSocials: Social[]
+  userProfile: UserProfile;
+  userSocials: Social[];
 }
 interface UserProfile {
   contactId: number;
@@ -29,10 +29,9 @@ interface UserProfile {
   auth_provider: string;
 }
 interface Social {
-  socialLink: string,
-  socialPlatform: string
+  socialLink: string;
+  socialPlatform: string;
 }
-
 
 const ScanQrContact = () => {
   const [permission, requestPermission] = useCameraPermissions();
@@ -43,7 +42,7 @@ const ScanQrContact = () => {
   const [contact, setContact] = useState<Contact | null>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
-  const [contactModalType, setContactModalType] = useState('');
+  const [contactModalType, setContactModalType] = useState("");
 
   // Request camera permission when the component mounts
   useEffect(() => {
@@ -52,48 +51,92 @@ const ScanQrContact = () => {
 
   const openModal = (detail: Contact) => {
     setSelectedContact(detail);
-    setContactModalType("contacts")
-    setIsModalOpen(true)
+    setContactModalType("contacts");
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedContact(null)
-  }
+    setIsModalOpen(false);
+    setSelectedContact(null);
+  };
 
+  // const barcodeScanned = async ({ data }: { data: string }) => {
+  //   if (scanning) {
+  //     return;
+  //   }
+  //   setScanning(true);
+  //   setScannedValue(data);
+
+  //   if (data) {
+  //     const token = await SecureStore.getItemAsync("my-jwt");
+
+  //     const response = await scanTokenByQRCode(
+  //       token,
+  //       data,
+  //       "api/v1/saveContact",
+  //       "POST"
+  //     );
+  //     console.log("Get response: " + (await response.status));
+
+  //     if (!response || response.status !== 200) {
+  //       Alert.alert("Token invalid");
+  //       throw new Error("Save contact failed! Please try again.");
+  //     }
+  //     setApiResponse("API call successful!");
+
+  //     Alert.alert("Success", "Contact saved successfully!");
+  //     setContact(response);
+  //     openModal(response);
+  //   }
+
+  //   setTimeout(() => {
+  //     setScanning(false);
+  //   }, 2000);
+  // };
   const barcodeScanned = async ({ data }: { data: string }) => {
     if (scanning) {
       return;
     }
     setScanning(true);
     setScannedValue(data);
-
+  
     if (data) {
       const token = await SecureStore.getItemAsync("my-jwt");
-
+  
       const response = await scanTokenByQRCode(
         token,
         data,
         "api/v1/saveContact",
         "POST"
       );
-      console.log("Get response: " + await response)
-
-      if (!response  || response.status !== 200) {
-        Alert.alert("Token invalid")
-        throw new Error("Save contact failed! Please try again.");
+  
+      if (!response) {
+        Alert.alert("Error", "Failed to connect to the server.");
+        setScanning(false);
+        return;
       }
-
+  
+      console.log("Response status:", response.status);
+  
+      if (!response.ok) {
+        Alert.alert("Token invalid", `Error: ${response.status}`);
+        setScanning(false);
+        return;
+      }
+  
+      const responseData = await response.json(); // แปลง JSON เฉพาะเมื่อ status = 200
       setApiResponse("API call successful!");
-
-      setContact(response)
-      openModal(response)
+  
+      Alert.alert("Success", "Contact saved successfully!");
+      setContact(responseData);
+      openModal(responseData);
     }
-
+  
     setTimeout(() => {
       setScanning(false);
     }, 2000);
   };
+  
 
   if (isPermissionGranted) {
     return (
@@ -108,7 +151,8 @@ const ScanQrContact = () => {
           <ProfileModal
             contactData={selectedContact}
             contactType={contactModalType}
-            handleClose={handleCloseModal} />
+            handleClose={handleCloseModal}
+          />
         )}
       </SafeAreaView>
     );

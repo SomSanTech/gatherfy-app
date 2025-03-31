@@ -82,7 +82,6 @@ const Contact = () => {
 
   const fetchProfile = async () => {
     const token = await SecureStore.getItemAsync("my-jwt");
-    console.log(token);
     try {
       const response = await fetchContact(token, "api/v2/profile", "GET");
       setProfile(response);
@@ -143,7 +142,6 @@ const Contact = () => {
   };
 
   const handleSearchSubmit = () => {
-    console.log("search key: " + search);
     let result: { [key: string]: Contact[] } = {};
     originalSections.forEach((section) => {
       const filteredUsers = section.data.filter((contact: Contact) => {
@@ -156,7 +154,6 @@ const Contact = () => {
       }
     });
     setFilterdContacts(result);
-    console.log(contacts);
   };
 
   const refreshContacts = async () => {
@@ -201,7 +198,7 @@ const Contact = () => {
         {profile?.userProfile.users_image ? (
           <Image
             source={{
-              uri: profile.userProfile.users_image ,
+              uri: profile.userProfile.users_image,
             }}
             style={styles.contactImage}
           />
@@ -216,7 +213,7 @@ const Contact = () => {
           <Text style={styles.myCardUsername}>
             {profile?.userProfile.username}
           </Text>
-          <Text>My Card</Text>
+          <Text style={styles.description}>My Card</Text>
         </View>
       </TouchableOpacity>
       <SearchInput
@@ -355,16 +352,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "Poppins-Bold",
   },
+  description: {
+    fontSize: 14,
+    fontFamily: "Poppins-Regular",
+    includeFontPadding: false,
+  },
   contactFullname: {
     fontSize: 14,
     fontFamily: "Poppins-Regular",
+    includeFontPadding: false,
   },
   emptyContainer: {
     justifyContent: "center",
     margin: "auto",
   },
   emptyText: {
-    fontWeight: "bold",
+    fontFamily: "Poppins-SemiBold",
     margin: 20,
   },
   modalContainer: {
