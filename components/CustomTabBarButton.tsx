@@ -12,7 +12,7 @@ const CustomTabBarButton = ({
   return (
     <TouchableOpacity
       style={{
-        height: Platform.OS === "ios" ? 65 : 60, // กำหนดความสูงให้แน่นอน
+        height:  60, // กำหนดความสูงให้แน่นอน
         width: "100%",
         alignItems: "center",
         justifyContent: "center",

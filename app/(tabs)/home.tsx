@@ -84,12 +84,15 @@ const Home: React.FC = () => {
 
   const fetchSlideshow = async () => {
     const response = await getEvent("homeSlide");
+    
 
     const slideshowData = response.map((item: any) => ({
       slug: item.slug,
       name: item.name,
       start_date: item.start_date,
       end_date: item.end_date,
+      ticket_start_date: item.ticket_start_date,
+      ticket_end_date: item.ticket_end_date,
       image: item.image,
     }));
     setSlideshow(slideshowData);
@@ -162,11 +165,63 @@ const Home: React.FC = () => {
 
   return (
     <Fragment>
-      <SafeAreaView edges={["top"]} className="flex-1 bg-white" >
+      <SafeAreaView edges={["top"]} className="flex-1 bg-white relative">
         <FocusAwareStatusBar
           barStyle="dark-content"
           backgroundColor="transparent"
         />
+        <View
+          className="items-center justify-between flex-row bg-white rounded-3xl p-4 mx-3"
+          style={styles.header}
+        >
+          <TouchableOpacity onPress={handleNavigateToProfile} className="mr-3">
+            {userInfo.users_image ? (
+              <Image
+                source={{ uri: userInfo.users_image }}
+                className="w-12 h-12 object-bottom rounded-full"
+                resizeMode="cover"
+              />
+            ) : (
+              <DefaultProfile className="w-12 h-12 object-bottom rounded-full" />
+            )}
+          </TouchableOpacity>
+
+          <View className="flex-row items-center flex-1">
+            <View className="flex-1 pr-4">
+              <Text
+                className="text-sm font-Poppins-Light text-black"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={{ includeFontPadding: false }}
+              >
+                Hello,
+              </Text>
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                className="text-2xl font-Poppins-SemiBold text-black"
+                style={{
+                  textTransform: "capitalize",
+                  fontSize: wp("4.4"),
+                  includeFontPadding: false,
+                }}
+              >
+                {`${userInfo.users_firstname} ${userInfo.users_lastname}`}
+              </Text>
+            </View>
+          </View>
+          <View className="flex-row items-center gap-x-4">
+            <TouchableOpacity className="w-12">
+              <Icon
+                name="heart-outline"
+                type="ionicon"
+                size={24}
+                color="#000000"
+                onPress={() => navigation.navigate("FavoriteEvent")}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {isLoading ? (
           <View className="flex-1 justify-center items-center">
@@ -193,104 +248,7 @@ const Home: React.FC = () => {
             renderItem={({ item }) => {
               if (item.type === "slideshow") {
                 return (
-                  <View>
-                    <View className="pt-2">
-                      <View className="px-4 h-22 justify-center">
-                        <View
-                          className="items-center justify-between flex-row bg-white rounded-3xl p-4 mb-2"
-                          style={styles.header}
-                        >
-                          <TouchableOpacity
-                            onPress={handleNavigateToProfile}
-                            className="mr-3"
-                          >
-                            {userInfo.users_image ? (
-                              <Image
-                                source={{ uri: userInfo.users_image }}
-                                className="w-12 h-12 object-bottom rounded-full"
-                                resizeMode="cover"
-                              />
-                            ) : (
-                              <DefaultProfile className="w-12 h-12 object-bottom rounded-full" />
-                            )}
-                          </TouchableOpacity>
-                          {/* <View className="flex-row items-center flex-1">
-                <View className="">
-                  <Text
-                    className="text-sm font-Poppins-Light text-black"
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    Hello,
-                  </Text>
-                  <View className="flex-row">
-                    <Text
-                      className="text-2xl font-Poppins-SemiBold text-black "
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                      style={{
-                        textTransform: "capitalize",
-                        fontSize: wp("4.4"),
-                        includeFontPadding: false,
-                        paddingRight: 10,
-                      }}
-                    >
-                      {userInfo.users_firstname}
-                    </Text>
-                    <Text
-                      className="text-2xl font-Poppins-SemiBold text-black "
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                      style={{
-                        textTransform: "capitalize",
-                        fontSize: wp("4.4"),
-                        includeFontPadding: false,
-                        paddingRight: 10,
-                      }}
-                    >
-                      {userInfo.users_lastname}
-                    </Text>
-                  </View>
-                </View>
-              </View> */}
-                          <View className="flex-row items-center flex-1">
-                            <View className="flex-1 pr-4">
-                              <Text
-                                className="text-sm font-Poppins-Light text-black"
-                                numberOfLines={1}
-                                ellipsizeMode="tail"
-                                style={{ includeFontPadding: false }}
-                              >
-                                Hello,
-                              </Text>
-                              <Text
-                                numberOfLines={1}
-                                ellipsizeMode="tail"
-                                className="text-2xl font-Poppins-SemiBold text-black"
-                                style={{
-                                  textTransform: "capitalize",
-                                  fontSize: wp("4.4"),
-                                  includeFontPadding: false,
-                                }}
-                              >
-                                {`${userInfo.users_firstname} ${userInfo.users_lastname}`}
-                              </Text>
-                            </View>
-                          </View>
-                          <View className="flex-row items-center gap-x-4">
-                            <TouchableOpacity className="w-12">
-                              <Icon
-                                name="ticket-outline"
-                                type="ionicon"
-                                size={24}
-                                color="#000000"
-                                onPress={() => navigation.navigate("Ticket")}
-                              />
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
+                  <View style={{ marginTop: Platform.OS === "ios" ? 85 : 95 }}>
                     <View className="pt-5 bg-white rounded-b-3xl">
                       <Text
                         className={`text-left pl-7 
@@ -342,7 +300,7 @@ const Home: React.FC = () => {
                 const groupedEvents = groupEventsByDate(events); // Group events by date
                 return (
                   <Fragment key={item.type}>
-                    <View className="py-8 bg-gray-300 rounded-t-2xl">
+                    <View className="py-8 mx-3 bg-gray-300 rounded-2xl mb-5">
                       <Text
                         className="font-Poppins-Regular text-2xl py-3 pt-0 text-primary text-center"
                         style={{ fontSize: wp("4.8") }}
@@ -355,7 +313,7 @@ const Home: React.FC = () => {
                             ? eventsOnDate
                             : [];
                           return (
-                            <View key={date} className="mb-3 px-3">
+                            <View key={date} className="mb-3">
                               <Text
                                 className={`text-lg font-Poppins-Regular text-black mb-3 ${
                                   index === 0 ? "mt-0" : "mt-4"
@@ -395,6 +353,10 @@ const Home: React.FC = () => {
 
 const styles = StyleSheet.create({
   header: {
+    position: "absolute",
+    top: 60,
+    zIndex: 2,
+
     ...Platform.select({
       ios: {
         shadowColor: "#000", // สีของเงา

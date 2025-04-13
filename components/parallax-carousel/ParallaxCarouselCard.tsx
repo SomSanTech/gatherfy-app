@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Button } from "@rneui/themed";
-import React from "react";
+import React, { useEffect , useState } from "react";
 import useNavigateToEventDetail from "@/composables/navigateToEventDetail";
 import Animated, {
   interpolate,
@@ -46,6 +46,27 @@ const ParallaxCarouselCard: React.FC<ParallaxCarouselCardProps> = ({
 }) => {
   const { navigateToEventDetail } = useNavigateToEventDetail();
 
+  const [closeRegister, setCloseRegister] = useState(false);
+  const [closeRegisterText, setCloseRegisterText] = useState("");
+
+  useEffect(() => {
+    const currentDate = new Date();
+    const startDate = new Date(item.ticket_start_date);
+    const endDate = new Date(item.ticket_end_date);
+
+    if (currentDate < startDate) {
+      setCloseRegister(true);
+      setCloseRegisterText("Coming Soon");
+    } else if (currentDate > endDate) {
+      setCloseRegister(true);
+      setCloseRegisterText("Sale Close");
+    }else{
+      setCloseRegister(false);
+      setCloseRegisterText("Register Now");
+    }
+  }, [item.start_date, item.end_date]);
+
+  
   const inputRange = [
     (id - 1) * Item_width,
     id * Item_width,
@@ -94,6 +115,11 @@ const ParallaxCarouselCard: React.FC<ParallaxCarouselCardProps> = ({
     };
   });
 
+  useEffect(() => {
+  console.log("item", item);
+  
+  }, []);
+
   return (
     <Animated.View
       style={[
@@ -105,8 +131,6 @@ const ParallaxCarouselCard: React.FC<ParallaxCarouselCardProps> = ({
             id === total - 1 ? (SCREEN_WIDTH - Item_width) / 2 : undefined,
           overflow: "hidden",
           borderRadius: 25,
-          borderWidth: 1,
-          borderColor: "white",
         },
         translateStyle,
       ]}
@@ -146,7 +170,7 @@ const ParallaxCarouselCard: React.FC<ParallaxCarouselCardProps> = ({
                     style={{
                       marginRight: 5,
                       elevation: 4,
-                  
+
                       borderRadius: 4, // ถ้าอยากให้เงาดูนุ่มขึ้น
                       shadowColor: "black",
                       shadowOffset: { width: 0, height: 1 },
@@ -166,14 +190,15 @@ const ParallaxCarouselCard: React.FC<ParallaxCarouselCardProps> = ({
               </View>
               <View style={styles.buttonStyle}>
                 <Button
-                  title="Register Now"
+                  title={closeRegisterText}
                   titleStyle={{
-                    fontSize: wp(2.6),
+                    fontSize: wp(2.5),
                     color: "#D71515",
                     fontFamily: "Poppins-SemiBold",
                     textAlign: "center",
                     includeFontPadding: false,
                   }}
+                  disabled={closeRegister}
                   buttonStyle={{
                     backgroundColor: "rgba(255, 255, 255, 0.8)",
                     borderColor: "transparent",

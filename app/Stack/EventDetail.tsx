@@ -35,6 +35,8 @@ interface EventDetail {
   detail: string;
   start_date: string;
   end_date: string;
+  ticket_start_date: string;
+  ticket_end_date: string;
   tags: { tag_id: number; tag_title: string; tag_code: string }[];
   image: string;
   owner: string;
@@ -50,6 +52,9 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     {} as EventDetail
   );
   const [isRegistered, setIsRegistered] = useState<boolean>(false);
+  const [closeRegister, setCloseRegister] = useState<boolean>(false);
+  const [closeRegisterText, setCloseRegisterText] =
+    useState<string>("Register Event");
   const [usersInfo, setUsersInfo] = useState<any>([]);
   const [confirmRegister, setConfirmRegister] = useState<boolean>(false);
 
@@ -58,6 +63,23 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const fetchDataDetailAsync = async () => {
     const response = await getEvent("detail", undefined, slug);
     setEventDetail(response);
+  };
+
+  const validateTimeRegister = async () => {
+    const currentDate = new Date();
+    const startDate = new Date(eventDetail.ticket_start_date);
+    const endDate = new Date(eventDetail.ticket_end_date);
+
+    if (currentDate < startDate) {
+      setCloseRegister(true);
+      setCloseRegisterText("Coming Soon");
+    } else if (currentDate > endDate) {
+      setCloseRegister(true);
+      setCloseRegisterText("Sale Close");
+    } else {
+      setCloseRegister(false);
+      setCloseRegisterText("Register Event");
+    }
   };
 
   const getUsersInfo = async () => {
@@ -81,6 +103,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     };
 
     fetchRegistration();
+    validateTimeRegister();
     fetchDataDetailAsync();
     getUsersInfo();
 
@@ -174,10 +197,19 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                 />
               ) : (
                 <CustomButton
-                  title="Register event"
-                  containerStyles={styles.registerButton}
-                  textStyle={styles.registerButtonText}
+                  title={closeRegisterText}
+                  containerStyles={
+                    closeRegister
+                      ? styles.registerButtonDisabled
+                      : styles.registerButton
+                  }
+                  textStyle={
+                    closeRegister
+                      ? styles.registerButtonTextDisabled
+                      : styles.registerButtonText
+                  }
                   handlePress={() => setPopupVisible(true)}
+                  disabled={closeRegister}
                 />
               )}
             </View>

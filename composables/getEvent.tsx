@@ -46,6 +46,7 @@ export const getEvent = async (
     }
     if (page === "homeSlide") {
       url = `${url}/recommended`;
+      
       const response = await fetch(url, {
         method: "GET",
         headers: {

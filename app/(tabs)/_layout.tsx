@@ -28,6 +28,7 @@ import EditProfile from "../stack/EditProfile";
 import EditSocialMedia from "../stack/EditSocialMedia";
 import EmailNotificationSetting from "../stack/EmailNotificationSetting";
 import ResetPassword from "../stack/ResetPassword";
+import FavoriteEvent from "../stack/FavoriteEvent";
 
 import { RootStackParamList } from "@/rootStack/RootStackParamList";
 import CustomTabBarButton from "@/components/CustomTabBarButton";
@@ -50,12 +51,13 @@ type TabIconProps = {
 const screenHeight = Dimensions.get("window");
 
 const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
+  const iconHeight = Platform.OS === "ios" ? 22 : 24;
   return (
     <View style={{ alignItems: "center", justifyContent: "center" }}>
       <Image
         source={icon}
         resizeMode="contain"
-        style={{ tintColor: color, width: 24, height: 24 }}
+        style={{ tintColor: color, height: iconHeight, width: iconHeight }}
       />
     </View>
   );
@@ -70,7 +72,7 @@ const tabWidth = tabBarWidth / 5; // Divide the available width by the number of
 
 const TabNav = () => {
   return (
-    <GestureHandlerRootView style={{ flex:1  }}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Tab.Navigator
         backBehavior="history"
         initialRouteName="Home"
@@ -89,19 +91,18 @@ const TabNav = () => {
               routeName === "ShareProfile"
                 ? { display: "none" }
                 : {
-                   
-                  bottom: 0,
-                  elevation: 3,
-                  backgroundColor: "#fff",
-                  width: "auto", // ให้ React Native คำนวณขนาดอัตโนมัติ
-                  height: Platform.OS === "ios" ? 88 : 60,
-                  paddingHorizontal: Platform.OS === "ios" ? 10 : 0,
-                  borderTopWidth: 0,
-                  alignItems: "center",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 10 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 10,
+                    bottom: 0,
+                    elevation: 3,
+                    backgroundColor: "#fff",
+                    width: "auto", // ให้ React Native คำนวณขนาดอัตโนมัติ
+                    height: Platform.OS === "ios" ? 88 : 60,
+                    paddingHorizontal: Platform.OS === "ios" ? 10 : 0,
+                    borderTopWidth: 0,
+                    alignItems: "center",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 10 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 10,
                   },
 
             tabBarButton: (props) => <CustomTabBarButton {...props} />,
@@ -222,6 +223,11 @@ const StackHomeNavigator = () => {
       <Stack.Screen
         name="EventTag"
         component={EventTag}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FavoriteEvent"
+        component={FavoriteEvent}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
