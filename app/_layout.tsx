@@ -112,7 +112,6 @@ const StackLayout = () => {
     const inAuthGroup = segments[0] === "(tabs)";
 
     if (!authState?.authenticated && inAuthGroup) {
-      console.log("Redirecting to /");
       router.replace("/");
     } else if (authState?.authenticated === true) {
       // ตรวจสอบว่า email ได้รับการยืนยันแล้วหรือยัง
@@ -120,7 +119,6 @@ const StackLayout = () => {
         console.log("Email not verified, redirecting to OTP screen...");
         router.replace("/(auth)/otpScreen"); // ถ้า email ยังไม่ verified ให้ไปที่หน้า OTP
       } else if (segments[0] !== "(tabs)") {
-        console.log("Redirecting to /home");
         router.replace("/(tabs)/home");
       }
     }

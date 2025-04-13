@@ -115,10 +115,6 @@ const ParallaxCarouselCard: React.FC<ParallaxCarouselCardProps> = ({
     };
   });
 
-  useEffect(() => {
-  console.log("item", item);
-  
-  }, []);
 
   return (
     <Animated.View

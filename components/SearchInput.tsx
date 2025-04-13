@@ -41,7 +41,7 @@ const SearchInput: React.FC<{
             onSubmitEditing={onSearchSubmit}
             style={styles.searchInput}
             underlineColorAndroid="transparent"
-            enablesReturnKeyAutomatically={true}
+            enablesReturnKeyAutomatically={false}
           />
           {value !== "" && (
             <TouchableOpacity
@@ -76,20 +76,6 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex:20
   },
-  // searchInput: {
-  //   fontFamily: "Poppins-Regular",
-  //   fontSize: 16,
-  //   lineHeight: 22,
-  //   height: 55,
-  //   borderColor: "gray",
-  //   borderWidth: 1,
-  //   borderRadius: 10,
-  //   paddingLeft: 50,
-  //   paddingRight: 50,
-  //   paddingVertical: 0, // ลด vertical padding
-  //   textAlignVertical: "center", // จัดข้อความให้อยู่ตรงกลาง
-  //   includeFontPadding: false, // ปิด font padding ใน Android
-  // },
   searchInput: {
     fontFamily: "Poppins-Regular",
     fontSize: wp("3.6%"),

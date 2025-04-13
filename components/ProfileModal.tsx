@@ -125,7 +125,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   const handleDeleteContact = async () => {
     if (deleteContact) {
       const contactId = deleteContact.contactId;
-      console.log(contactId);
       const token = await SecureStore.getItemAsync("my-jwt");
 
       const response = await fetchContact(

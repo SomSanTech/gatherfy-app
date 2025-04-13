@@ -106,7 +106,7 @@ const Search = () => {
           search={search}
           isSearched={isSearched}
           setIsSearched={setIsSearched}
-          isLoading={false}
+          isLoading={true}
         />
       </SafeAreaView>
     </Fragment>

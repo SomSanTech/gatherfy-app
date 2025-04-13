@@ -44,7 +44,7 @@ const EventCard: React.FC<EventCardProps> = ({
   const { navigateToEventDetail } = useNavigateToEventDetail();
 
   useEffect(() => {
-    console.log(page);
+
 
     if (page === "search") {
       if (search && isSearched) {

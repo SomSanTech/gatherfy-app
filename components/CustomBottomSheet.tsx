@@ -6,7 +6,7 @@ import {
   FlatList,
   Image,
 } from "react-native";
-import React, { forwardRef, useMemo } from "react";
+import React, { forwardRef, useCallback, useMemo } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, {
   BottomSheetView,
@@ -70,6 +70,18 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
     }
   };
 
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        opacity={0.5}
+        appearsOnIndex={2}
+        disappearsOnIndex={-1}
+      />
+    ),
+    []
+  );
+
   return (
     <GestureHandlerRootView style={styles.bottomModalContainer}>
       <View className="m-0 p-0" style={{ flex: 1 }}>
@@ -124,10 +136,8 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
         ref={ref}
         index={-1}
         snapPoints={snapPoints}
+        backdropComponent={renderBackdrop}
         enablePanDownToClose={true}
-        backdropComponent={(props) => (
-          <BottomSheetBackdrop {...props} opacity={0.5} />
-        )}
         backgroundStyle={{ backgroundColor: "white" }}
         handleIndicatorStyle={{ backgroundColor: "#D71515" }}
         animationConfigs={timingConfigs}
@@ -211,7 +221,7 @@ const styles = StyleSheet.create({
   },
   bottomModalHeadline: {
     fontSize: 24,
-    fontWeight: "600",
+    fontFamily: "Poppins-SemiBold",
   },
   closeButton: {
     position: "absolute",

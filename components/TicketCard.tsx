@@ -39,6 +39,8 @@ interface TicketProps {
 const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
   const { navigateToReview } = useNavigateToReview();
   const [rotate, setRotate] = useState(false);
+  const [closeTicket, setCloseTicket] = useState(false);
+  const [closeTicketText, setCloseTicketText] = useState("");
 
   const { navigateToEventDetail } = useNavigateToEventDetail();
   const { navigateToTicketDetail } = useNavigateToTicketDetail();
@@ -46,7 +48,24 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
 
   const { eventId, name, image, slug, start_date, end_date, location } = item;
 
+  const validateTicket = () => {
+    const currentDate = new Date();
+    const startDate = new Date(item.start_date);
+    const endDate = new Date(item.end_date);
+    if (currentDate < startDate) {
+      setCloseTicket(true);
+      setCloseTicketText("Event not started");
+    } else if (currentDate > endDate) {
+      setCloseTicket(true);
+      setCloseTicketText("Event ended");
+    } else {
+      setCloseTicket(false);
+      setCloseTicketText("View Ticket");
+    }
+  };
+
   useEffect(() => {
+    validateTicket();
     // Force re-render if needed
     const timer = setTimeout(() => {
       setRotate(true);
@@ -162,7 +181,8 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
             onPress={() => {
               navigateToTicketDetail(eventId, slug);
             }}
-            className="w-[13%] bg-primary"
+            disabled={closeTicket}
+            className={`w-[13%] ${closeTicket ? 'bg-gray-200' : 'bg-primary'}`}
           >
             <View style={styles.dashedLineContainer}>
               {Array.from({ length: 25 }).map((_, index) => (
@@ -173,10 +193,11 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
               style={[
                 styles.footerTicketText,
                 { transform: rotate ? [{ rotate: "270deg" }] : [] },
+                closeTicket ? { color: "#9c9c9c" } : { color: "#fff" },
               ]}
               className="font-Poppins-SemiBold text-white"
             >
-              View Ticket
+              {closeTicketText}
             </Text>
           </TouchableOpacity>
           <View
@@ -244,7 +265,6 @@ const styles = StyleSheet.create({
       { translateY: -hp("2.5%") }, // เลื่อนข้อความกลับไปครึ่งหนึ่งของความสูง
       { rotate: "270deg" }, // หมุนข้อความ
     ],
-    color: "#fff",
     fontSize: wp("3.5"),
   },
   dashedLineContainer: {
