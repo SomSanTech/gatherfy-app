@@ -77,7 +77,6 @@ export const AuthProvider = ({ children }: any) => {
     const loadToken = async () => {
       const token = await SecureStore.getItemAsync(TOKEN_KEY);
       const isVerified = await SecureStore.getItemAsync(isVerifiedStorage);
-      console.log("store-token: ", token);
 
       if (token) {
         const decoded: any = jwtDecode(token); // ✅ Now it works
@@ -143,7 +142,7 @@ export const AuthProvider = ({ children }: any) => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
-        console.log("🚨 Interceptor triggered:", error.response);
+        console.log("🚨 Interceptor triggered:", error.response.status);
 
         const originalRequest = error.config;
 

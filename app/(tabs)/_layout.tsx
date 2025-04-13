@@ -63,9 +63,14 @@ const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
 
 const Tab = createBottomTabNavigator();
 
+const { width } = Dimensions.get("window");
+const MARGIN = 16; // Adjust this value as needed
+const tabBarWidth = width - 2 * MARGIN; // 16 is the marginHorizontal of TabBar
+const tabWidth = tabBarWidth / 5; // Divide the available width by the number of tabs
+
 const TabNav = () => {
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex:1  }}>
       <Tab.Navigator
         backBehavior="history"
         initialRouteName="Home"
@@ -80,18 +85,25 @@ const TabNav = () => {
               routeName === "ScanQR" ||
               routeName == "ScanQrContact" ||
               routeName === "EditProfile" ||
-              routeName === "EditSocialMedia"||
-              routeName === "ShareProfile" 
+              routeName === "EditSocialMedia" ||
+              routeName === "ShareProfile"
                 ? { display: "none" }
                 : {
-                    backgroundColor: "white",
-                    borderTopWidth: 0.5,
-                    borderTopColor: "transparent",
-                    paddingHorizontal: 5,
-                    elevation: 0, // ลดหรือปิดเงาของ tabBar
-                    shadowColor: "transparent", // ไม่มีเงาที่ tabBar
-                    flex: 0.07, // ให้ tabBar สูงตามสัดส่วนของจอ
+                   
+                  bottom: 0,
+                  elevation: 3,
+                  backgroundColor: "#fff",
+                  width: "auto", // ให้ React Native คำนวณขนาดอัตโนมัติ
+                  height: Platform.OS === "ios" ? 88 : 60,
+                  paddingHorizontal: Platform.OS === "ios" ? 10 : 0,
+                  borderTopWidth: 0,
+                  alignItems: "center",
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 10 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 10,
                   },
+
             tabBarButton: (props) => <CustomTabBarButton {...props} />,
           };
         }}

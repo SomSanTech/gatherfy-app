@@ -80,7 +80,7 @@ const EventCard: React.FC<EventCardProps> = ({
           ]}
         >
           <View className=" bg-white p-4 h-52 rounded-lg flex-row">
-            <View className="w-[44%] mr-4">
+            <View className="w-[39%] mr-4">
               <Image
                 source={{ uri: item.image }}
                 className="w-full h-full rounded-lg"

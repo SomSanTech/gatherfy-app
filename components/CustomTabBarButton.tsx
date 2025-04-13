@@ -1,34 +1,35 @@
 import React from "react";
-import { TouchableOpacity, ViewStyle ,View} from "react-native";
+import { TouchableOpacity, View, Platform } from "react-native";
 import { BottomTabBarButtonProps } from "@react-navigation/bottom-tabs";
 
 const CustomTabBarButton = ({
   accessibilityState,
   onPress,
-    children,
+  children,
 }: BottomTabBarButtonProps) => {
   const isSelected = accessibilityState?.selected;
 
   return (
     <TouchableOpacity
       style={{
-        flex: 1,
+        height: Platform.OS === "ios" ? 65 : 60, // กำหนดความสูงให้แน่นอน
+        width: "100%",
         alignItems: "center",
         justifyContent: "center",
       }}
       activeOpacity={1}
-      onPress={onPress} // ทำให้การเปลี่ยนแท็บยังทำงานได้
+      onPress={onPress}
     >
-        <View
-            style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-            height: "100%",
-            }}
-        >
-            {children}
-        </View>
+      <View
+        style={{
+          height: "100%",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {children}
+      </View>
     </TouchableOpacity>
   );
 };

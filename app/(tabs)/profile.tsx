@@ -9,9 +9,9 @@ import {
   Pressable,
   Alert,
   StatusBar,
+  StatusBarProps,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
-import { StatusBarProps } from "react-native";
 
 import { useFocusEffect } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
@@ -59,7 +59,6 @@ const Profile = () => {
   };
 
   const navigateToScanQR = () => {
-    
     if (permission?.granted === false) {
       Alert.alert(
         "Permission Required",
@@ -197,7 +196,7 @@ const Profile = () => {
                 </TouchableOpacity>
               </View>
             </View>
-          
+
             {userInfo.users_role === "Organizer" && (
               <View style={styles.menuListContainer}>
                 <View style={styles.headerMenu}>
@@ -262,7 +261,7 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center", // จัดตำแหน่งแนวตั้ง
     alignItems: "center", // จัดตำแหน่งแนวนอน
-    paddingTop: 50// ระยะห่างขอบจอ
+    paddingTop: 50, // ระยะห่างขอบจอ
   },
   menuContainer: {
     padding: 20,

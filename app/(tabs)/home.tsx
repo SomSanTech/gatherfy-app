@@ -14,9 +14,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  StatusBar,
+  StatusBarProps,
 } from "react-native";
 import EventCard from "../../components/EventCard";
-import images from "../../constants/icons";
+import { useIsFocused } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getEvent } from "@/composables/getEvent";
 import useNavigateToEventDetail from "@/composables/navigateToEventDetail";
@@ -40,17 +42,19 @@ import { useAuth } from "@/app/context/AuthContext";
 import { fetchUserProfile } from "@/composables/useFetchUserProfile";
 import DefaultProfile from "@/assets/images/default-profile.svg";
 import { useFocusEffect } from "expo-router";
+import { Item_width } from "@/components/parallax-carousel/ParallaxCarouselCard";
 
 interface SlideshowData {
   id: string;
   name: string;
   image: string;
+  start_date: string;
+  end_date: string;
   slug: string;
 }
 
 const mockupUserName = "MABELZ SUCHADA SONPAN";
 const OFFSET = 45; // Define OFFSET with an appropriate value
-const Item_width = Dimensions.get("window").width - OFFSET * 2;
 
 const Home: React.FC = () => {
   const [slideshow, setSlideshow] = useState<SlideshowData[]>([]);
@@ -66,6 +70,12 @@ const Home: React.FC = () => {
   const [scrolling, setScrolling] = useState(false); // Detect if scrolling manually
   const timerRef = useRef<NodeJS.Timeout | null>(null); // Use useRef to store the timer
 
+  function FocusAwareStatusBar(props: StatusBarProps) {
+    const isFocused = useIsFocused();
+
+    return isFocused ? <StatusBar {...props} /> : null;
+  }
+
   const fetchData = async () => {
     const data = await getEvent("home");
     setIsLoading(false);
@@ -78,6 +88,8 @@ const Home: React.FC = () => {
     const slideshowData = response.map((item: any) => ({
       slug: item.slug,
       name: item.name,
+      start_date: item.start_date,
+      end_date: item.end_date,
       image: item.image,
     }));
     setSlideshow(slideshowData);
@@ -146,68 +158,16 @@ const Home: React.FC = () => {
     }, 1000); // Delay for 1 second after the last scroll
   };
 
+  const TABBAR_HEIGHT = 30;
+
   return (
     <Fragment>
-      <SafeAreaView edges={["top"]} className="flex-1 bg-white">
-        <View>
-          <View className="px-5 h-24 justify-center" style={styles.header}>
-            <View className="items-center justify-between flex-row ">
-              <View className="flex-row items-center flex-1">
-                <View className="">
-                  <Text
-                    className="text-2xl font-Poppins-SemiBold text-black "
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                    style={{
-                      textTransform: "capitalize",
-                      fontSize: wp("4.4"),
-                      includeFontPadding: false,
-                      paddingRight: 10,
-                    }}
-                  >
-                    Hello, {userInfo.users_firstname}
-                  </Text>
-                  <Text
-                    className="text-xs font-Poppins-Light text-black"
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    Welcome To Gatherfy
-                  </Text>
-                </View>
-              </View>
-              {/* <Text
-              className="text-[40px] font-OoohBaby-Regular text-black"
-              style={{ lineHeight: 40 }}
-            >
-              <Text className="text-primary">Ga</Text>therfy
-            </Text> */}
-              <View className="flex-row items-center gap-x-4">
-                <TouchableOpacity className="w-12">
-                  <Icon
-                    name="ticket-outline"
-                    type="ionicon"
-                    size={24}
-                    color="#000000"
-                    onPress={() => navigation.navigate("Ticket")}
-                  />
-                </TouchableOpacity>
+      <SafeAreaView edges={["top"]} className="flex-1 bg-white" >
+        <FocusAwareStatusBar
+          barStyle="dark-content"
+          backgroundColor="transparent"
+        />
 
-                <TouchableOpacity onPress={handleNavigateToProfile}>
-                  {userInfo.users_image ? (
-                    <Image
-                      source={{ uri: userInfo.users_image }}
-                      className="w-12 h-12 object-bottom rounded-full"
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <DefaultProfile className="w-12 h-12 object-bottom rounded-full" />
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </View>
         {isLoading ? (
           <View className="flex-1 justify-center items-center">
             <Text className="text-3xl font-Poppins-Regular text-black mx-4 my-5 text-center ">
@@ -233,46 +193,148 @@ const Home: React.FC = () => {
             renderItem={({ item }) => {
               if (item.type === "slideshow") {
                 return (
-                  <View className="mb-3 mt-5">
-                    <Text
-                      className={`text-center 
-                        font-Poppins-Regular mt-4 mb-3`}
-                      style={{ lineHeight: 38, fontSize: wp("6.4") }}
-                    >
-                      Recommended
-                    </Text>
-                    <View style={styles.parallaxCarouselView}>
-                      <Animated.ScrollView
-                        ref={scrollViewRef}
-                        horizontal={true}
-                        decelerationRate={0.6}
-                        contentOffset={{ x: 0, y: 0 }}
-                        snapToInterval={Item_width}
-                        showsHorizontalScrollIndicator={false}
-                        bounces={false}
-                        disableIntervalMomentum
-                        scrollEventThrottle={16}
-                        onScroll={handleUserScroll}
-                      >
-                        {slideshow.map((item, index) => (
+                  <View>
+                    <View className="pt-2">
+                      <View className="px-4 h-22 justify-center">
+                        <View
+                          className="items-center justify-between flex-row bg-white rounded-3xl p-4 mb-2"
+                          style={styles.header}
+                        >
                           <TouchableOpacity
-                            key={item.slug}
-                            onPress={() => navigateToEventDetail(item.slug)}
+                            onPress={handleNavigateToProfile}
+                            className="mr-3"
                           >
-                            <ParallaxCarouselCard
-                              item={item}
-                              key={index}
-                              id={index}
-                              scrollX={scrollX}
-                              total={slideshow.length}
-                            />
+                            {userInfo.users_image ? (
+                              <Image
+                                source={{ uri: userInfo.users_image }}
+                                className="w-12 h-12 object-bottom rounded-full"
+                                resizeMode="cover"
+                              />
+                            ) : (
+                              <DefaultProfile className="w-12 h-12 object-bottom rounded-full" />
+                            )}
                           </TouchableOpacity>
-                        ))}
-                      </Animated.ScrollView>
-                      <ParallaxCarouselPagination
-                        data={slideshow}
-                        scrollX={scrollX}
-                      />
+                          {/* <View className="flex-row items-center flex-1">
+                <View className="">
+                  <Text
+                    className="text-sm font-Poppins-Light text-black"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Hello,
+                  </Text>
+                  <View className="flex-row">
+                    <Text
+                      className="text-2xl font-Poppins-SemiBold text-black "
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={{
+                        textTransform: "capitalize",
+                        fontSize: wp("4.4"),
+                        includeFontPadding: false,
+                        paddingRight: 10,
+                      }}
+                    >
+                      {userInfo.users_firstname}
+                    </Text>
+                    <Text
+                      className="text-2xl font-Poppins-SemiBold text-black "
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={{
+                        textTransform: "capitalize",
+                        fontSize: wp("4.4"),
+                        includeFontPadding: false,
+                        paddingRight: 10,
+                      }}
+                    >
+                      {userInfo.users_lastname}
+                    </Text>
+                  </View>
+                </View>
+              </View> */}
+                          <View className="flex-row items-center flex-1">
+                            <View className="flex-1 pr-4">
+                              <Text
+                                className="text-sm font-Poppins-Light text-black"
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                                style={{ includeFontPadding: false }}
+                              >
+                                Hello,
+                              </Text>
+                              <Text
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                                className="text-2xl font-Poppins-SemiBold text-black"
+                                style={{
+                                  textTransform: "capitalize",
+                                  fontSize: wp("4.4"),
+                                  includeFontPadding: false,
+                                }}
+                              >
+                                {`${userInfo.users_firstname} ${userInfo.users_lastname}`}
+                              </Text>
+                            </View>
+                          </View>
+                          <View className="flex-row items-center gap-x-4">
+                            <TouchableOpacity className="w-12">
+                              <Icon
+                                name="ticket-outline"
+                                type="ionicon"
+                                size={24}
+                                color="#000000"
+                                onPress={() => navigation.navigate("Ticket")}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View className="pt-5 bg-white rounded-b-3xl">
+                      <Text
+                        className={`text-left pl-7 
+                        font-Poppins-SemiBold  mb-2 text-black`}
+                        style={{
+                          includeFontPadding: false,
+                          fontSize: wp("4.5"),
+                        }}
+                      >
+                        Recommended Events
+                      </Text>
+                      <View style={styles.parallaxCarouselView}>
+                        <Animated.ScrollView
+                          ref={scrollViewRef}
+                          horizontal={true}
+                          decelerationRate={0.6}
+                          contentOffset={{ x: 0, y: 0 }}
+                          snapToInterval={Item_width} // ✅ ต้องตรงกับขนาดการ์ดจริง
+                          showsHorizontalScrollIndicator={false}
+                          bounces={false}
+                          disableIntervalMomentum
+                          scrollEventThrottle={16}
+                          onScroll={handleUserScroll}
+                        >
+                          {slideshow.map((item, index) => (
+                            <TouchableOpacity
+                              key={item.slug}
+                              onPress={() => navigateToEventDetail(item.slug)}
+                            >
+                              <ParallaxCarouselCard
+                                item={item}
+                                key={index}
+                                id={index}
+                                scrollX={scrollX}
+                                total={slideshow.length}
+                              />
+                            </TouchableOpacity>
+                          ))}
+                        </Animated.ScrollView>
+                        <ParallaxCarouselPagination
+                          data={slideshow}
+                          scrollX={scrollX}
+                        />
+                      </View>
                     </View>
                   </View>
                 );
@@ -280,9 +342,12 @@ const Home: React.FC = () => {
                 const groupedEvents = groupEventsByDate(events); // Group events by date
                 return (
                   <Fragment key={item.type}>
-                    <View className="bg-gray-200 py-5 mx-2 mb-3 rounded-2xl">
-                      <Text className="font-Poppins-Regular text-2xl p-4 py-3 pt-0 text-primary" style={{ fontSize: wp("4.8") }}>
-                        Explore by date
+                    <View className="py-8 bg-gray-300 rounded-t-2xl">
+                      <Text
+                        className="font-Poppins-Regular text-2xl py-3 pt-0 text-primary text-center"
+                        style={{ fontSize: wp("4.8") }}
+                      >
+                        - Explore by date -
                       </Text>
                       {Object.entries(groupedEvents).map(
                         ([date, eventsOnDate], index) => {
@@ -290,19 +355,21 @@ const Home: React.FC = () => {
                             ? eventsOnDate
                             : [];
                           return (
-                            <View key={date} className="mb-3">
+                            <View key={date} className="mb-3 px-3">
                               <Text
                                 className={`text-lg font-Poppins-Regular text-black mb-3 ${
                                   index === 0 ? "mt-0" : "mt-4"
-                                } px-4`}
+                                } px-5`}
                                 style={{
                                   fontSize: wp("3.8"),
                                   textTransform: "capitalize",
+                                  includeFontPadding: false,
+                                  textAlign: "center",
                                 }}
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
                               >
-                                {formatDate(date, false, false, true).date}
+                                - {formatDate(date, false, false, true).date} -
                               </Text>
                               <EventCard
                                 key={date}
@@ -328,11 +395,10 @@ const Home: React.FC = () => {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: "#ffffff", // พื้นหลังของ View
     ...Platform.select({
       ios: {
         shadowColor: "#000", // สีของเงา
-        shadowOffset: { width: 0, height: 7 }, // เงาเฉพาะด้านล่าง
+        shadowOffset: { width: 0, height: 2 }, // เงาเฉพาะด้านล่าง
         shadowOpacity: 0.1, // ความโปร่งแสงของเงา
         shadowRadius: 5, // ความเบลอของเงา
       },
@@ -350,7 +416,6 @@ const styles = StyleSheet.create({
   },
   parallaxCarouselView: {
     paddingBottom: 20,
-    paddingTop: 10,
   },
 });
 

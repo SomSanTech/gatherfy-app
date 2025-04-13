@@ -189,7 +189,7 @@ const Contact = () => {
   }, [isLoading]);
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-white">
+    <SafeAreaView edges={["top"]} className="flex-1 bg-white pb-24">
       <Text style={styles.header}>Contacts</Text>
       <TouchableOpacity
         onPress={() => profile && openModal("myCard", profile)}
