@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "gatherfy",
+    "scheme": "somsantechgatherfy",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.somsantech.gatherfy",
+      "bundleIdentifier": "com.somsantechgatherfy",
       "config": {
         "usesNonExemptEncryption": false
       }
@@ -30,7 +30,7 @@
         "android.permission.RECORD_AUDIO"
       ],
       "useCleartextTraffic": true,
-      "package": "com.somsantech.gatherfy",
+      "package": "com.somsantechgatherfy",
       "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
