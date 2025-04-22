@@ -15,9 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.somsantechgatherfy",
-      "config": {
-        "usesNonExemptEncryption": false
-      }
+
     },
     "android": {
       "adaptiveIcon": {
@@ -35,7 +33,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "server",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [

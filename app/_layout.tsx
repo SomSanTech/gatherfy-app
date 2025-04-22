@@ -93,6 +93,7 @@ import * as SecureStore from "expo-secure-store";
 import { useFonts } from "expo-font";
 import * as NavigationBar from "expo-navigation-bar";
 import * as SplashScreen from "expo-splash-screen";
+import { AuthProviderGoogle, useAuthGoogle } from "@/app/context/auth";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -200,8 +201,10 @@ export default function RootLayout() {
   if (!fontsLoaded && !error) return null;
 
   return (
-    <AuthProvider>
-      <StackLayout />
-    </AuthProvider>
+
+      <AuthProviderGoogle>
+        <StackLayout />
+      </AuthProviderGoogle>
+
   );
 }
