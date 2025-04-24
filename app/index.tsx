@@ -3,12 +3,15 @@ import "react-native-gesture-handler";
 import TabNav from "./(tabs)/_layout";
 
 import { useCallback, useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import Entypo from "@expo/vector-icons/Entypo";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
 
 import Google from "@/assets/images/google-logo.svg";
 import { SvgXml } from "react-native-svg";
+
+
 
 import {
   ScrollView,
@@ -42,7 +45,6 @@ import {
 //   statusCodes,
 // } from "@react-native-google-signin/google-signin";
 // import { signInGoogle } from "@/composables/signinGoogle";
-import { IOS_CLIENT_ID, WEB_CLIENT_ID } from "@/app/files";
 
 // GoogleSignin.configure({
 //   webClientId: WEB_CLIENT_ID, // client ID of type WEB for your server. Required to get the `idToken` on the user object, and for offline access.
@@ -54,7 +56,8 @@ import { IOS_CLIENT_ID, WEB_CLIENT_ID } from "@/app/files";
 // });
 
 export default function App() {
-  const { authState } = useAuth();
+  const { authState , onLoginGoogle} = useAuth();
+
 
   useEffect(() => {
     if (authState?.authenticated === true && authState.verifyEmail === true) {
@@ -62,6 +65,7 @@ export default function App() {
       router.replace("/(tabs)/home");
     }
   }, []);
+
 
   return (
     <>
@@ -111,17 +115,17 @@ export default function App() {
                     }
                   />
                 </Animated.View>
-                {/* <Animated.View
+                <Animated.View
                   entering={FadeInDown.delay(600).duration(400).springify()}
                 >
                   <CustomButton
                     title="Continue with Google"
-                    handlePress={() => router.push("/signIn")}
+                    handlePress={onLoginGoogle || (() => {})}
                     containerStyles={styles.button}
                     textStyle={styles.buttonText}
                     IconComponent={<Google width={20} height={20} />}
                   />
-                </Animated.View> */}
+                </Animated.View>
               </View>
               <View
                 style={{

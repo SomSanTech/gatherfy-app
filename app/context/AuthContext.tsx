@@ -6,6 +6,16 @@ import dayjs from "dayjs";
 import { jwtDecode } from "jwt-decode";
 import Constants from "expo-constants";
 import { set } from "lodash";
+import {
+  GoogleSignin,
+  isSuccessResponse,
+  isErrorWithCode,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
+import { IOS_CLIENT_ID, ANDROID_CLIENT_ID , WEB_CLIENT_ID} from "@/app/files";
+import * as jose from "jose";
+
+import { useNavigation } from "@react-navigation/native";
 
 interface AuthProps {
   authState?: {
@@ -36,10 +46,12 @@ interface AuthProps {
   ) => Promise<any>;
   onVerifiedEmail?: (check: boolean) => Promise<void>;
   onLogin?: (username: string, password: string) => Promise<any>;
+  onLoginGoogle?: () => Promise<any>;
   onLogout?: () => void;
 }
 
 const TOKEN_KEY = "my-jwt";
+const Refresh_TOKEN_KEY = "refresh-token";
 const usernameStorage = "username";
 const firstnameStorage = "firstname";
 const lastnameStorage = "lastname";
@@ -164,6 +176,7 @@ export const AuthProvider = ({ children }: any) => {
             const refreshToken = await SecureStore.getItemAsync(
               "refresh-token"
             );
+            console.log("🔑 Stored refreshToken:", refreshToken); // Debugging
 
             if (!refreshToken) throw new Error("No refresh token");
 
@@ -310,7 +323,6 @@ export const AuthProvider = ({ children }: any) => {
 
       // Assuming the API returns user data in the response
       const userProfile = profileResponse.data;
-      console.log("User Profile:", userProfile.users_email);
 
       setAuthState({
         token: result.data.accessToken,
@@ -323,6 +335,10 @@ export const AuthProvider = ({ children }: any) => {
       ] = `Bearer ${result.data.accessToken}`;
 
       await SecureStore.setItemAsync(TOKEN_KEY, result.data.accessToken);
+      await SecureStore.setItemAsync(
+        Refresh_TOKEN_KEY,
+        result.data.refreshToken
+      );
       await SecureStore.setItemAsync(usernameStorage, userProfile.username);
       await SecureStore.setItemAsync(
         firstnameStorage,
@@ -359,15 +375,116 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
+
+    GoogleSignin.configure({
+      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+      iosClientId: IOS_CLIENT_ID,
+      webClientId: WEB_CLIENT_ID,
+      offlineAccess: true,
+      forceCodeForRefreshToken: true,
+      profileImageSize: 150,
+    });
+
+  const loginWithGoogle = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      if (isSuccessResponse(response)) {
+        const responseIdToken = response.data.idToken;
+
+        console.log("Google Sign-In response:", responseIdToken);
+
+        if (responseIdToken) {
+          const decodedToken = jose.decodeJwt(responseIdToken);
+          const expiredGoogleToken = decodedToken.exp
+            ? decodedToken.exp * 1000 < Date.now()
+            : true;
+          if (expiredGoogleToken) {
+            console.log("Google token expired");
+            return;
+          } else {
+            const result = await axios.post(
+              `${API_URL}/api/v1/login/google`,
+              {},
+              {
+                headers: {
+                  Authorization: `Bearer ${responseIdToken}`,
+                },
+              }
+            );
+
+            if (result.status !== 200) {
+              console.error("Login failed");
+              return;
+            } else {
+              // Fetch user profile after successful login
+              const profileResponse = await axios.get(
+                `${API_URL}/api/v1/profile`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${result.data.accessToken}`,
+                  },
+                }
+              );
+
+              // Assuming the API returns user data in the response
+              const userProfile = profileResponse.data;
+
+              await SecureStore.setItemAsync(
+                TOKEN_KEY,
+                result.data.accessToken
+              );
+              await SecureStore.setItemAsync(
+                Refresh_TOKEN_KEY,
+                result.data.refreshToken
+              );
+              await SecureStore.setItemAsync(
+                isVerifiedStorage,
+                JSON.stringify(userProfile.is_verified)
+              );
+
+              setAuthState({
+                token: result.data.accessToken,
+                authenticated: true,
+                verifyEmail: userProfile.is_verified,
+              });
+            }
+          }
+        } else {
+          console.error("Google Sign-In responseIdToken is null");
+        }
+      }
+    } catch (error) {
+      if (isErrorWithCode(error)) {
+        switch (error.code) {
+          case statusCodes.SIGN_IN_CANCELLED:
+            console.log("User cancelled the login flow");
+            break;
+          case statusCodes.IN_PROGRESS:
+            console.log("Sign-in is in progress");
+            break;
+          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+            console.log("Play services not available or outdated");
+            break;
+          default:
+            console.log("Unknown error:", error);
+        }
+      } else {
+        console.log("Error during Google Sign-In:", error);
+      }
+    }
+  };
+
   const logout = async () => {
     //Delete token from storage
     await SecureStore.deleteItemAsync(TOKEN_KEY);
+    await SecureStore.deleteItemAsync(Refresh_TOKEN_KEY);
     await SecureStore.deleteItemAsync(usernameStorage);
     await SecureStore.deleteItemAsync(firstnameStorage);
     await SecureStore.deleteItemAsync(lastnameStorage);
     await SecureStore.deleteItemAsync(emailStorage);
     await SecureStore.deleteItemAsync(roleStorage);
-
+    await SecureStore.deleteItemAsync(isVerifiedStorage);
     //Update TTP Headers
     axios.defaults.headers.common["Authorization"] = "";
 
@@ -396,6 +513,7 @@ export const AuthProvider = ({ children }: any) => {
     onRegister: register,
     updateProfile: updateProfile,
     onLogin: login,
+    onLoginGoogle: loginWithGoogle,
     onLogout: logout,
     onVerifiedEmail: verifiedEmail,
     authState,

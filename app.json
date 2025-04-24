@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.somsantechgatherfy",
+      "bundleIdentifier": "com.somsantech.gatherfy",
       "config": {
         "usesNonExemptEncryption": false
       }
@@ -30,7 +30,7 @@
         "android.permission.RECORD_AUDIO"
       ],
       "useCleartextTraffic": true,
-      "package": "com.somsantechgatherfy",
+      "package": "com.somsantech.gatherfy",
       "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
