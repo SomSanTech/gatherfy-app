@@ -375,19 +375,20 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
-
+  useEffect(() => {
     GoogleSignin.configure({
-      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
       iosClientId: IOS_CLIENT_ID,
       webClientId: WEB_CLIENT_ID,
       offlineAccess: true,
       forceCodeForRefreshToken: true,
       profileImageSize: 150,
     });
+  }, []);
 
   const loginWithGoogle = async () => {
     try {
-      await GoogleSignin.hasPlayServices();
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      await GoogleSignin.signOut();
       const response = await GoogleSignin.signIn();
       if (isSuccessResponse(response)) {
         const responseIdToken = response.data.idToken;

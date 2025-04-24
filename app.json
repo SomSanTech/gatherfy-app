@@ -14,10 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.somsantech.gatherfy",
       "config": {
         "usesNonExemptEncryption": false
-      }
+      },
+      "bundleIdentifier": "com.somsantech.gatherfy"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,13 +25,13 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "INTERNET",
+        "android.permission.INTERNET",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
       "useCleartextTraffic": true,
-      "package": "com.somsantech.gatherfy",
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "com.somsantech.gatherfy"
     },
     "web": {
       "bundler": "metro",
@@ -74,11 +74,14 @@
       "typedRoutes": true
     },
     "sdkVersion": "52.0.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "newArchEnabled": true,
     "extra": {
       "apiBaseUrl": "https://capstone24.sit.kmutt.ac.th/us1",
-      // "apiBaseUrl": "http://cp24us1.sit.kmutt.ac.th:543",
       "router": {
         "origin": false
       },
