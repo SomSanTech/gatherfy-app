@@ -17,7 +17,7 @@ import React, {
   useState,
 } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { fetchContact } from "@/composables/useFetchContact";
+import { fetchContact } from "@/composables/usefetchContact";
 import * as SecureStore from "expo-secure-store";
 import { useNavigation } from "@react-navigation/native";
 import SearchInput from "@/components/SearchInput";
@@ -224,7 +224,7 @@ const Contact = () => {
       <SectionList
         sections={sections}
         data={contacts}
-        keyExtractor={(item) => item.contactId.toString()}
+        keyExtractor={(item) => item.contactId}
         renderSectionHeader={({ section: { title } }) => (
           <Text style={styles.sectionHeader}>{title}</Text>
         )}
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   header: {
-    fontSize: 24,
+    fontSize: 22,
     fontFamily: "Poppins-Bold",
     margin: 16,
   },

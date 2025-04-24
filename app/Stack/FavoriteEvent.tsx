@@ -5,11 +5,17 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 import useNavigateToGoBack from "@/composables/navigateToGoBack";
-
+import { fetchFavortite } from "@/composables/useFetchFavorite";
+import * as SecureStore from "expo-secure-store";
+import FavoriteCard from "../../components/FavoriteCard"
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const mockFavoriteEvents = [
   { id: "1", name: "Music Festival 2025" },
@@ -17,14 +23,41 @@ const mockFavoriteEvents = [
   { id: "3", name: "Startup Pitch Night" },
 ];
 
+interface FavEvent {
+  favoriteId: number,
+  eventId: number,
+  name: string,
+  slug: string,
+  image: string,
+  createdAt: string
+}
+
 const FavoriteEvent = () => {
   const { navigateToGoBack } = useNavigateToGoBack();
+  const [favorites, setFavorites] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const renderItem = ({ item }: { item: { id: string; name: string } }) => (
     <TouchableOpacity style={styles.card}>
       <Text style={styles.eventName}>{item.name}</Text>
     </TouchableOpacity>
   );
+
+  const fetchData = async () => {
+    const token = await SecureStore.getItemAsync("my-jwt");
+    try{
+      const response = await fetchFavortite(token);
+      console.log(response)
+      setIsLoading(false);
+      setFavorites(response);
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+    }
+  };
+
+  useEffect(() => {
+      fetchData()
+  }, [] ); // Add eventDetail.eventId to the dependency array
 
   return (
     <SafeAreaView style={styles.container}>
@@ -33,16 +66,22 @@ const FavoriteEvent = () => {
           <TouchableOpacity onPress={() => navigateToGoBack()} className="">
             <Icon name="chevron-back" size={26} color="#000000" />
           </TouchableOpacity>
-          <Text style={styles.header}>Favorite Events</Text>
+          <Text className="text-2xl font-Poppins-SemiBold" style={{fontSize: wp("4.4"),}}>Favorite Events</Text>
         </View>
       </View>
+      <FavoriteCard events={favorites} page="favorites" />
 
-      <FlatList
-        data={mockFavoriteEvents}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
+      {/* <FlatList
+        data={favorites}
+        keyExtractor={(item) => item.favoriteId.toString()}
         contentContainerStyle={styles.list}
-      />
+        renderItem={({item}) => {
+          return (
+            <Text>{item.name}</Text>
+          )
+        }}
+
+      /> */}
     </SafeAreaView>
   );
 };
@@ -54,11 +93,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 16,
-  },
-  header: {
-    fontSize: 24,
-    fontFamily: "Poppins-Bold",
-    marginLeft: 10,
   },
   list: {
     paddingBottom: 16,

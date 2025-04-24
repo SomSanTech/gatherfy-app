@@ -3,7 +3,7 @@ const formatDate = (
   shortMonth: boolean = false,
   days: boolean = false,
   shortDay: boolean = true,
-  only: "day" | "month" | "year" | null = null
+  only: "daysOfWeek" |"day" | "month" | "year" | null = null
 ): { date: string; time: string } => {
   try {
     const date = new Date(dateString);
@@ -29,6 +29,7 @@ const formatDate = (
     if (only === "day") return { date: `${day}`, time: "" };
     if (only === "month") return { date: month, time: "" };
     if (only === "year") return { date: `${year}`, time: "" };
+    if (only === "daysOfWeek") return { date: `${dayOfWeek}`, time: "" };
 
     const formattedDate = days ? `${dayOfWeek} ${day} ${month} ${year}` : `${day} ${month} ${year}`;
 

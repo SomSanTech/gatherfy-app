@@ -9,7 +9,6 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import * as NavigationBar from "expo-navigation-bar";
 import { Button } from "@rneui/base";
-
 interface SortingDropdownProps {
   sorting: (value: string) => void;
 }
@@ -28,6 +27,7 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
   };
 
   const sortingOptions = [
+    { label: "Relevance", value: "" },
     { label: "Newest", value: "date_desc" },
     { label: "Oldest", value: "date_asc" },
     { label: "A-Z", value: "name_asc" },
@@ -42,6 +42,7 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
         // ตั้งค่าให้ปุ่มใน Navigation Bar เป็นสีอ่อน (หากพื้นหลังเป็นสีเข้ม)
         await NavigationBar.setButtonStyleAsync("dark");
         NavigationBar.setBorderColorAsync("#ffffff");
+        setSelectedSort("")
       } catch (error) {
         console.error("Error configuring Navigation Bar:", error);
       }
@@ -81,14 +82,14 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
         fontFamily="Poppins-Regular"
         onChange={(item) => handleSortChange(item.value)}
       />
-      <View className="items-end">
+      {/* <View className="items-start">
         <TouchableOpacity
           onPress={handleClear}
           style={styles.buttonClearContainer}
         >
           <Text style={styles.buttonText}>Clear</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -152,14 +153,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     backgroundColor: "white",
+    // margin:10,
+    // paddingVertical:20,
+    width: "100%"
   },
-  buttonClearContainer: {
-    width: 70,
-    backgroundColor: "transparent",
-    marginTop: 15,
-    borderRadius: 10,
-    padding: 2,
-  },
+  // buttonClearContainer: {
+  //   width: 70,
+  //   backgroundColor: "transparent",
+  //   marginTop: 15,
+  //   borderRadius: 10,
+  //   padding: 2,
+  // },
   buttonText: {
     fontFamily: "Poppins-SemiBold",
     textAlign: "center",

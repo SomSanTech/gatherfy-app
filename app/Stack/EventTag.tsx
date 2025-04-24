@@ -40,7 +40,7 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
       undefined
     );
     setEvents(data); // Update events after filtering
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   const loadSubscribed = async () => {
@@ -78,8 +78,12 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
   };
 
   useEffect(() => {
-    loadSubscribed();
-    fetchEventData();
+    try{
+      loadSubscribed();
+      fetchEventData();
+    }finally{
+      setIsLoading(false);
+    }
   }, []);
 
   return (
@@ -91,7 +95,7 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
               <Icon name="chevron-back" size={26} color="#000000" />
             </TouchableOpacity>
             <Text
-              className="text-xl font-Poppins-Bold text-center ml-5"
+              className="text-xl font-Poppins-SemiBold text-center ml-5"
               style={styles.headerText}
             >
               {tag}
@@ -115,7 +119,7 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
               style={styles.subscribeButton}
               onPress={() => handleChangeSubscribed()}
             >
-              <NotificationAdd />
+              <NotificationAdd width={21} height={21} />
               <Text style={styles.subscribeButtonText}>Subscribe</Text>
             </TouchableOpacity>
           )}
@@ -126,7 +130,7 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
           <Text style={styles.loadingText}>Loading...</Text>
         </View>
       ) : (
-        <View className="m-0 p-0" style={{ flex: 1 }}>
+        <View className="mx-3 p-0" style={{ flex: 1 }}>
           <EventCard events={events} page="tag" />
         </View>
       )}
@@ -144,10 +148,10 @@ const styles = StyleSheet.create({
   headerContainer: {
     padding: 15,
     position: "relative",
-    shadowColor: "#000", // สีของเงา
-    shadowOffset: { width: 0, height: 8 }, // เงาเฉพาะด้านล่าง
-    shadowOpacity: 0.1, // ความโปร่งแสงของเงา
-    shadowRadius: 5, // ความเบลอของเงา
+    // shadowColor: "#000", // สีของเงา
+    // shadowOffset: { width: 0, height: 10 }, // เงาเฉพาะด้านล่าง
+    // shadowOpacity: 0.05, // ความโปร่งแสงของเงา
+    // shadowRadius: 8, // ความเบลอของเงา
     elevation: 2, // สำหรับ Android
     backgroundColor: "#ffffff", // พื้นหลังของ View
   },
@@ -158,15 +162,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 5,
-    paddingRight: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    // paddingRight: 8,
     backgroundColor: "#f1f1f1",
-    borderRadius: 8,
+    borderRadius: 18,
   },
   subscribeButtonText: {
     includeFontPadding: false,
     fontSize: 14.2,
-    fontFamily: "Poppins-Bold",
+    fontFamily: "Poppins-SemiBold",
     color: "#000000",
     marginLeft: 5,
   },

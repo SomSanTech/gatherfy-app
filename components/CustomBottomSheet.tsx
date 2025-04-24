@@ -27,6 +27,7 @@ import { SortingDropdown } from "@/components/Dropdown";
 import EventCard from "./EventCard";
 import icons from "@/constants/icons";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import CustomButton from "./CustomButton";
 
 interface Props {
   title: string;
@@ -146,9 +147,9 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
           showsVerticalScrollIndicator={false}
           style={styles.modalContentContainer}
         >
-          <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+          {/* <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
             <Text style={styles.closeButtonText}>×</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <Text style={styles.bottomModalHeadline}>{props.title}</Text>
 
           <View className="pb-5">
@@ -161,8 +162,8 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
             <View style={styles.sortingWrapper}>
               <SortingDropdown sorting={props.sorting} />
             </View>
-            <View className="mb-5 bg-gray-200 rounded-lg p-5 mt-10">
-              <Text className="text-center text-lg text-primary font-Poppins-SemiBold">
+            <View className="mb-5 rounded-lg p-0 mt-10">
+              <Text className="text-lg text-primary font-Poppins-SemiBold">
                 Tags
               </Text>
               <View style={styles.checkboxWrapper}>
@@ -195,11 +196,13 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
               </View>
             </View>
             <View className="mb-10">
-              <TouchableOpacity onPress={() => props.handleSearchSubmit()}>
-                <Text className="text-center mt-5 text-black text-[20px] border  p-3 rounded-lg font-Poppins-SemiBold">
-                  Search
-                </Text>
-              </TouchableOpacity>
+                <CustomButton
+                    title="Search"
+                    containerStyles={styles.searchBtn}
+                    textStyle={styles.searchBtnText}
+                    handlePress={() => { props.handleSearchSubmit()}}
+                    disabled={true}
+                  />
             </View>
           </View>
         </BottomSheetScrollView>
@@ -250,7 +253,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap", // ให้สามารถขึ้นบรรทัดใหม่ได้
     justifyContent: "space-between", // จัดให้ช่องว่างระหว่าง Checkbox เท่ากัน
     alignItems: "center", // จัดให้อยู่กึ่งกลาง
-    padding: 10,
+    // padding: 10,
     marginTop: 10,
     backgroundColor: "#FFFFFF",
     borderRadius: 10,
@@ -292,6 +295,18 @@ const styles = StyleSheet.create({
     height: 30,
     marginTop: 10,
     marginBottom: 10,
+  },
+  searchBtn: {
+    backgroundColor: "#D71515",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    borderColor: "#D71515",
+    borderWidth: 1,
+  },
+  searchBtnText: {
+    color: "#FFFFFF",
+    fontFamily: "Poppins-SemiBold",
   },
 });
 

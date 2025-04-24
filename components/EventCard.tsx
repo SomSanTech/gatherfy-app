@@ -4,23 +4,27 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  Platform,
-  Image,
   Dimensions,
   StyleSheet,
+  ImageBackground,
 } from "react-native";
 import useNavigateToEventDetail from "@/composables/navigateToEventDetail";
 import formatDate from "@/utils/formatDate";
-import Icon from "react-native-vector-icons/Ionicons";
+import Calendar from "../assets/icons/Calendar.svg"
+import Location from "../assets/icons/Location.svg"
+import Time from "../assets/icons/Time.svg"
 
 interface Event {
   slug: string;
   name: string;
   start_date: string;
   end_date: string;
+  ticket_start_date: string;
+  ticket_end_date: string;
   tags: { tag_id: number; tag_title: string; tag_code: string }[];
   image: string;
   location: string;
+  status: string;
 }
 
 interface EventCardProps {
@@ -42,10 +46,22 @@ const EventCard: React.FC<EventCardProps> = ({
 }) => {
   const screenWidth = Dimensions.get("window").width;
   const { navigateToEventDetail } = useNavigateToEventDetail();
+  const handleEventStatus = (event: Event) => {
+    const currentDate = new Date();
+    const startDate = new Date(event.ticket_start_date);
+    const endDate = new Date(event.ticket_end_date);
 
+    if (currentDate < startDate) {
+      return "SOON"
+    } else if (event.status !== 'full' && currentDate > endDate) {
+      return" ClOSED";
+    } else if (event.status === 'full') {
+      return"FULL";
+    } else {
+      return"Now";
+    }
+  }
   useEffect(() => {
-
-
     if (page === "search") {
       if (search && isSearched) {
         setIsSearched && setIsSearched(true);
@@ -72,25 +88,31 @@ const EventCard: React.FC<EventCardProps> = ({
           onPress={() => navigateToEventDetail(item.slug)}
           className="items-center justify-center"
           style={[
-            styles.cardContainer,
             {
               marginTop:
-                page === "tag" && index === 0 ? 25 : index === 0 ? 5 : 20,
+                page === "tag" && index === 0 ? 25 : index === 0 ? 5 : 10,
             },
           ]}
         >
           <View className=" bg-white p-4 h-52 rounded-lg flex-row">
             <View className="w-[39%] mr-4">
-              <Image
+              <ImageBackground
                 source={{ uri: item.image }}
-                className="w-full h-full rounded-lg"
-                resizeMode="cover"
-              />
+                className="w-full h-full overflow-hidden rounded-lg"
+              >
+                { page === 'tag' ? (
+                <View style={styles.statusBox} className="absolute top-3 left-3">
+                <Text className="font-bold text-white" style={{fontSize: 9}}>
+                  { handleEventStatus(item) }
+                  </Text>
+              </View>
+                ): null }
+              </ImageBackground>
             </View>
             <View className="flex-1 justify-between pb-5 overflow-hidden">
               <View>
                 <Text
-                  className="text-xl w-full text-primary font-Poppins-SemiBold"
+                  className="text-xl w-full text-black font-Poppins-SemiBold"
                   style={{ maxWidth: "100%" }}
                   numberOfLines={2}
                   ellipsizeMode="tail"
@@ -99,12 +121,12 @@ const EventCard: React.FC<EventCardProps> = ({
                 </Text>
               </View>
               <View>
-                <Text style={[styles.detailTag]}>
+                <Text style={[styles.detailTag]} numberOfLines={1}>
                   {item.tags.map((tag) => tag.tag_title).join(", ")}
                 </Text>
 
                 <View style={[styles.detailContainer]}>
-                  <Icon name="calendar-outline" size={18} color="#000000" />
+                  <Calendar width={18} height={18} color="#4B5563" strokeWidth={10}/>
                   <Text
                     style={[styles.detail]}
                     numberOfLines={1}
@@ -115,7 +137,7 @@ const EventCard: React.FC<EventCardProps> = ({
                   </Text>
                 </View>
                 <View style={[styles.detailContainer]}>
-                  <Icon name="time-outline" size={20} color="#000000" />
+                  <Time width={18} height={18} color="#4B5563" />
                   <Text
                     style={[styles.detail]}
                     numberOfLines={1}
@@ -126,7 +148,7 @@ const EventCard: React.FC<EventCardProps> = ({
                   </Text>
                 </View>
                 <View style={[styles.detailContainer]}>
-                  <Icon name="map-outline" size={20} color="#000000" />
+                  <Location width={18} height={18} color="#4B5563" />
                   <Text
                     style={[styles.detail]}
                     numberOfLines={1}
@@ -174,19 +196,6 @@ const EventCard: React.FC<EventCardProps> = ({
 };
 
 const styles = StyleSheet.create({
-  cardContainer: {
-    marginHorizontal: 20,
-    borderRadius: 10, // มุมโค้งมน
-    backgroundColor: "#FFFFFF", // พื้นหลังของการ์ด
-    shadowColor: "#000000",
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.17,
-    shadowRadius: 5,
-    elevation: 6,
-  },
   detailContainer: {
     flexDirection: "row",
     width: "98%",
@@ -206,6 +215,12 @@ const styles = StyleSheet.create({
     width: "90%",
     marginLeft: 5,
     fontFamily: "Poppins-Regular",
+  },
+  statusBox:{
+    backgroundColor: "#ea2929",
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 12
   },
 });
 

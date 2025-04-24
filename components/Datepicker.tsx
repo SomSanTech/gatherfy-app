@@ -17,7 +17,7 @@ const Datepicker: React.FC<DatepickerProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.customHeader}>- Select Date -</Text>
+      {/* <Text style={styles.customHeader}>- Select Date -</Text> */}
       <DateTimePicker
         mode="single"
         date={date ? dayjs(date).toDate() : undefined}
@@ -46,16 +46,16 @@ const Datepicker: React.FC<DatepickerProps> = ({
         weekDaysTextStyle={{
           color: "#D71515",
           fontSize: 18,
-          fontFamily: "Poppins-SemiBold",
+          fontFamily: "Poppins-medium",
         }} // เปลี่ยนฟอนต์ในวัน
         calendarTextStyle={{
-          fontSize: 18,
-          fontFamily: "Poppins-SemiBold",
+          fontSize: 17,
+          fontFamily: "Poppins-medium",
           lineHeight: 24,
         }} // เปลี่ยนฟอนต์ในตัวเลือกวันที่
       />
       {!disabledClear && (
-        <View className="px-5 mt-5">
+        <View className=" mt-5">
           <Button
             onPress={() => setDate(undefined)}
             buttonStyle={styles.buttonClear}
@@ -78,16 +78,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   buttonClear: {
-    backgroundColor: "#D71515",
-    color: "white",
+    backgroundColor: "transparent",
+    color: "#D71515",
     borderRadius: 10,
     padding: 10,
+    borderColor: "#D71515",
+    borderWidth: 1
   },
   buttonText: {
     fontFamily: "Poppins-SemiBold", // เปลี่ยนฟอนต์ที่ต้องการ
-    fontSize: 18,
-    lineHeight: 24,
-    color: "white", // กำหนดสีข้อความหากต้องการ
+    fontSize: 16,
+    // lineHeight: 24,
+    color: "#D71515", // กำหนดสีข้อความหากต้องการ
   },
   customHeader: {
     fontSize: 20,
