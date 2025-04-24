@@ -57,7 +57,7 @@ import { IOS_CLIENT_ID, WEB_CLIENT_ID } from "@/app/files";
 // });
 
 export default function App() {
-  const { authState } = useAuth();
+  const { authState , onLoginGoogle} = useAuth();
 
   const { user, isLoading, signIn } = useAuthGoogle();
 
@@ -97,7 +97,6 @@ export default function App() {
             style={styles.linearBackground}
           >
             <View style={styles.wrapper}>
-              <Text>{JSON.stringify(user)}</Text>
               <Animated.Text
                 style={styles.title}
                 entering={FadeInRight.delay(300).duration(300).springify()}
@@ -133,7 +132,7 @@ export default function App() {
                 >
                   <CustomButton
                     title="Continue with Google"
-                    handlePress={signIn}
+                    handlePress={onLoginGoogle || (() => {})}
                     containerStyles={styles.button}
                     textStyle={styles.buttonText}
                     IconComponent={<Google width={20} height={20} />}

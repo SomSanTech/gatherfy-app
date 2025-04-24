@@ -202,9 +202,9 @@ export default function RootLayout() {
 
   return (
 
-      <AuthProviderGoogle>
+      <AuthProvider>
         <StackLayout />
-      </AuthProviderGoogle>
+      </AuthProvider>
 
   );
 }

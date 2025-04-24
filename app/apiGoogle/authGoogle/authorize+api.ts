@@ -1,23 +1,24 @@
 import {
-  APP_SCHEME,
-  BASE_URL,
-  GOOGLE_AUTH_URL,
   GOOGLE_CLIENT_ID,
+  BASE_URL,
+  APP_SCHEME,
+  GOOGLE_AUTH_URL,
   GOOGLE_REDIRECT_URI,
 } from "@/utils/constants";
-import { G } from "react-native-svg";
 
 export async function GET(request: Request) {
   if (!GOOGLE_CLIENT_ID) {
     return Response.json(
-      { error: "GOOGLE_CLIENT_ID is not defined" },
+      { error: "Missing GOOGLE_CLIENT_ID environment variable" },
       { status: 500 }
     );
   }
 
   const url = new URL(request.url);
   let idpClientId: string;
+
   const internalClient = url.searchParams.get("client_id");
+
   const redirectUri = url.searchParams.get("redirect_uri");
 
   let platform;
@@ -27,16 +28,22 @@ export async function GET(request: Request) {
   } else if (redirectUri === BASE_URL) {
     platform = "web";
   } else {
-    return Response.json({ error: "Invalid redirect URI" }, { status: 400 });
+    return Response.json({ error: "Invalid redirect_uri" }, { status: 400 });
   }
 
-  //use state tot drive redirect back to platform
+  // use state to drive redirect back to platform
   let state = platform + "|" + url.searchParams.get("state");
 
   if (internalClient === "google") {
     idpClientId = GOOGLE_CLIENT_ID;
+    
   } else {
-    return Response.json({ error: "Invalid client_id" }, { status: 400 });
+    return Response.json({ error: "Invalid client" }, { status: 400 });
+  }
+
+  // additional enforcement
+  if (!state) {
+    return Response.json({ error: "Invalid state" }, { status: 400 });
   }
 
   const params = new URLSearchParams({

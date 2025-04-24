@@ -19,7 +19,7 @@ export const REFRESH_BEFORE_EXPIRY_SEC = 60; // Refresh token 1 minute before ex
 // Google OAuth Constants
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
-export const GOOGLE_REDIRECT_URI = `${process.env.EXPO_PUBLIC_BASE_URL}/api/auth/callback`;
+export const GOOGLE_REDIRECT_URI = `${process.env.EXPO_PUBLIC_BASE_URL}/apiGoogle/authGoogle/callback`;
 export const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 
 // // Apple OAuth Constants
