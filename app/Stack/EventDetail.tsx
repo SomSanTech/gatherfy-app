@@ -18,12 +18,15 @@ import { Colors } from "@/constants/Colors";
 import useNavigateToEventTag from "@/composables/navigateToEventTag";
 import Favorite from "@/assets/icons/favorite-icon.svg";
 import FavoriteFill from "@/assets/icons/favorite-fill-icon.svg";
+import Calendar from "../../assets/icons/Calendar.svg"
+import Location from "../../assets/icons/Location.svg"
+import Time from "../../assets/icons/Time.svg"
 
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { addFavortite, fetchFavortite, RemoveFavortite } from "@/composables/useFetchFavorite";
+import { addFavortite, fetchFavortite, removeFavortite } from "@/composables/useFetchFavorite";
 import Loader from "@/components/Loader";
 
 type EventDetailRouteProp = RouteProp<RootStackParamList, "EventDetail">;
@@ -66,8 +69,6 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const [usersInfo, setUsersInfo] = useState<any>([]);
   const [confirmRegister, setConfirmRegister] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [imageLoaded, setImageLoaded] = useState(false);
-
   const { navigateToEventTag } = useNavigateToEventTag();
 
   const fetchDataDetailAsync = async () => {
@@ -114,8 +115,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
 
   const handleRemoveFavorite = async (eventId: any) => {
     const token = await SecureStore.getItemAsync("my-jwt");
-    console.log(favoriteId)
-    const response = await RemoveFavortite(token, eventId)
+    await removeFavortite(token, eventId)
     setIsFavorite(false)
     setFavoriteId(null)
   }
@@ -149,14 +149,10 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
         countViewById(`/api/v1/countView/${eventDetail.eventId}`);
       }
     } finally {
-        setIsLoading(false)
-        console.log(imageLoaded)
-        
+        setIsLoading(false)        
     }
   }, [eventDetail.slug, confirmRegister, eventDetail.eventId, isFavorite]); // Add eventDetail.eventId to the dependency array
-  useEffect(() => {
-    console.log("ImageLoaded state:", imageLoaded);
-  }, [imageLoaded]);
+
   const startDate = eventDetail.start_date
     ? formatDate(eventDetail.start_date, true, true, true).date
     : "";
@@ -192,9 +188,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                   source={{ uri: eventDetail.image }}
                   style={styles.image}
                   resizeMode="contain"
-                  onLoadEnd={() => setImageLoaded(true)}
                 />
-                <Text className="absolute bottom-4 right-2">Join Event</Text>
               </ImageBackground>
             </View>
             <View style={styles.detailContainer}>
@@ -217,7 +211,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
               </View>
               <View style={styles.eventDetail} className="">
                 <View className="flex-row">
-                  <Icon name="calendar-outline" size={20} color="#626567" />
+                  <Calendar width={18} height={18} color="#4B5563" strokeWidth={10}/>
                   <Text className="font-semibold mx-2">
                     {startDate}{" "}
                     {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
@@ -228,13 +222,13 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                   </Text>
                 </View>
                 <View className="flex-row">
-                  <Icon name="time-outline" size={20} color="#626567" />
+                  <Time width={18} height={18} color="#4B5563" strokeWidth={10}/>
                   <Text className="font-semibold mx-2">
                     {startTime} - {endTime}
                   </Text>
                 </View>
                 <View className="flex-row">
-                  <Icon name="map-outline" size={20} color="#626567" />
+                  <Location width={18} height={18} color="#4B5563" strokeWidth={10}/>
                   <Text className="font-semibold mx-2">
                     {eventDetail.location}
                   </Text>
@@ -264,9 +258,9 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                 <View style={{ width: '52%' }}>
                   {isRegistered ? (
                     <CustomButton
-                      title="Already Registered"
-                      containerStyles={styles.registerButtonDisabled}
-                      textStyle={styles.registerButtonTextDisabled}
+                      title="Registered"
+                      containerStyles={styles.registerButton}
+                      textStyle={styles.registerButtonText}
                       handlePress={() => { }}
                       disabled={true}
                     />
@@ -355,19 +349,16 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: "100%",
     height: 420,
-
   },
   image: {
     width: "90%",
     height: "90%",
-    // borderRadius: 10,
     margin: "auto",
     objectFit: "contain",
   },
   detailContainer: {
     padding: 15,
     paddingVertical: 20,
-    // backgroundColor: "#f5f5f5",
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     marginBottom: 25,
@@ -429,7 +420,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   registerButtonTextDisabled: {
-    color: "#FFFFFF",
+    color: "#808080",
     fontFamily: "Poppins-SemiBold",
   },
   descriptionTitle: {
@@ -451,29 +442,22 @@ const styles = StyleSheet.create({
     height: 400,
     width: "100%",
     backgroundColor: "#f5f5f5",
-    // borderRadius: 30
   },
   modalDetail: {
     marginTop: 20,
-    // marginHorizontal: 2,
     paddingHorizontal: 5,
     paddingVertical: 18,
-    // backgroundColor: "#F9FBFC",
     borderRadius: 20,
     gap: 10,
     borderColor: '#ECECEC',
-    // borderWidth: 1
   },
   eventDetail: {
     marginTop: 20,
-    // marginHorizontal: 2,
     paddingHorizontal: 5,
     paddingVertical: 18,
-    // backgroundColor: "#F9FBFC",
     borderRadius: 20,
     gap: 10,
     borderColor: '#ECECEC',
-    // borderWidth: 1
   },
   favButton: {
     backgroundColor: "#fff",

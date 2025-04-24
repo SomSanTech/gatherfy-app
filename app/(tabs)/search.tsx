@@ -1,19 +1,13 @@
 import React, { Fragment, useState, useEffect, useMemo } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
   StyleSheet,
 } from "react-native";
 import { getEvent } from "@/composables/getEvent";
 import { getTag } from "@/composables/getTag";
 import SearchInput from "@/components/SearchInput";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "@rneui/themed";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { useCallback, useRef } from "react";
+import { useRef } from "react";
 import CustomBottomSheet from "@/components/CustomBottomSheet";
 
 const Search = () => {
@@ -28,7 +22,6 @@ const Search = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isSearched, setIsSearched] = useState(false);
   const [date, setDate] = useState<string | undefined>(undefined); // เริ่มต้นเป็น undefined
-  const [visible, setVisible] = useState(false);
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const fetchTagData = async () => {
@@ -93,7 +86,7 @@ const Search = () => {
         /> 
         <CustomBottomSheet
           ref={bottomSheetRef}
-          title="Filter Event"
+          title="Add filters"
           events={events}
           setDate={setDate} // ฟังก์ชันสำหรับเปลี่ยนวันที่
           sorting={sorting}

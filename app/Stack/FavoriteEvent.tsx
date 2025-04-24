@@ -61,27 +61,15 @@ const FavoriteEvent = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View className="items-center justify-between flex-row">
-        <View className="flex-row items-center justify-center mt-1 mb-3">
+      <View className="items-center justify-between flex-row py-4">
+        <View className="flex-row items-center justify-center">
           <TouchableOpacity onPress={() => navigateToGoBack()} className="">
             <Icon name="chevron-back" size={26} color="#000000" />
           </TouchableOpacity>
-          <Text className="text-2xl font-Poppins-SemiBold" style={{fontSize: wp("4.4"),}}>Favorite Events</Text>
+          <Text className="text-xl font-Poppins-SemiBold ml-3">Favorite Events</Text>
         </View>
       </View>
       <FavoriteCard events={favorites} page="favorites" />
-
-      {/* <FlatList
-        data={favorites}
-        keyExtractor={(item) => item.favoriteId.toString()}
-        contentContainerStyle={styles.list}
-        renderItem={({item}) => {
-          return (
-            <Text>{item.name}</Text>
-          )
-        }}
-
-      /> */}
     </SafeAreaView>
   );
 };

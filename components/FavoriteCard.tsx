@@ -114,7 +114,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
                   </View>
                   <Text
                   numberOfLines={2}
-                    className="text-white text-lg font-semibold bottom-5 text-left mx-5"
+                    className="text-white text-base font-semibold bottom-5 text-left mx-4"
                     style={styles.favText}
                   >
                     {item.name}

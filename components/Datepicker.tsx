@@ -17,7 +17,6 @@ const Datepicker: React.FC<DatepickerProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.customHeader}>- Select Date -</Text> */}
       <DateTimePicker
         mode="single"
         date={date ? dayjs(date).toDate() : undefined}
@@ -27,7 +26,7 @@ const Datepicker: React.FC<DatepickerProps> = ({
         selectedItemColor="#D71515"
         selectedTextStyle={{
           fontSize: 18,
-          fontFamily: "Poppins-SemiBold",
+          fontFamily: "Poppins-base",
           lineHeight: 24,
         }} // เปลี่ยนฟอนต์ในวันที่เลือก
         headerContainerStyle={{
@@ -50,7 +49,7 @@ const Datepicker: React.FC<DatepickerProps> = ({
         }} // เปลี่ยนฟอนต์ในวัน
         calendarTextStyle={{
           fontSize: 17,
-          fontFamily: "Poppins-medium",
+          fontFamily: "Poppins-base",
           lineHeight: 24,
         }} // เปลี่ยนฟอนต์ในตัวเลือกวันที่
       />
@@ -81,14 +80,13 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     color: "#D71515",
     borderRadius: 10,
-    padding: 10,
+    padding: 9,
     borderColor: "#D71515",
     borderWidth: 1
   },
   buttonText: {
     fontFamily: "Poppins-SemiBold", // เปลี่ยนฟอนต์ที่ต้องการ
     fontSize: 16,
-    // lineHeight: 24,
     color: "#D71515", // กำหนดสีข้อความหากต้องการ
   },
   customHeader: {

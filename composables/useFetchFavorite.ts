@@ -62,9 +62,7 @@ export const addFavortite = async (token: any, body: any) => {
       console.error(`Error: ${response.status} - ${errorMessage}`);
       return [];
     }
-    
-    alert("Add to favorite");
-    
+        
     const data = await response.json(); // อ่าน response เมื่อสำเร็จ
     return data;
     
@@ -74,7 +72,7 @@ export const addFavortite = async (token: any, body: any) => {
   }
 };
 
-export const RemoveFavortite = async (token: any, favoriteId: any) => {
+export const removeFavortite = async (token: any, favoriteId: any) => {
   try {
     if (!API_BASE_URL) {
       console.error("API_BASE_URL is not defined in the app's configuration.");
@@ -98,7 +96,6 @@ export const RemoveFavortite = async (token: any, favoriteId: any) => {
       return [];
     }
     
-    alert("Remove from your favorite");
     return response;    
   } catch (error) {
     console.error(error);

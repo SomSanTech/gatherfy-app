@@ -58,7 +58,7 @@ const EventCard: React.FC<EventCardProps> = ({
     } else if (event.status === 'full') {
       return"FULL";
     } else {
-      return"Now";
+      return"NOW";
     }
   }
   useEffect(() => {
@@ -90,7 +90,7 @@ const EventCard: React.FC<EventCardProps> = ({
           style={[
             {
               marginTop:
-                page === "tag" && index === 0 ? 25 : index === 0 ? 5 : 10,
+                page === "tag" && index === 0 ? 15 : index === 0 ? 5 : 10,
             },
           ]}
         >

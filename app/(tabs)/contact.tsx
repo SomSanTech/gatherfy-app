@@ -190,7 +190,7 @@ const Contact = () => {
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-white pb-24">
-      <Text style={styles.header}>Contacts</Text>
+      <Text className="text-xl font-Poppins-SemiBold text-center" style={styles.header}>Contacts</Text>
       <TouchableOpacity
         onPress={() => profile && openModal("myCard", profile)}
         style={styles.myCardContainer}
@@ -330,8 +330,6 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   header: {
-    fontSize: 22,
-    fontFamily: "Poppins-Bold",
     margin: 16,
   },
   contactItem: {

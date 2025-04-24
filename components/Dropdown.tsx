@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import * as NavigationBar from "expo-navigation-bar";
-import { Button } from "@rneui/base";
 interface SortingDropdownProps {
   sorting: (value: string) => void;
 }
@@ -74,22 +70,14 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
         }}
         itemTextStyle={{
           color: "black",
-          lineHeight: 24,
+          lineHeight: 17,
           marginTop: 2,
         }}
-        itemContainerStyle={{ backgroundColor: "white" }}
+        itemContainerStyle={{ backgroundColor: "white"}}
         value={selectedSort}
         fontFamily="Poppins-Regular"
         onChange={(item) => handleSortChange(item.value)}
       />
-      {/* <View className="items-start">
-        <TouchableOpacity
-          onPress={handleClear}
-          style={styles.buttonClearContainer}
-        >
-          <Text style={styles.buttonText}>Clear</Text>
-        </TouchableOpacity>
-      </View> */}
     </View>
   );
 };
@@ -147,29 +135,13 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   dropdown: {
-    height: "100%",
+    height: "120%",
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
     backgroundColor: "white",
-    // margin:10,
-    // paddingVertical:20,
     width: "100%"
-  },
-  // buttonClearContainer: {
-  //   width: 70,
-  //   backgroundColor: "transparent",
-  //   marginTop: 15,
-  //   borderRadius: 10,
-  //   padding: 2,
-  // },
-  buttonText: {
-    fontFamily: "Poppins-SemiBold",
-    textAlign: "center",
-    fontSize: 14,
-    lineHeight: 24,
-    color: "black",
   },
 });
 

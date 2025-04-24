@@ -95,7 +95,7 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
               <Icon name="chevron-back" size={26} color="#000000" />
             </TouchableOpacity>
             <Text
-              className="text-xl font-Poppins-SemiBold text-center ml-5"
+              className="text-xl font-Poppins-SemiBold text-center ml-3"
               style={styles.headerText}
             >
               {tag}
@@ -148,10 +148,6 @@ const styles = StyleSheet.create({
   headerContainer: {
     padding: 15,
     position: "relative",
-    // shadowColor: "#000", // สีของเงา
-    // shadowOffset: { width: 0, height: 10 }, // เงาเฉพาะด้านล่าง
-    // shadowOpacity: 0.05, // ความโปร่งแสงของเงา
-    // shadowRadius: 8, // ความเบลอของเงา
     elevation: 2, // สำหรับ Android
     backgroundColor: "#ffffff", // พื้นหลังของ View
   },

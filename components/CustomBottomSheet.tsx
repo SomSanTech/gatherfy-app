@@ -3,19 +3,15 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   Image,
 } from "react-native";
 import React, { forwardRef, useCallback, useMemo } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomSheet, {
-  BottomSheetView,
   BottomSheetBackdrop,
   useBottomSheetTimingConfigs,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import { Button } from "@rneui/themed";
-import { CheckBox } from "@rneui/themed";
 
 import {
   widthPercentageToDP as wp,
@@ -86,20 +82,6 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
   return (
     <GestureHandlerRootView style={styles.bottomModalContainer}>
       <View className="m-0 p-0" style={{ flex: 1 }}>
-        {/* {props.isSearched == false && props.events && (
-          <View className="flex-row flex-wrap justify-start items-center mt-1 gap-2 px-5">
-            {suggestedEvents.map((event, index) => (
-              <TouchableOpacity
-                key={index}
-                className="text-base text-primary font-Poppins-SemiBold p-3 bg-gray-200 rounded-lg"
-              >
-                <Text className="text-base text-primary font-Poppins-SemiBold text-center bg-gray-200 rounded-lg">
-                  {event.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )} */}
         <View className="flex-row justify-between items-center mx-5 mt-1 pb-4">
           {props.countResult > 0 && (
             <Text className="text-sm text-searchText font-Poppins-Regular">
@@ -111,13 +93,13 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
           {props.isSearched && (
             <TouchableOpacity
               onPress={handleOpen}
-              className="px-4 py-[2px] border rounded-lg items-center"
+              className="px-4 py-[2px] border rounded-2xl items-center"
             >
-              <View className="flex-row">
+              <View className="flex-row items-center">
                 <Image
                   source={icons.filter}
-                  style={{ width: 15, height: 18 }}
-                  className="mr-1"
+                  style={{ width: 18, height: 18 }}
+                  className="mr-1 my-auto"
                 />
                 <Text className="font-Poppins-Regular text-sm"> Filter</Text>
               </View>
@@ -147,22 +129,17 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
           showsVerticalScrollIndicator={false}
           style={styles.modalContentContainer}
         >
-          {/* <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-            <Text style={styles.closeButtonText}>×</Text>
-          </TouchableOpacity> */}
-          <Text style={styles.bottomModalHeadline}>{props.title}</Text>
-
           <View className="pb-5">
-            <View className=" mt-5 mb-3 pt-0 rounded-lg">
+            <View className="mb-3 pt-0 rounded-lg">
               <Datepicker date={props.date} setDate={props.setDate} />
             </View>
-            <Text className="text-center text-lg text-primary font-Poppins-SemiBold mt-5">
+            <Text className="text-lg text-primary font-Poppins-SemiBold mt-5">
               Sort By
             </Text>
             <View style={styles.sortingWrapper}>
               <SortingDropdown sorting={props.sorting} />
             </View>
-            <View className="mb-5 rounded-lg p-0 mt-10">
+            <View className="mb-8 rounded-lg p-0 mt-10">
               <Text className="text-lg text-primary font-Poppins-SemiBold">
                 Tags
               </Text>
@@ -201,7 +178,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
                     containerStyles={styles.searchBtn}
                     textStyle={styles.searchBtnText}
                     handlePress={() => { props.handleSearchSubmit()}}
-                    disabled={true}
+                    disabled={false}
                   />
             </View>
           </View>
@@ -223,8 +200,9 @@ const styles = StyleSheet.create({
     paddingTop: 26,
   },
   bottomModalHeadline: {
-    fontSize: 24,
-    fontFamily: "Poppins-SemiBold",
+    fontSize: 22,
+    fontFamily: "Poppins-Base",
+    display: "none"
   },
   closeButton: {
     position: "absolute",
@@ -305,6 +283,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   searchBtnText: {
+    fontSize: 16,
     color: "#FFFFFF",
     fontFamily: "Poppins-SemiBold",
   },

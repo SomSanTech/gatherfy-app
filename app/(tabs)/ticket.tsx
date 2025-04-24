@@ -82,7 +82,7 @@ const Ticket = () => {
     <Fragment>
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <View style={styles.container}>
-          <Text style={styles.header}>Tickets</Text>
+          <Text className="text-xl font-Poppins-SemiBold" style={styles.header}>Tickets</Text>
 
           {isLoading ? (
             <View style={styles.loaderContainer}>
@@ -126,8 +126,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   header: {
-    fontSize: 22,
-    fontFamily: "Poppins-Bold",
     marginBottom: 4,
     textAlign: "center",
   },
