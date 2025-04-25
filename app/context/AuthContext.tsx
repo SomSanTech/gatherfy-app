@@ -12,7 +12,6 @@ import {
   isErrorWithCode,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
-import { IOS_CLIENT_ID, ANDROID_CLIENT_ID , WEB_CLIENT_ID} from "@/app/files";
 import * as jose from "jose";
 
 import { useNavigation } from "@react-navigation/native";
@@ -375,25 +374,26 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
-  useEffect(() => {
-    GoogleSignin.configure({
-      iosClientId: IOS_CLIENT_ID,
-      webClientId: WEB_CLIENT_ID,
-      offlineAccess: true,
-      forceCodeForRefreshToken: true,
-      profileImageSize: 150,
-    });
-  }, []);
+  GoogleSignin.configure({
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+    offlineAccess: true,
+    forceCodeForRefreshToken: true,
+    profileImageSize: 150,
+  });
 
   const loginWithGoogle = async () => {
+    console.log("Login with Google", process.env.EXPO_PUBLIC_WEB_CLIENT_ID ,    process.env.EXPO_PUBLIC_IOS_CLIENT_ID);
+
     try {
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
       await GoogleSignin.signOut();
       const response = await GoogleSignin.signIn();
       if (isSuccessResponse(response)) {
         const responseIdToken = response.data.idToken;
 
-        console.log("Google Sign-In response:", responseIdToken);
 
         if (responseIdToken) {
           const decodedToken = jose.decodeJwt(responseIdToken);

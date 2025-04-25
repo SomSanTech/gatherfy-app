@@ -27,6 +27,9 @@
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET",
+        "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
       "useCleartextTraffic": true,
@@ -88,6 +91,12 @@
       "eas": {
         "projectId": "bfa809f4-13dd-4c4a-bf54-175cde940b3b"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/bfa809f4-13dd-4c4a-bf54-175cde940b3b"
     }
   }
 }
