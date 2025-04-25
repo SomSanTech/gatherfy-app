@@ -8,6 +8,10 @@ import {
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import * as NavigationBar from "expo-navigation-bar";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { Button } from "@rneui/base";
 
 interface SortingDropdownProps {
@@ -131,6 +135,7 @@ const DropdownComponent: React.FC<DropdownProps> = ({
         color: "black",
         fontFamily: "Poppins-Regular",
         lineHeight: 24,
+        fontSize: wp(3),
         includeFontPadding: false,
       }}
       selectedTextProps={{ numberOfLines: 1 }}

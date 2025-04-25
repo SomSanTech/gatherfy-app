@@ -29,6 +29,10 @@ import { useCameraPermissions } from "expo-camera";
 import ProfileModal from "@/components/ProfileModal";
 import { useFocusEffect } from "expo-router";
 import Animated from "react-native-reanimated";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const Contact = () => {
   interface Profile {
@@ -209,8 +213,12 @@ const Contact = () => {
             className="opacity-70"
           />
         )}
-        <View>
-          <Text style={styles.myCardUsername}>
+        <View className="flex-1">
+          <Text
+            style={styles.myCardUsername}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {profile?.userProfile.username}
           </Text>
           <Text style={styles.description}>My Card</Text>
@@ -322,6 +330,7 @@ const styles = StyleSheet.create({
   myCardUsername: {
     fontSize: 18,
     fontFamily: "Poppins-SemiBold",
+    paddingRight: 20,
   },
   myCardImage: {
     width: 60,

@@ -84,7 +84,6 @@ const Home: React.FC = () => {
 
   const fetchSlideshow = async () => {
     const response = await getEvent("homeSlide");
-    
 
     const slideshowData = response.map((item: any) => ({
       slug: item.slug,
@@ -182,7 +181,10 @@ const Home: React.FC = () => {
                 resizeMode="cover"
               />
             ) : (
-              <DefaultProfile className="w-12 h-12 object-bottom rounded-full" />
+              <Image
+                source={require("@/assets/icons/person-fill-icon.png")}
+                className="opacity-60 w-12 h-12 object-bottom rounded-full"
+              />
             )}
           </TouchableOpacity>
 

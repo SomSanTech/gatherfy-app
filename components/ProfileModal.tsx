@@ -164,82 +164,39 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             <View className="pb-10">
               {contactData?.userProfile.users_image ? (
                 <View style={styles.modalHeader}>
-                  {contactData?.userProfile.auth_provider === "system" ? (
-                    <ImageBackground
-                      className="w-full h-full"
-                      style={styles.systemImage}
-                      source={{
-                        uri: contactData.userProfile.users_image,
-                      }}
+                  <ImageBackground
+                    className="w-full h-full"
+                    style={styles.systemImage}
+                    source={{
+                      uri: contactData.userProfile.users_image,
+                    }}
+                  >
+                    <LinearGradient
+                      colors={[
+                        "transparent",
+                        "rgba(255,255,255,0)",
+                        "rgba(0,0,0,0.65)",
+                      ]}
+                      locations={
+                        Platform.OS === "android" ? [0, 0.4, 0.85] : [0.5, 0]
+                      }
+                      style={styles.linearBackground}
                     >
-                      <LinearGradient
-                        colors={[
-                          "transparent",
-                          "rgba(255,255,255,0)",
-                          "rgba(0,0,0,0.65)",
-                        ]}
-                        locations={
-                          Platform.OS === "android" ? [0, 0.4, 0.85] : [0.5, 0]
-                        }
-                        style={styles.linearBackground}
+                      <Text
+                        className="text-center text-white text-3xl"
+                        style={styles.text}
                       >
-                        <Text
-                          className="text-center text-white text-3xl"
-                          style={styles.text}
-                        >
-                          {contactData?.userProfile.username}
-                        </Text>
-                        <Text
-                          className="text-center text-white text-xl pb-7"
-                          style={[
-                            styles.text,
-                            { fontFamily: "Poppins-Regular" },
-                          ]}
-                        >
-                          {contactData?.userProfile.users_firstname}{" "}
-                          {contactData?.userProfile.users_lastname}
-                        </Text>
-                      </LinearGradient>
-                    </ImageBackground>
-                  ) : (
-                    contactData?.userProfile.auth_provider === "google" && (
-                      <View style={styles.modalHeader}>
-                        <ImageBackground
-                          className="w-full h-full"
-                          blurRadius={3}
-                          source={{
-                            uri: contactData.userProfile.users_image,
-                          }}
-                        >
-                          <LinearGradient
-                            colors={[
-                              "transparent",
-                              "rgba(255,255,255,0)",
-                              "rgba(0,0,0,0.65)",
-                            ]}
-                            locations={[0.5, 0]}
-                            style={styles.linearBackground}
-                          >
-                            <View style={styles.googleImage}>
-                              <Image
-                                source={{
-                                  uri: contactData.userProfile.users_image,
-                                }}
-                                className="w-36 h-36 rounded-full mb-5"
-                              />
-                              <Text className="text-center text-white text-3xl font-Poppins-SemiBold">
-                                {contactData?.userProfile.username}
-                              </Text>
-                              <Text className="text-center text-white text-xl pb-7">
-                                {contactData?.userProfile.users_firstname}{" "}
-                                {contactData?.userProfile.users_lastname}
-                              </Text>
-                            </View>
-                          </LinearGradient>
-                        </ImageBackground>
-                      </View>
-                    )
-                  )}
+                        {contactData?.userProfile.username}
+                      </Text>
+                      <Text
+                        className="text-center text-white text-xl pb-7"
+                        style={[styles.text, { fontFamily: "Poppins-Regular" }]}
+                      >
+                        {contactData?.userProfile.users_firstname}{" "}
+                        {contactData?.userProfile.users_lastname}
+                      </Text>
+                    </LinearGradient>
+                  </ImageBackground>
                 </View>
               ) : (
                 contactData?.userProfile.users_image === null && (

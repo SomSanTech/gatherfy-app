@@ -1,7 +1,16 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { Platform } from "react-native";
+import {
+  Alert,
+  Modal,
+  Platform,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+  Text,
+  StyleSheet,
+} from "react-native";
 import dayjs from "dayjs";
 import { jwtDecode } from "jwt-decode";
 import Constants from "expo-constants";
@@ -13,6 +22,13 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 import * as jose from "jose";
+
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+
+import { Colors } from "@/constants/Colors";
 
 import { useNavigation } from "@react-navigation/native";
 
@@ -111,45 +127,6 @@ export const AuthProvider = ({ children }: any) => {
 
     loadToken();
 
-    // Setup axios interceptor
-    // const interceptor = axios.interceptors.response.use(
-    //   (response) => response,
-    //   async (error) => {
-    //     console.log("🚨 Interceptor triggered:", error.response); // Debugging
-
-    //     if (error.response?.status === 401) {
-    //       // Unauthorized
-    //       console.log("🔄 Token expired, trying to refresh...");
-
-    //       try {
-    //         const refreshToken = await SecureStore.getItemAsync(
-    //           "refresh-token"
-    //         );
-    //         console.log("🔑 Stored refreshToken:", refreshToken); // Debugging
-
-    //         if (!refreshToken) throw new Error("No refresh token");
-
-    //         const res = await axios.post(`${API_URL}/api/v1/refresh`, {
-    //           refreshToken,
-    //         });
-    //         console.log("✅ Token refreshed:", res.data.accessToken); // Debugging
-
-    //         const newToken = res.data.accessToken;
-
-    //         await SecureStore.setItemAsync(TOKEN_KEY, newToken);
-    //         axios.defaults.headers.common[
-    //           "Authorization"
-    //         ] = `Bearer ${newToken}`;
-
-    //         return axios(error.config); // Retry the original request
-    //       } catch (refreshError) {
-    //         console.error("❌ Failed to refresh token:", refreshError);
-    //         logout();
-    //       }
-    //     }
-    //     return Promise.reject(error);
-    //   }
-    // );
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
@@ -382,97 +359,354 @@ export const AuthProvider = ({ children }: any) => {
     profileImageSize: 150,
   });
 
-  const loginWithGoogle = async () => {
-    console.log("Login with Google", process.env.EXPO_PUBLIC_WEB_CLIENT_ID ,    process.env.EXPO_PUBLIC_IOS_CLIENT_ID);
+  const handleGoogleLoginWithToken = async (responseIdToken: string) => {
+    const decodedToken = jose.decodeJwt(responseIdToken);
+    const expiredGoogleToken = decodedToken.exp
+      ? decodedToken.exp * 1000 < Date.now()
+      : true;
+
+    if (expiredGoogleToken) {
+      console.log("Google token expired");
+      return;
+    }
 
     try {
-      await GoogleSignin.hasPlayServices({
-        showPlayServicesUpdateDialog: true,
+      const result = await axios.post(
+        `${API_URL}/api/v1/login/google`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${responseIdToken}`,
+          },
+        }
+      );
+
+      const profileResponse = await axios.get(`${API_URL}/api/v1/profile`, {
+        headers: {
+          Authorization: `Bearer ${result.data.accessToken}`,
+        },
       });
-      await GoogleSignin.signOut();
-      const response = await GoogleSignin.signIn();
-      if (isSuccessResponse(response)) {
-        const responseIdToken = response.data.idToken;
 
+      const userProfile = profileResponse.data;
 
-        if (responseIdToken) {
-          const decodedToken = jose.decodeJwt(responseIdToken);
-          const expiredGoogleToken = decodedToken.exp
-            ? decodedToken.exp * 1000 < Date.now()
-            : true;
-          if (expiredGoogleToken) {
-            console.log("Google token expired");
-            return;
-          } else {
-            const result = await axios.post(
-              `${API_URL}/api/v1/login/google`,
-              {},
-              {
-                headers: {
-                  Authorization: `Bearer ${responseIdToken}`,
-                },
-              }
-            );
+      await SecureStore.setItemAsync(TOKEN_KEY, result.data.accessToken);
+      await SecureStore.setItemAsync(
+        Refresh_TOKEN_KEY,
+        result.data.refreshToken
+      );
+      await SecureStore.setItemAsync(
+        isVerifiedStorage,
+        JSON.stringify(userProfile.is_verified)
+      );
 
-            if (result.status !== 200) {
-              console.error("Login failed");
-              return;
-            } else {
-              // Fetch user profile after successful login
-              const profileResponse = await axios.get(
-                `${API_URL}/api/v1/profile`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${result.data.accessToken}`,
-                  },
-                }
-              );
-
-              // Assuming the API returns user data in the response
-              const userProfile = profileResponse.data;
-
-              await SecureStore.setItemAsync(
-                TOKEN_KEY,
-                result.data.accessToken
-              );
-              await SecureStore.setItemAsync(
-                Refresh_TOKEN_KEY,
-                result.data.refreshToken
-              );
-              await SecureStore.setItemAsync(
-                isVerifiedStorage,
-                JSON.stringify(userProfile.is_verified)
-              );
-
-              setAuthState({
-                token: result.data.accessToken,
-                authenticated: true,
-                verifyEmail: userProfile.is_verified,
-              });
-            }
-          }
-        } else {
-          console.error("Google Sign-In responseIdToken is null");
-        }
-      }
+      setAuthState({
+        token: result.data.accessToken,
+        authenticated: true,
+        verifyEmail: userProfile.is_verified,
+      });
     } catch (error) {
-      if (isErrorWithCode(error)) {
-        switch (error.code) {
-          case statusCodes.SIGN_IN_CANCELLED:
-            console.log("User cancelled the login flow");
-            break;
-          case statusCodes.IN_PROGRESS:
-            console.log("Sign-in is in progress");
-            break;
-          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-            console.log("Play services not available or outdated");
-            break;
-          default:
-            console.log("Unknown error:", error);
-        }
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.log("Google token not registered");
+        setCachedToken(responseIdToken);
+        openRoleModal(); 
       } else {
-        console.log("Error during Google Sign-In:", error);
+        throw error;
       }
+    }
+  };
+
+  // const loginWithGoogle = async () => {
+  //   console.log(
+  //     "Login with Google",
+  //     process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+  //     process.env.EXPO_PUBLIC_IOS_CLIENT_ID
+  //   );
+
+  //   // try {
+  //   //   await GoogleSignin.hasPlayServices({
+  //   //     showPlayServicesUpdateDialog: true,
+  //   //   });
+  //   //   await GoogleSignin.signOut();
+  //   //   const response = await GoogleSignin.signIn();
+  //   //   if (isSuccessResponse(response)) {
+  //   //     const responseIdToken = response.data.idToken;
+
+  //   //     if (responseIdToken) {
+  //   //       const decodedToken = jose.decodeJwt(responseIdToken);
+  //   //       const expiredGoogleToken = decodedToken.exp
+  //   //         ? decodedToken.exp * 1000 < Date.now()
+  //   //         : true;
+  //   //       if (expiredGoogleToken) {
+  //   //         console.log("Google token expired");
+  //   //         return;
+  //   //       } else {
+  //   //         const result = await axios.post(
+  //   //           `${API_URL}/api/v1/login/google`,
+  //   //           {},
+  //   //           {
+  //   //             headers: {
+  //   //               Authorization: `Bearer ${responseIdToken}`,
+  //   //             },
+  //   //             validateStatus: () => true
+  //   //           }
+  //   //         );
+
+  //   //         console.log(result.status);
+
+  //   //         if (result.status !== 200) {
+  //   //           console.error("Login failed");
+  //   //           return;
+  //   //         } else {
+  //   //           // Fetch user profile after successful login
+  //   //           const profileResponse = await axios.get(
+  //   //             `${API_URL}/api/v1/profile`,
+  //   //             {
+  //   //               headers: {
+  //   //                 Authorization: `Bearer ${result.data.accessToken}`,
+  //   //               },
+  //   //             }
+  //   //           );
+
+  //   //           // Assuming the API returns user data in the response
+  //   //           const userProfile = profileResponse.data;
+
+  //   //           await SecureStore.setItemAsync(
+  //   //             TOKEN_KEY,
+  //   //             result.data.accessToken
+  //   //           );
+  //   //           await SecureStore.setItemAsync(
+  //   //             Refresh_TOKEN_KEY,
+  //   //             result.data.refreshToken
+  //   //           );
+  //   //           await SecureStore.setItemAsync(
+  //   //             isVerifiedStorage,
+  //   //             JSON.stringify(userProfile.is_verified)
+  //   //           );
+
+  //   //           setAuthState({
+  //   //             token: result.data.accessToken,
+  //   //             authenticated: true,
+  //   //             verifyEmail: userProfile.is_verified,
+  //   //           });
+  //   //         }
+  //   //       }
+  //   //     } else {
+  //   //       console.error("Google Sign-In responseIdToken is null");
+  //   //     }
+  //   //   }
+  //   // } catch (error) {
+  //   //   if (isErrorWithCode(error)) {
+  //   //     switch (error.code) {
+  //   //       case statusCodes.SIGN_IN_CANCELLED:
+  //   //         console.log("User cancelled the login flow");
+  //   //         break;
+  //   //       case statusCodes.IN_PROGRESS:
+  //   //         console.log("Sign-in is in progress");
+  //   //         break;
+  //   //       case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+  //   //         console.log("Play services not available or outdated");
+  //   //         break;
+  //   //       default:
+  //   //         console.log("Unknown error:", error);
+  //   //     }
+  //   //   } else {
+  //   //     console.log("Error during Google Sign-In:", error);
+  //   //   }
+  //   // }
+  //   const response = await GoogleSignin.signIn();
+  //   if (!response.data) {
+  //     console.error("Google Sign-In response data is null");
+  //     return;
+  //   }
+  //   const responseIdToken = response.data.idToken;
+
+  //   console.log("Login with Google responseIdToken", responseIdToken);
+
+  //   try {
+  //     if (!isSuccessResponse(response)) return;
+
+  //     if (!responseIdToken) {
+  //       console.error("Google Sign-In responseIdToken is null");
+  //       return;
+  //     }
+
+  //     const decodedToken = jose.decodeJwt(responseIdToken);
+  //     const expiredGoogleToken = decodedToken.exp
+  //       ? decodedToken.exp * 1000 < Date.now()
+  //       : true;
+
+  //     if (expiredGoogleToken) {
+  //       console.log("Google token expired");
+  //       return;
+  //     }
+
+  //     // 👇 โยน error ถ้ามี status ที่ไม่ใช่ 2xx
+  //     const result = await axios.post(
+  //       `${API_URL}/api/v1/login/google`,
+  //       {},
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${responseIdToken}`,
+  //         },
+  //       }
+  //     );
+
+  //     // ถ้าไม่ throw error ก็คือ 2xx แล้ว
+  //     const profileResponse = await axios.get(`${API_URL}/api/v1/profile`, {
+  //       headers: {
+  //         Authorization: `Bearer ${result.data.accessToken}`,
+  //       },
+  //     });
+
+  //     const userProfile = profileResponse.data;
+
+  //     await SecureStore.setItemAsync(TOKEN_KEY, result.data.accessToken);
+  //     await SecureStore.setItemAsync(
+  //       Refresh_TOKEN_KEY,
+  //       result.data.refreshToken
+  //     );
+  //     await SecureStore.setItemAsync(
+  //       isVerifiedStorage,
+  //       JSON.stringify(userProfile.is_verified)
+  //     );
+
+  //     setAuthState({
+  //       token: result.data.accessToken,
+  //       authenticated: true,
+  //       verifyEmail: userProfile.is_verified,
+  //     });
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error)) {
+  //       const status = error.response?.status;
+  //       const data = error.response?.data;
+
+  //       if (status === 401) {
+  //         console.log("Unauthorized - Invalid Google token");
+
+  //         const registerGoogle = await axios.post(
+  //           `${API_URL}/api/v1/signup/google`,
+  //           {
+  //             "token": responseIdToken,
+  //             "role": "organizer",
+  //           },
+  //           {
+  //             validateStatus: () => true,
+  //           }
+  //         );
+
+  //         console.log(registerGoogle.status,"sadoakdoks");
+
+  //         if (registerGoogle.status === 200) {
+  //           // const userProfile = registerGoogle.data;
+
+  //           // await SecureStore.setItemAsync(
+  //           //   isVerifiedStorage,
+  //           //   JSON.stringify(userProfile.is_verified)
+  //           // );
+
+  //           // setAuthState({
+  //           //   token: registerGoogle.data.accessToken,
+  //           //   authenticated: true,
+  //           //   verifyEmail: userProfile.is_verified,
+  //           // });
+
+  //           alert(
+  //             "Please verify your email to complete the registration process."
+  //           );
+  //         }
+  //       } else if (status === 500) {
+  //         console.log("Server error");
+  //       } else {
+  //         console.log("Axios error:", status, data);
+  //       }
+  //     } else if (isErrorWithCode(error)) {
+  //       switch (error.code) {
+  //         case statusCodes.SIGN_IN_CANCELLED:
+  //           console.log("User cancelled the login flow");
+  //           break;
+  //         case statusCodes.IN_PROGRESS:
+  //           console.log("Sign-in is in progress");
+  //           break;
+  //         case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+  //           console.log("Play services not available or outdated");
+  //           break;
+  //         default:
+  //           console.log("Unknown sign-in error:", error);
+  //       }
+  //     } else {
+  //       console.log("Unexpected error during Google Sign-In:", error);
+  //     }
+  //   }
+  // };
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<
+    "Attendee" | "Organizer" | null
+  >(null);
+  const [cachedToken, setCachedToken] = useState<string | null>(null);
+
+  const openRoleModal = () => setModalVisible(true);
+
+  const registerGoogleUser = async (token: string, role: string) => {
+    const registerGoogle = await axios.post(
+      `${API_URL}/api/v1/signup/google`,
+      { token, role },
+      { validateStatus: () => true }
+    );
+
+    if (registerGoogle.status === 200) {
+      Alert.alert("Success", "Registered successfully", [
+        {
+          text: "OK",
+          onPress: async () => {
+            try {
+              await handleGoogleLoginWithToken(token);
+            } catch (e) {
+              console.error("Login failed after register:", e);
+            }
+          },
+        },
+      ]);
+    }
+  };
+
+  const setRoleFromUI = (role: "Attendee" | "Organizer") => {
+    setSelectedRole(role);
+    setModalVisible(false);
+    if (cachedToken) {
+      registerGoogleUser(cachedToken, role);
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    console.log(
+      "Login with Google",
+      process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+      process.env.EXPO_PUBLIC_IOS_CLIENT_ID
+    );
+
+    await GoogleSignin.hasPlayServices({
+      showPlayServicesUpdateDialog: true,
+    });
+   
+    await GoogleSignin.signOut();
+    const response = await GoogleSignin.signIn();
+
+    if (!isSuccessResponse(response)) return;
+
+    const { idToken } = await GoogleSignin.getTokens();
+    await GoogleSignin.clearCachedAccessToken(idToken); 
+
+
+    if (!idToken) {
+      console.error("Google Sign-In responseIdToken is null");
+      return;
+    }
+
+    try {
+      await handleGoogleLoginWithToken(idToken);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -520,5 +754,79 @@ export const AuthProvider = ({ children }: any) => {
     authState,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+      <Modal transparent={true} visible={modalVisible} animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Choose an option</Text>
+              <View style={styles.modalContentList}>
+                <TouchableOpacity
+                  style={styles.optionButton}
+                  onPress={() => setRoleFromUI("Attendee")}
+                >
+                  <Text style={styles.optionText}>Attendee</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.optionButton}
+                  onPress={() => setRoleFromUI("Organizer")}
+                >
+                  <Text style={styles.optionText}>Organizer</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    </AuthContext.Provider>
+  );
 };
+
+const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    padding: 8,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    paddingBottom: 10,
+    borderRadius: 15,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: "Poppins-Bold",
+    includeFontPadding: false,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  modalContentList: {
+    flexDirection: "row", // จัดเรียงปุ่มในแนวนอน
+    justifyContent: "space-around", // จัดระยะห่างระหว่างปุ่ม
+    width: "100%",
+    borderBottomColor: "#ccc",
+    marginBottom: 10,
+  },
+  optionButton: {
+    padding: 30,
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    flex: 1, // ใช้ flex เพื่อให้ปุ่มขยายได้
+    marginHorizontal: 5, // ให้มีช่องว่างระหว่างปุ่ม
+    marginTop: 10, // ให้มีช่องว่างระหว่างปุ่ม
+    justifyContent: "center", // จัดให้ข้อความอยู่ตรงกลาง
+  },
+  optionText: {
+    fontSize: 16,
+    textAlign: "center",
+    fontFamily: "Poppins-Regular",
+    includeFontPadding: false,
+  },
+});
