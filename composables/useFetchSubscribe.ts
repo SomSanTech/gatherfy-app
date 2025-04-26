@@ -47,9 +47,6 @@ export const saveSubscribe = async (
     let urlToFetch = `${API_BASE_URL}${url}`;
 
     if (method === "POST") {
-      console.log(token);
-      console.log("url" + urlToFetch);
-      console.log("tagId: " + tagId);
 
       const response = await fetch(urlToFetch, {
         method: method,
@@ -67,7 +64,6 @@ export const saveSubscribe = async (
 
       return await response.json();
     } else if (method === "DELETE") {
-      console.log(urlToFetch);
 
       const response = await fetch(urlToFetch, {
         method: method,

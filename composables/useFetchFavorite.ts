@@ -21,11 +21,6 @@ export const fetchFavortite = async (token: any) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    let errorMessage = "Error during registration. Please try again."; // ข้อความ error เริ่มต้น
-    // console.log("✅ Url:", urlToFetch);
-    // console.log("✅ Token:", token);
-    // console.log("✅ Request Headers:", [...response.headers.entries()]);
-    // console.log("✅ Status:", response.status);
     if (!response.ok) {
       console.error(`Error: ${response.status} - ${response.statusText}`);
       return `Error: ${response.status} - ${response.statusText}`;
@@ -45,7 +40,6 @@ export const addFavortite = async (token: any, body: any) => {
     }
 
     let url = `${API_BASE_URL}/api/v1/favorites`;
-    console.log(url)
 
     const response = await fetch(url, {
       method: "POST",
@@ -80,7 +74,6 @@ export const removeFavortite = async (token: any, favoriteId: any) => {
     }
 
     let url = `${API_BASE_URL}/api/v1/favorites/${favoriteId}`;
-    console.log(url)
 
     const response = await fetch(url, {
       method: "DELETE",

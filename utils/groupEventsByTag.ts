@@ -35,8 +35,6 @@ const groupEventsByTag = (events: any[] = []) => {  // เพิ่มค่า 
         }
       })
     });
-    console.log("group by tags" + grouped)
-    // จัดเรียงวันที่ และจำกัดไว้แค่ 3 วัน
 
     return grouped
 };

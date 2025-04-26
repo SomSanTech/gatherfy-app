@@ -1,26 +1,24 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-} from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import * as NavigationBar from "expo-navigation-bar";
+
 interface SortingDropdownProps {
   sorting: (value: string) => void;
+  value: string;
 }
 
-const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
+const SortingDropdown = ({ sorting, value }: SortingDropdownProps) => {
   const [selectedSort, setSelectedSort] = useState<string | null>(null);
 
-  const handleSortChange = (value: string) => {
-    setSelectedSort(value);
-    sorting(value); // Trigger sorting function
+  const handleSortChange = (newValue: string) => {
+    setSelectedSort(newValue);
+    sorting(newValue); // Trigger sorting function
   };
 
-  const handleClear = () => {
-    setSelectedSort(null); // Clear the selected value
-    sorting(""); // Pass an empty value to the sorting function
-  };
+  useEffect(() => {
+    // Whenever parent value changes, update local state too
+    setSelectedSort(value);
+  }, [value]);
 
   const sortingOptions = [
     { label: "Relevance", value: "" },
@@ -29,23 +27,6 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
     { label: "A-Z", value: "name_asc" },
     { label: "Z-A", value: "name_desc" },
   ];
-
-  useEffect(() => {
-    async function configureNavigationBar() {
-      try {
-        // ตั้งค่าพื้นหลังโปร่งใส
-        await NavigationBar.setBackgroundColorAsync("#ffffffcc");
-        // ตั้งค่าให้ปุ่มใน Navigation Bar เป็นสีอ่อน (หากพื้นหลังเป็นสีเข้ม)
-        await NavigationBar.setButtonStyleAsync("dark");
-        NavigationBar.setBorderColorAsync("#ffffff");
-        setSelectedSort("")
-      } catch (error) {
-        console.error("Error configuring Navigation Bar:", error);
-      }
-    }
-
-    configureNavigationBar();
-  }, []);
 
   return (
     <View style={styles.sortingWrapper}>
@@ -62,24 +43,28 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
           lineHeight: 30,
           marginTop: 2,
           includeFontPadding: false,
-        }} // เปลี่ยนฟอนต์ของ placeholder
+        }}
         selectedTextStyle={{
           color: "black",
           marginTop: 2,
           includeFontPadding: false,
-          paddingHorizontal: 4
+          paddingHorizontal: 4,
         }}
         itemTextStyle={{
           color: "black",
           lineHeight: 17,
           marginTop: 2,
           includeFontPadding: false,
-          fontSize: 16
+          fontSize: 16,
         }}
         itemContainerStyle={{ backgroundColor: "white" }}
         value={selectedSort}
         fontFamily="Poppins-Regular"
-        containerStyle={{ borderRadius: 10, maxHeight: 220, overflow: "hidden" }}
+        containerStyle={{
+          borderRadius: 10,
+          maxHeight: 220,
+          overflow: "hidden",
+        }}
         onChange={(item) => handleSortChange(item.value)}
       />
     </View>
@@ -145,7 +130,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     backgroundColor: "white",
-    width: "100%"
+    width: "100%",
   },
 });
 

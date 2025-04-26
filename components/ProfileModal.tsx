@@ -133,7 +133,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         "DELETE"
       );
       if (response === 200) {
-        console.log("response: " + response);
         setIsDeleteModalOpen(false);
         setDeleteContact(null);
         handleClose();
@@ -178,7 +177,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                         "rgba(0,0,0,0.65)",
                       ]}
                       locations={
-                        Platform.OS === "android" ? [0, 0.4, 0.85] : [0.5, 0]
+                        Platform.OS === "android" ? [0, 0.4, 0.85] : [0.5, 0, 1]
                       }
                       style={styles.linearBackground}
                     >
@@ -207,7 +206,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                         "rgba(255,255,255,0)",
                         "rgba(0,0,0,0.5)",
                       ]}
-                      locations={[0.4, 0.4]}
+                      locations={[0.4, 0.4 ,1]}
                       style={styles.linearBackground}
                     >
                       <View style={styles.googleImage}>

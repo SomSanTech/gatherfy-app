@@ -17,6 +17,7 @@ import {
   fetchSubscribed,
   saveSubscribe,
 } from "@/composables/useFetchSubscribe";
+import Loader from "@/components/Loader";
 
 interface EventDetailProps {
   route: any; // Adjust the type as needed
@@ -27,7 +28,7 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
   const { tagId } = route.params;
   const navigation = useNavigation();
   const [events, setEvents] = useState([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [subscribed, setSubscribed] = useState<boolean>(false);
 
   const fetchEventData = async () => {
@@ -40,16 +41,13 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
       undefined
     );
     setEvents(data); // Update events after filtering
-    // setIsLoading(false);
   };
 
   const loadSubscribed = async () => {
     const token = await SecureStore.getItemAsync("my-jwt");
     const responseSub = await fetchSubscribed(token, "GET");
-    console.log(responseSub); // ตรวจสอบค่าที่ได้
 
     const subscribedList = responseSub.tagId; // [1, 6]
-    console.log(subscribedList);
 
     if (subscribedList.includes(Number(tagId))) {
       setSubscribed(true);
@@ -67,23 +65,37 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
 
   const saveSubscription = async (tagId: number) => {
     const token = await SecureStore.getItemAsync("my-jwt");
-    const responseSub = await saveSubscribe(token, "POST", `/api/v1/subscribe`, tagId);
-    console.log("response sub post"+responseSub);
+    const responseSub = await saveSubscribe(
+      token,
+      "POST",
+      `/api/v1/subscribe`,
+      tagId
+    );
   };
 
   const deleteSubscription = async (tagId: number) => {
     const token = await SecureStore.getItemAsync("my-jwt");
-    const responseSub = await saveSubscribe(token, "DELETE",`/api/v1/subscribe/${tagId}`);
-    console.log("response sub delete"+responseSub);
+    const responseSub = await saveSubscribe(
+      token,
+      "DELETE",
+      `/api/v1/subscribe/${tagId}`
+    );
+    console.log("response sub delete" + responseSub);
   };
 
+
   useEffect(() => {
-    try{
-      loadSubscribed();
-      fetchEventData();
-    }finally{
-      setIsLoading(false);
-    }
+    const load = async () => {
+      setIsLoading(true);
+      try {
+        await fetchEventData();
+        await loadSubscribed();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    load();
   }, []);
 
   return (
@@ -91,7 +103,10 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
       <View className=" px-4 py-4 space-y-3" style={styles.headerContainer}>
         <View className="items-center justify-between flex-row">
           <View className="flex-row items-center">
-            <TouchableOpacity onPress={() => navigation.goBack()} className="flex-row items-center">
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              className="flex-row items-center"
+            >
               <Icon name="chevron-back" size={26} color="#000000" />
               <Text
                 className="text-xl font-Poppins-SemiBold text-center ml-3"
@@ -126,9 +141,7 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
         </View>
       </View>
       {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading...</Text>
-        </View>
+        <Loader />
       ) : (
         <View className="mx-3 p-0" style={{ flex: 1 }}>
           <EventCard events={events} page="tag" />
@@ -153,6 +166,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 21,
+    includeFontPadding: false,
   },
   subscribeButton: {
     flexDirection: "row",

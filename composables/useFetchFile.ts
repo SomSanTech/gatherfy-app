@@ -66,9 +66,7 @@ export const useFetchDelete = async (url: string, token: any) => {
       }
   
       let urlToFetch = `${API_BASE_URL}/api/${url}`;
-  
-      console.log("Token:", token);
-      console.log("URL:", urlToFetch);
+
   
       const response = await fetch(urlToFetch, {
         method: "DELETE",

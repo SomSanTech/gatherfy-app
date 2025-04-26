@@ -19,9 +19,6 @@
       "android": {
         "buildType": "apk"
       },
-      "env": {
-        "ENVFILE": ".env"
-      },
       "environment": "production"
     }
   },

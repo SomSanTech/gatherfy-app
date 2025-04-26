@@ -37,6 +37,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "@/app/context/AuthContext";
 import { useFetchDelete, useFetchUpload } from "@/composables/useFetchFile";
 import { Colors } from "@/constants/Colors";
+import { ActivityIndicator } from "react-native-paper";
 
 const EditProfile = () => {
   const { updateProfile } = useAuth();
@@ -48,6 +49,7 @@ const EditProfile = () => {
   const [email, setEmail] = useState("");
   const [userInfo, setUserInfo] = useState<any>({});
   const [phone, setPhone] = useState("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [open, setOpen] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -63,6 +65,7 @@ const EditProfile = () => {
 
   const loadUserProfile = async () => {
     try {
+      setIsLoading(true);
       const token = await SecureStore.getItemAsync("my-jwt");
       const user = await fetchUserProfile(token, "/v1/profile", "GET");
 
@@ -79,6 +82,7 @@ const EditProfile = () => {
       setDateOfBirth(user.users_birthday || "");
       setEmail(user.users_email || "");
       setUserGender(user.users_gender || "");
+      setIsLoading(false);
     } catch (error) {
       console.error("Failed to load user profile:", error);
       Alert.alert("Error", "Failed to load user profile.");
@@ -106,13 +110,13 @@ const EditProfile = () => {
     if (type === "camera") {
       result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
-        quality: 1,
+        quality: 0.5,
       });
     } else {
       result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
-        quality: 1,
+        quality: 0.5,
       });
     }
 
@@ -124,6 +128,7 @@ const EditProfile = () => {
 
   const handleSaveProfile = async () => {
     try {
+      setIsLoading(true);
       const missingFields = [];
 
       // ตรวจสอบค่าที่จำเป็น
@@ -140,6 +145,7 @@ const EditProfile = () => {
           "Missing Fields",
           `Please fill ${missingFields.join(", ")}`
         );
+        setIsLoading(false);
         return;
       }
 
@@ -159,7 +165,6 @@ const EditProfile = () => {
         // ลบรูปเก่าถ้ามี
         if (currentImage) {
           const currentImageName = currentImage.split("/").pop(); // ดึงชื่อไฟล์จาก URL
-          console.log("Deleting old image:", currentImageName);
           await useFetchDelete(
             `v1/files/delete/${currentImageName}?bucket=profiles`,
             token
@@ -177,6 +182,7 @@ const EditProfile = () => {
         if (!uploadResponse || uploadResponse.error) {
           console.error("Upload failed:", uploadResponse?.error);
           Alert.alert("Upload Failed", "Failed to upload profile image.");
+          setIsLoading(false);
           return;
         }
 
@@ -186,10 +192,9 @@ const EditProfile = () => {
 
       // ส่งข้อมูลไปอัปเดต
       if (updateProfile) {
-        console.log("Updating profile with image filename:", newImageFileName);
-        console.log(selectedImage);
-
         if (selectedImage) {
+          const token = await SecureStore.getItemAsync("my-jwt");
+          console.log(token);
           console.log("with selected");
 
           const result = await updateProfile(
@@ -203,18 +208,26 @@ const EditProfile = () => {
             newImageFileName || "" // ตรวจสอบให้เป็น string เสมอ
           );
           if (result.error) {
-            Alert.alert("Error", result.msg);
+            setIsLoading(false);
+            let errorMessage = "Something went wrong.";
+            if (result.status == 413) {
+              errorMessage =
+                "File size too large. Please select a smaller image.";
+            } else if (result.msg) {
+              errorMessage = result.msg;
+            }
+
+            Alert.alert("Error", errorMessage);
           } else {
             console.log(
               "Profile updated successfully with image:",
               newImageFileName
             );
             Alert.alert("Success", "Profile updated successfully");
-
-            setCurrentImage(newImageFileName); // อัปเดตรูปที่แสดงใน UI
+            setIsLoading(false);
+            setCurrentImage(newImageFileName);
           }
         } else {
-          console.log("without selected");
           const result = await updateProfile(
             username,
             firstname,
@@ -225,9 +238,10 @@ const EditProfile = () => {
             userGender || ""
           );
           if (result.error) {
+            setIsLoading(false);
             Alert.alert("Error", result.msg);
           } else {
-            console.log("Profile updated successfully without image");
+            setIsLoading(false);
             Alert.alert("Success", "Profile updated successfully");
           }
         }
@@ -250,10 +264,18 @@ const EditProfile = () => {
           style={{ flex: 1 }}
         >
           <View style={styles.headerContainer}>
-            <TouchableOpacity onPress={navigateToGoBack}>
+            <TouchableOpacity
+              onPress={navigateToGoBack}
+              className="flex-row items-center"
+            >
               <Icon name="chevron-back" size={26} color="#000000" />
+              <Text
+                className="text-xl font-Poppins-SemiBold text-center ml-3"
+                style={styles.headerText}
+              >
+                Edit Profile
+              </Text>
             </TouchableOpacity>
-            <Text style={styles.headerText}>Edit Profile</Text>
           </View>
           <TouchableWithoutFeedback>
             <ScrollView
@@ -285,7 +307,7 @@ const EditProfile = () => {
                             locations={
                               Platform.OS === "android"
                                 ? [0, 0.4, 0.85]
-                                : [0.5, 0]
+                                : [0.5, 0, 1]
                             }
                             style={styles.linearBackground}
                           ></LinearGradient>
@@ -455,11 +477,7 @@ const EditProfile = () => {
                       </View>
                     </TouchableOpacity>
                   </View>
-                  <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={open}
-                  >
+                  <Modal animationType="fade" transparent={true} visible={open}>
                     <View style={styles.centeredView}>
                       <View style={styles.modalView}>
                         <Datepicker
@@ -494,7 +512,13 @@ const EditProfile = () => {
                             bouncinessOut={0.5}
                             text={gender}
                             isChecked={userGender === gender}
-                            onPress={() => setUserGender(gender)}
+                            onPress={() => {
+                              if (userGender !== gender) {
+                                setUserGender(gender);
+                              } else {
+                                setUserGender("");
+                              }
+                            }}
                             textStyle={{
                               fontFamily: "Poppins-Regular",
                               textDecorationLine: "none",
@@ -522,8 +546,17 @@ const EditProfile = () => {
                 </View>
                 <TouchableOpacity
                   onPress={handleSaveProfile}
-                  className="bg-primary p-3 rounded-lg items-center mb-3"
+                  className={`bg-primary p-3 rounded-lg items-center justify-center flex-row ${
+                    Platform.OS === "ios" ? "mb-7" : "mb-2"
+                  }`}
                 >
+                  {isLoading ? (
+                    <ActivityIndicator
+                      size="small"
+                      color="white"
+                      className="mr-5"
+                    />
+                  ) : null}
                   <Text className="text-white" style={styles.buttonSave}>
                     Save Changes
                   </Text>
@@ -533,7 +566,7 @@ const EditProfile = () => {
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </SafeAreaView>
-      <Modal transparent={true} visible={modalVisible} animationType="slide">
+      <Modal transparent={true} visible={modalVisible} animationType="fade">
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
@@ -744,10 +777,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   headerText: {
+    fontSize: wp(4.2),
     includeFontPadding: false,
-    fontSize: 18,
-    fontFamily: "Poppins-Bold",
-    marginLeft: 10,
   },
   editImageContainer: {
     backgroundColor: "#fff",

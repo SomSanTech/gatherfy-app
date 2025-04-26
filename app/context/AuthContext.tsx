@@ -226,10 +226,6 @@ export const AuthProvider = ({ children }: any) => {
     gender: string,
     image?: string
   ) => {
-    const urlToFetch = `${API_URL}/api/v1/profile`;
-    console.log("urlToFetch", urlToFetch);
-
-    console.log("imagee", image);
 
     try {
       const requestData: any = {
@@ -279,7 +275,7 @@ export const AuthProvider = ({ children }: any) => {
     } catch (err: any) {
       const errorMsg = err?.response?.data?.message || "Error updating profile";
       console.error("Error updating profile:", errorMsg);
-      return { error: true, msg: errorMsg };
+      return { error: false, msg: errorMsg };
     }
   };
 
@@ -415,230 +411,6 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
-  // const loginWithGoogle = async () => {
-  //   console.log(
-  //     "Login with Google",
-  //     process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
-  //     process.env.EXPO_PUBLIC_IOS_CLIENT_ID
-  //   );
-
-  //   // try {
-  //   //   await GoogleSignin.hasPlayServices({
-  //   //     showPlayServicesUpdateDialog: true,
-  //   //   });
-  //   //   await GoogleSignin.signOut();
-  //   //   const response = await GoogleSignin.signIn();
-  //   //   if (isSuccessResponse(response)) {
-  //   //     const responseIdToken = response.data.idToken;
-
-  //   //     if (responseIdToken) {
-  //   //       const decodedToken = jose.decodeJwt(responseIdToken);
-  //   //       const expiredGoogleToken = decodedToken.exp
-  //   //         ? decodedToken.exp * 1000 < Date.now()
-  //   //         : true;
-  //   //       if (expiredGoogleToken) {
-  //   //         console.log("Google token expired");
-  //   //         return;
-  //   //       } else {
-  //   //         const result = await axios.post(
-  //   //           `${API_URL}/api/v1/login/google`,
-  //   //           {},
-  //   //           {
-  //   //             headers: {
-  //   //               Authorization: `Bearer ${responseIdToken}`,
-  //   //             },
-  //   //             validateStatus: () => true
-  //   //           }
-  //   //         );
-
-  //   //         console.log(result.status);
-
-  //   //         if (result.status !== 200) {
-  //   //           console.error("Login failed");
-  //   //           return;
-  //   //         } else {
-  //   //           // Fetch user profile after successful login
-  //   //           const profileResponse = await axios.get(
-  //   //             `${API_URL}/api/v1/profile`,
-  //   //             {
-  //   //               headers: {
-  //   //                 Authorization: `Bearer ${result.data.accessToken}`,
-  //   //               },
-  //   //             }
-  //   //           );
-
-  //   //           // Assuming the API returns user data in the response
-  //   //           const userProfile = profileResponse.data;
-
-  //   //           await SecureStore.setItemAsync(
-  //   //             TOKEN_KEY,
-  //   //             result.data.accessToken
-  //   //           );
-  //   //           await SecureStore.setItemAsync(
-  //   //             Refresh_TOKEN_KEY,
-  //   //             result.data.refreshToken
-  //   //           );
-  //   //           await SecureStore.setItemAsync(
-  //   //             isVerifiedStorage,
-  //   //             JSON.stringify(userProfile.is_verified)
-  //   //           );
-
-  //   //           setAuthState({
-  //   //             token: result.data.accessToken,
-  //   //             authenticated: true,
-  //   //             verifyEmail: userProfile.is_verified,
-  //   //           });
-  //   //         }
-  //   //       }
-  //   //     } else {
-  //   //       console.error("Google Sign-In responseIdToken is null");
-  //   //     }
-  //   //   }
-  //   // } catch (error) {
-  //   //   if (isErrorWithCode(error)) {
-  //   //     switch (error.code) {
-  //   //       case statusCodes.SIGN_IN_CANCELLED:
-  //   //         console.log("User cancelled the login flow");
-  //   //         break;
-  //   //       case statusCodes.IN_PROGRESS:
-  //   //         console.log("Sign-in is in progress");
-  //   //         break;
-  //   //       case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-  //   //         console.log("Play services not available or outdated");
-  //   //         break;
-  //   //       default:
-  //   //         console.log("Unknown error:", error);
-  //   //     }
-  //   //   } else {
-  //   //     console.log("Error during Google Sign-In:", error);
-  //   //   }
-  //   // }
-  //   const response = await GoogleSignin.signIn();
-  //   if (!response.data) {
-  //     console.error("Google Sign-In response data is null");
-  //     return;
-  //   }
-  //   const responseIdToken = response.data.idToken;
-
-  //   console.log("Login with Google responseIdToken", responseIdToken);
-
-  //   try {
-  //     if (!isSuccessResponse(response)) return;
-
-  //     if (!responseIdToken) {
-  //       console.error("Google Sign-In responseIdToken is null");
-  //       return;
-  //     }
-
-  //     const decodedToken = jose.decodeJwt(responseIdToken);
-  //     const expiredGoogleToken = decodedToken.exp
-  //       ? decodedToken.exp * 1000 < Date.now()
-  //       : true;
-
-  //     if (expiredGoogleToken) {
-  //       console.log("Google token expired");
-  //       return;
-  //     }
-
-  //     // 👇 โยน error ถ้ามี status ที่ไม่ใช่ 2xx
-  //     const result = await axios.post(
-  //       `${API_URL}/api/v1/login/google`,
-  //       {},
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${responseIdToken}`,
-  //         },
-  //       }
-  //     );
-
-  //     // ถ้าไม่ throw error ก็คือ 2xx แล้ว
-  //     const profileResponse = await axios.get(`${API_URL}/api/v1/profile`, {
-  //       headers: {
-  //         Authorization: `Bearer ${result.data.accessToken}`,
-  //       },
-  //     });
-
-  //     const userProfile = profileResponse.data;
-
-  //     await SecureStore.setItemAsync(TOKEN_KEY, result.data.accessToken);
-  //     await SecureStore.setItemAsync(
-  //       Refresh_TOKEN_KEY,
-  //       result.data.refreshToken
-  //     );
-  //     await SecureStore.setItemAsync(
-  //       isVerifiedStorage,
-  //       JSON.stringify(userProfile.is_verified)
-  //     );
-
-  //     setAuthState({
-  //       token: result.data.accessToken,
-  //       authenticated: true,
-  //       verifyEmail: userProfile.is_verified,
-  //     });
-  //   } catch (error) {
-  //     if (axios.isAxiosError(error)) {
-  //       const status = error.response?.status;
-  //       const data = error.response?.data;
-
-  //       if (status === 401) {
-  //         console.log("Unauthorized - Invalid Google token");
-
-  //         const registerGoogle = await axios.post(
-  //           `${API_URL}/api/v1/signup/google`,
-  //           {
-  //             "token": responseIdToken,
-  //             "role": "organizer",
-  //           },
-  //           {
-  //             validateStatus: () => true,
-  //           }
-  //         );
-
-  //         console.log(registerGoogle.status,"sadoakdoks");
-
-  //         if (registerGoogle.status === 200) {
-  //           // const userProfile = registerGoogle.data;
-
-  //           // await SecureStore.setItemAsync(
-  //           //   isVerifiedStorage,
-  //           //   JSON.stringify(userProfile.is_verified)
-  //           // );
-
-  //           // setAuthState({
-  //           //   token: registerGoogle.data.accessToken,
-  //           //   authenticated: true,
-  //           //   verifyEmail: userProfile.is_verified,
-  //           // });
-
-  //           alert(
-  //             "Please verify your email to complete the registration process."
-  //           );
-  //         }
-  //       } else if (status === 500) {
-  //         console.log("Server error");
-  //       } else {
-  //         console.log("Axios error:", status, data);
-  //       }
-  //     } else if (isErrorWithCode(error)) {
-  //       switch (error.code) {
-  //         case statusCodes.SIGN_IN_CANCELLED:
-  //           console.log("User cancelled the login flow");
-  //           break;
-  //         case statusCodes.IN_PROGRESS:
-  //           console.log("Sign-in is in progress");
-  //           break;
-  //         case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-  //           console.log("Play services not available or outdated");
-  //           break;
-  //         default:
-  //           console.log("Unknown sign-in error:", error);
-  //       }
-  //     } else {
-  //       console.log("Unexpected error during Google Sign-In:", error);
-  //     }
-  //   }
-  // };
-
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRole, setSelectedRole] = useState<
     "Attendee" | "Organizer" | null
@@ -679,11 +451,6 @@ export const AuthProvider = ({ children }: any) => {
   };
 
   const loginWithGoogle = async () => {
-    console.log(
-      "Login with Google",
-      process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
-      process.env.EXPO_PUBLIC_IOS_CLIENT_ID
-    );
 
     await GoogleSignin.hasPlayServices({
       showPlayServicesUpdateDialog: true,
@@ -783,6 +550,8 @@ export const AuthProvider = ({ children }: any) => {
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;
 
 const styles = StyleSheet.create({
   modalContainer: {

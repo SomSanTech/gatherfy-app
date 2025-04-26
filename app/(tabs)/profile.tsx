@@ -6,13 +6,12 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  Pressable,
+  Modal,
   Alert,
-  StatusBar,
-  StatusBarProps,
+  TouchableWithoutFeedback,
 } from "react-native";
-import { useIsFocused } from "@react-navigation/native";
-
+import { StatusBar } from "expo-status-bar";
+import { Colors } from "@/constants/Colors";
 import { useFocusEffect } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 import { useCameraPermissions } from "expo-camera";
@@ -31,6 +30,8 @@ import useNavigateToEmailNotificationSetting from "@/composables/useNavigateToEm
 import useNavigateToResetPassword from "@/composables/useNavigateToResetPassword";
 import { ScrollView } from "react-native-gesture-handler";
 import CustomButton from "@/components/CustomButton";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { transparent } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 const Profile = () => {
   const navigation = useNavigation<any>();
@@ -39,17 +40,17 @@ const Profile = () => {
   const { navigateToEmailNotificationSetting } =
     useNavigateToEmailNotificationSetting();
   const [permission, requestPermission] = useCameraPermissions();
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const { authState, onLogout } = useAuth();
-
-  function FocusAwareStatusBar(props: StatusBarProps) {
-    const isFocused = useIsFocused();
-
-    return isFocused ? <StatusBar {...props} /> : null;
-  }
+  const { onLogout } = useAuth();
 
   const onLogoutPress = () => {
+    closeLogOutModal();
     onLogout!();
+  };
+
+  const closeLogOutModal = () => {
+    setModalVisible(false);
   };
 
   const loadUserProfile = async () => {
@@ -86,10 +87,7 @@ const Profile = () => {
 
   return (
     <Fragment>
-      <FocusAwareStatusBar
-        barStyle="dark-content"
-        backgroundColor="transparent"
-      />
+      <StatusBar backgroundColor="transparent" style="dark" />
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
         <ScrollView
           className="bg-white"
@@ -225,20 +223,21 @@ const Profile = () => {
               </View>
             )}
           </View>
-
           <View>
             <CustomButton
               title="Logout"
-              handlePress={onLogoutPress}
+              handlePress={() => setModalVisible(true)}
               containerStyles={{
-                backgroundColor: "#002642",
+                backgroundColor: "transparent",
+                borderWidth: 1,
+                borderColor: Colors.primary,
                 width: 200,
                 alignSelf: "center",
                 marginTop: 10,
                 marginBottom: 20,
               }}
               textStyle={{
-                color: "white",
+                color: Colors.primary,
                 fontFamily: "Poppins-Bold",
                 fontSize: wp("4%"),
               }}
@@ -249,13 +248,46 @@ const Profile = () => {
                   name="log-out-outline"
                   size={20}
                   color="white"
-                  style={{ marginRight: 10 }}
+                  style={{ marginRight: 10, color: Colors.primary }}
                 />
               }
             />
           </View>
         </ScrollView>
       </SafeAreaView>
+      <Modal transparent={true} visible={modalVisible} animationType="fade">
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <View className="pt-10 pb-5 items-center justify-between">
+                <Ionicons
+                  name="log-out-outline"
+                  size={40}
+                  style={{ marginBottom: 20 }}
+                />
+                <Text style={styles.modalTitle}>Logout</Text>
+                <Text style={styles.modalDescriptionText}>
+                  Are you sure you want to log out?
+                </Text>
+              </View>
+              <View style={styles.modalContentList}>
+                <TouchableOpacity
+                  style={styles.optionButton}
+                  onPress={onLogoutPress}
+                >
+                  <Text style={styles.optionText}>Logout</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.optionCancelButton}
+                  onPress={closeLogOutModal}
+                >
+                  <Text style={styles.cancelText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </Fragment>
   );
 };
@@ -308,6 +340,167 @@ const styles = StyleSheet.create({
     fontSize: wp("4%"),
     fontFamily: "Poppins-Regular",
     textAlign: "left",
+    includeFontPadding: false,
+  },
+
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    width: wp("95%"), // กำหนดความกว้างเป็น 90% ของหน้าจอ
+    height: hp("55%"), // กำหนดความสูงเป็น 50% ของหน้าจอ
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  dateContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: wp("52%"),
+  },
+  IconContainer: {
+    width: wp("10%"),
+    includeFontPadding: false,
+    alignItems: "center",
+  },
+  closeButtonModal: {
+    fontSize: wp("3.5%"), // ขนาด font เป็น 4% ของหน้าจอ
+    color: "#000000",
+    fontFamily: "Poppins-Bold",
+  },
+  checkboxWrapper: {
+    marginTop: wp(2),
+    flex: 2.5,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  checkboxContainer: {
+    width: wp("30%"), // ทำให้มี 2 อันต่อแถว (แบ่งพื้นที่ 48% ของแต่ละอัน)
+    marginBottom: 18,
+    borderWidth: 0,
+  },
+  socialMediaContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 15,
+    borderRadius: 10,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "#A9A9A9",
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#ffffff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  headerText: {
+    includeFontPadding: false,
+    fontSize: 18,
+    fontFamily: "Poppins-Bold",
+    marginLeft: 10,
+  },
+  editImageContainer: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 25,
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    zIndex: 10, // เพื่อให้แน่ใจว่าอยู่เหนือภาพ
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  modalContainer: {
+    flex: 1,
+    padding: 8,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    paddingHorizontal: 10,
+    paddingBottom: 15,
+    borderRadius: 15,
+  },
+  modalTitle: {
+    fontSize: wp("6.5%"),
+    fontFamily: "Poppins-Bold",
+    includeFontPadding: false,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  modalDescriptionText: {
+    fontSize: wp("3.5%"),
+    fontFamily: "Poppins-Regular",
+    includeFontPadding: false,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  modalContentList: {
+    flexDirection: "row", // จัดเรียงปุ่มในแนวนอน
+    justifyContent: "space-around", // จัดระยะห่างระหว่างปุ่ม
+    width: "100%",
+    paddingHorizontal: 10,
+    borderBottomColor: "#ccc",
+    marginBottom: 10,
+  },
+  optionButtonContainer: {
+    flexDirection: "row", // จัดเรียงปุ่มในแนวนอน
+    justifyContent: "space-around", // จัดระยะห่างระหว่างปุ่ม
+    width: "100%", // ให้ container กว้าง 100% ของหน้าจอ
+  },
+  optionCancelButton: {
+    padding: 15,
+    alignItems: "center",
+    borderColor: "#ccc",
+    borderRadius: 10,
+    flex: 1, // ใช้ flex เพื่อให้ปุ่มขยายได้
+    marginHorizontal: 5, // ให้มีช่องว่างระหว่างปุ่ม
+    marginTop: 10, // ให้มีช่องว่างระหว่างปุ่ม
+    justifyContent: "center", // จัดให้ข้อความอยู่ตรงกลาง
+  },
+  optionButton: {
+    padding: 15,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    flex: 1, // ใช้ flex เพื่อให้ปุ่มขยายได้
+    marginHorizontal: 5, // ให้มีช่องว่างระหว่างปุ่ม
+    marginTop: 10, // ให้มีช่องว่างระหว่างปุ่ม
+    justifyContent: "center", // จัดให้ข้อความอยู่ตรงกลาง
+  },
+  cancelText: {
+    fontSize: 16,
+    textAlign: "center",
+    fontFamily: "Poppins-Regular",
+    includeFontPadding: false,
+  },
+  optionText: {
+    fontSize: 16,
+    color: Colors.white,
+    fontFamily: "Poppins-Regular",
     includeFontPadding: false,
   },
 });

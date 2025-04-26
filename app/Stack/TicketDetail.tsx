@@ -98,7 +98,7 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ route }) => {
       } 
       
       await setQrToken(qrResponse.qrToken);
-      console.log("QR Token: ", qrResponse.qrToken);
+
       
     } catch (error) {
       setError("Failed to generate QR code");

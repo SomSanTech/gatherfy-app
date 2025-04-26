@@ -121,7 +121,6 @@ const ResetPassword = () => {
       return;
     }
 
-    console.log("response", response);
 
     if (response.message === "Password updated successfully!") {
       Alert.alert("Success", response.message); // แสดงข้อความสำเร็จจาก backend

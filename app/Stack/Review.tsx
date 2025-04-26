@@ -126,7 +126,6 @@ const Review: React.FC<ReviewProps> = ({ route }) => {
         feedbackComment: answers[question.length - 1] || "",
       };
 
-      console.log("Sending defaultFeedback:", defaultFeedback);
 
       const urlDefault = `/api/v2/feedbacks`;
       const defaultResponse = await sendQuestionReview(
@@ -160,13 +159,8 @@ const Review: React.FC<ReviewProps> = ({ route }) => {
         .filter((q) => q.answerText !== "");
 
       if (customQuestions.length > 0) {
-        console.log("Sending customQuestions individually:", customQuestions);
 
         for (const question of customQuestions) {
-          console.log(
-            "Sending request body:",
-            JSON.stringify(customQuestions, null, 2)
-          );
 
           const urlCustom = `/api/v2/answers`;
           const customResponse = await sendQuestionReview(

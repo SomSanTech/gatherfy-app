@@ -28,15 +28,8 @@ type PopupProps = {
   startTime?: string;
   endTime?: string;
   eventId: string;
-  user: {
-    users_id: number;
-    username: string;
-    users_email: string;
-    password: string;
-  };
   setConfirmRegister: (value: boolean) => void;
-  registrationDateList: { label: string; value: string }[];
-  defaultValue: { label: string; value: string }
+  registrationDateList: { label: string, value: string; status: string }[];
 };
 
 const Popup: React.FC<PopupProps> = ({
@@ -49,30 +42,18 @@ const Popup: React.FC<PopupProps> = ({
   endDate,
   startTime,
   endTime,
-  user,
   eventId,
   setConfirmRegister,
   registrationDateList,
-  defaultValue
 }) => {
-  const [password, setPassword] = useState<string>(""); // State สำหรับเก็บ password
-  const [isPasswordValid, setIsPasswordValid] = useState<boolean>(true); // State สำหรับตรวจสอบ password
   const [errorText, setErrorText] = useState<string>(""); // State สำหรับเก็บข้อความแสดง error
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false); // สถานะการแสดงรหัสผ่าน
   const [fadeAnim] = useState(new Animated.Value(0)); // ค่าเริ่มต้นที่ 0 คือ ซ่อนโมดัล
   const [selectedDate, setSelectedDate] = useState<{ label: string; value: string }>(); // สถานะการแสดงรหัสผ่าน
   const [isSelectedDate, setIsSelectedDate] = useState(false); // สถานะการแสดงรหัสผ่าน
 
 
-  const togglePasswordVisibility = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
-
   const handleCancel = () => {
-    setIsPasswordValid(true);
-    setPassword("");
     setErrorText("");
-    setIsPasswordVisible(false);
     setIsSelectedDate(false)
 
     // เริ่มแอนิเมชันให้โมดัลค่อยๆ จางไป
@@ -111,9 +92,13 @@ const Popup: React.FC<PopupProps> = ({
     }
   };
 
-  const handleSelectedDate = (dateItem: any) => {
-    setSelectedDate(dateItem)
-    setIsSelectedDate(true)
+  const handleSelectedDate = async(dateItem: any) => {
+    if(dateItem === null){
+      setIsSelectedDate(false)
+    } else{
+      setSelectedDate(dateItem)
+      setIsSelectedDate(true)
+    }
   }
 
   useEffect(() => {
@@ -177,14 +162,21 @@ const Popup: React.FC<PopupProps> = ({
                   data={registrationDateList}
                   labelField="label"
                   valueField="value"
-                  onChange={(item) => handleSelectedDate(item)}
-                  placeholder={defaultValue?.label}
+                  onChange={(item) => {
+                    if (item.status === "full"){
+                      handleSelectedDate(null)
+                    } else if(item.status === "available") {
+                      handleSelectedDate(item);
+                    } ; 
+                  }}
+                  // onChange={(item) => handleSelectedDate(item)}
+                  placeholder="Confirm a registration date"
                   placeholderStyle={{
                     color: "gray",
                     includeFontPadding: false,
                     padding: 4,
                     fontSize: Platform.OS === "ios" ? 16 : 14,
-                    fontFamily: "Poppins-Regular",
+                    fontFamily: "Poppins-Base",
                   }}
                   selectedTextStyle={{
                     color: "black",
@@ -192,17 +184,24 @@ const Popup: React.FC<PopupProps> = ({
                     includeFontPadding: false,
                     fontSize: Platform.OS === "ios" ? 16 : 14
                   }}
-                  itemTextStyle={{
-                    color: "black",
-                    fontFamily: "Poppins-Regular",
-                    // lineHeight: 18,
-                    includeFontPadding: false,
-                    fontSize: Platform.OS === "ios" ? 16 : 14
-                  }}
                   selectedTextProps={{ numberOfLines: 1 }}
                   itemContainerStyle={{ backgroundColor: "white" }}
                   containerStyle={{ borderRadius: 10, maxHeight: 180, overflow: "hidden" }}
                   renderLeftIcon={() => (<Calendar width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" style={{ marginRight: 6 }} />)}
+                  renderItem={(item) => (
+                    <View style={styles.optionContainer}>
+                      <View>
+                      <Text style={[styles.optionText,{ color: item.status === "full" ? 'gray' : 'black' }]}>{item.label}</Text>
+                      </View>
+                      {item.status === 'full' ? 
+                      <View style={styles.statusBox} className="">
+                        <Text className="font-Poppins-SemiBold text-white" style={{ fontSize: 8, includeFontPadding: false }}>
+                          FULL
+                        </Text>
+                      </View> 
+                      : null}
+                    </View>
+                  )}
                 />
               </View>
             </View>
@@ -339,6 +338,29 @@ const styles = StyleSheet.create({
   cancelText: {
     color: "#626567",
     fontFamily: "Poppins-SemiBold",
+    includeFontPadding: false
+  },
+  optionContainer:{
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    backgroundColor: "#fff"
+  },
+  optionText: {
+    color: "black",
+    fontFamily: "Poppins-Regular",
+    // lineHeight: 18,
+    includeFontPadding: false,
+    fontSize: Platform.OS === "ios" ? 16 : 14,     
+    justifyContent: "space-between"
+  },
+  statusBox:{
+    backgroundColor: "#ea2929",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 16,
+    justifyContent: "center"
   },
 });
 

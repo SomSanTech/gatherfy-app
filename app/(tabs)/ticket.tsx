@@ -1,13 +1,6 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { Fragment, useEffect, useState, useCallback } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  FlatList,
-  RefreshControl,
-  ActivityIndicator,
-} from "react-native";
+import { View, StyleSheet, Text, FlatList, RefreshControl } from "react-native";
 import { useAuth } from "@/app/context/AuthContext";
 import {
   useFetchTicketWithAuth,
@@ -17,8 +10,7 @@ import { Colors } from "@/constants/Colors";
 import TicketCard from "@/components/TicketCard";
 import { useFocusEffect } from "@react-navigation/native";
 import Loader from "@/components/Loader";
-import * as SecureStore from "expo-secure-store";
-
+import { StatusBar } from "expo-status-bar";
 
 interface Ticket {
   registrationId: number;
@@ -29,6 +21,7 @@ interface Ticket {
   image: string;
   slug: string;
   location: string;
+  regisDate: string;
 }
 
 const Ticket = () => {
@@ -83,8 +76,11 @@ const Ticket = () => {
   return (
     <Fragment>
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
+        <StatusBar backgroundColor="transparent" style="dark" />
         <View style={styles.container}>
-          <Text className="text-xl font-Poppins-SemiBold" style={styles.header}>Tickets</Text>
+          <Text className="text-xl font-Poppins-SemiBold" style={styles.header}>
+            Tickets
+          </Text>
 
           {isLoading ? (
             <Loader />
@@ -100,7 +96,11 @@ const Ticket = () => {
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingTop: 5, paddingBottom: 30 }}
-              ListEmptyComponent={<Text style={styles.noTickets}>You have not registered for any events.</Text>}
+              ListEmptyComponent={
+                <Text style={styles.noTickets}>
+                  You have not registered for any events.
+                </Text>
+              }
               refreshControl={
                 <RefreshControl
                   refreshing={refreshing}

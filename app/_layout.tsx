@@ -1,7 +1,7 @@
 import { Stack, useRouter, useSegments } from "expo-router";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { useEffect, useRef, useState } from "react";
-import { AppState, StyleSheet, Text } from "react-native";
+import { AppState, Platform, StyleSheet, Text } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useFonts } from "expo-font";
 import * as NavigationBar from "expo-navigation-bar";
@@ -29,7 +29,6 @@ const StackLayout = () => {
     } else if (authState?.authenticated === true) {
       // ตรวจสอบว่า email ได้รับการยืนยันแล้วหรือยัง
       if (!authState.verifyEmail) {
-        console.log("Email not verified, redirecting to OTP screen...");
         router.replace("/(auth)/otpScreen"); // ถ้า email ยังไม่ verified ให้ไปที่หน้า OTP
       } else if (segments[0] !== "(tabs)") {
         router.replace("/(tabs)/home");
@@ -40,8 +39,6 @@ const StackLayout = () => {
   useEffect(() => {
     const handleAppStateChange = async (nextAppState: string) => {
       if (nextAppState === "inactive" || nextAppState === "background") {
-        console.log("App is closing...");
-
         // ถ้ายังไม่ได้ verify email ให้เคลียร์ค่าและกลับไป login
         if (authState?.authenticated && !authState.verifyEmail) {
           console.log(
@@ -93,12 +90,14 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function configureNavigationBar() {
-      try {
-        await NavigationBar.setBackgroundColorAsync("#ffffffcc");
-        await NavigationBar.setButtonStyleAsync("dark");
-        await NavigationBar.setBorderColorAsync("#ffffff");
-      } catch (error) {
-        console.error("Error configuring Navigation Bar:", error);
+      if (Platform.OS === "android") {
+        try {
+          await NavigationBar.setBackgroundColorAsync("#ffffffcc");
+          await NavigationBar.setButtonStyleAsync("dark");
+          await NavigationBar.setBorderColorAsync("#ffffff");
+        } catch (error) {
+          console.error("Error configuring Navigation Bar:", error);
+        }
       }
     }
 

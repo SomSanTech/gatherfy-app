@@ -20,7 +20,6 @@ export const useFetchTicketWithAuth = async (
     }
 
     let urlToFetch = `${API_BASE_URL}/api/${url}`;
-    console.log(urlToFetch)
     const response = await fetch(urlToFetch, {
       method: method,
       headers: {

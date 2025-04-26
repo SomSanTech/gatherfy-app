@@ -62,7 +62,6 @@ export const sendQuestionReview = async (
       },
       body: JSON.stringify(body),
     });
-    console.log("Response status:", response.status);
     const contentType = response.headers.get("content-type");
 
     if (!response.ok) {

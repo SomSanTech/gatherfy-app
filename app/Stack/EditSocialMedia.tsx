@@ -32,6 +32,7 @@ import Animated, {
   withSpring,
   useAnimatedStyle,
 } from "react-native-reanimated";
+import { StatusBar } from "expo-status-bar";
 
 const socialPlatforms = [
   { label: "Facebook", value: "Facebook" },
@@ -167,15 +168,24 @@ const EditSocialMedia = () => {
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-white pb-5">
+      <StatusBar backgroundColor="transparent" style="dark" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
       >
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={navigateToGoBack}>
+          <TouchableOpacity
+            onPress={navigateToGoBack}
+            className="flex-row items-center"
+          >
             <Icon name="chevron-back" size={26} color="#000000" />
+            <Text
+              className="text-xl font-Poppins-SemiBold text-center ml-3"
+              style={styles.headerText}
+            >
+              Edit Social Media
+            </Text>
           </TouchableOpacity>
-          <Text style={styles.headerText}>Edit Social Media</Text>
         </View>
         <FlatList
           ref={flatListRef}
@@ -341,10 +351,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   headerText: {
+    fontSize: wp(4.2),
     includeFontPadding: false,
-    fontSize: 18,
-    fontFamily: "Poppins-Bold",
-    marginLeft: 10,
   },
 });
 

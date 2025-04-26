@@ -24,6 +24,7 @@ export const getEvent = async (
     }
 
     let url = `${API_BASE_URL}/api/v1/events`;
+    let urlv2 = `${API_BASE_URL}/api/v2/events`;
 
     if (page === "home") {
       url = `${url}?sort=date_desc`;
@@ -77,7 +78,6 @@ export const getEvent = async (
         searchParam
       )}&sort=${sortParam}&date=${dateParam}&tags=${tagParam}`;
 
-      console.log("Fetching search with URL:", url);
       
       const response = await fetch(url, {
         method: "GET",
@@ -92,7 +92,6 @@ export const getEvent = async (
         return [];
       }
 
-      console.log("Search Fetching from URL:", url);
       const data = await response.json(); // Await here to resolve the promise
       return data; // Return the resolved data
     } else if (page === "search" && !search) {
@@ -100,11 +99,9 @@ export const getEvent = async (
     }
 
     if (page === "detail") {
-      console.log("Fetching detail with slug:", slug);
 
-      url += `/${slug}`;
-      const response = await fetch(url);
-      console.log("Fetching detail from URL:", url);
+      urlv2 += `/${slug}`;
+      const response = await fetch(urlv2);
 
       const data = await response.json();
       return data;

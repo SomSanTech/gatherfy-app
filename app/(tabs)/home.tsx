@@ -14,7 +14,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
-  StatusBar,
   StatusBarProps,
 } from "react-native";
 import EventCard from "../../components/EventCard";
@@ -47,6 +46,7 @@ import { Item_width } from "@/components/parallax-carousel/ParallaxCarouselCard"
 import groupEventsByTag from "@/utils/groupEventsByTag";
 import useNavigateToEventTag from "@/composables/navigateToEventTag";
 import Loader from "@/components/Loader";
+import { StatusBar } from "expo-status-bar";
 
 interface SlideshowData {
   id: string;
@@ -56,8 +56,6 @@ interface SlideshowData {
   end_date: string;
   slug: string;
 }
-
-const OFFSET = 45; // Define OFFSET with an appropriate value
 
 const Home: React.FC = () => {
   const [slideshow, setSlideshow] = useState<SlideshowData[]>([]);
@@ -75,17 +73,10 @@ const Home: React.FC = () => {
   const { navigateToEventTag } = useNavigateToEventTag();
   const { navigateToEventDetail } = useNavigateToEventDetail();
   const navigation = useNavigation<any>();
-
-  function FocusAwareStatusBar(props: StatusBarProps) {
-    const isFocused = useIsFocused();
-
-    return isFocused ? <StatusBar {...props} /> : null;
-  }
-
   const fetchData = async () => {
     const data = await getEvent("home");
     setEvents(data);
-    groupEventsByTag(events)
+    groupEventsByTag(data);
   };
 
   const fetchSlideshow = async () => {
@@ -102,7 +93,6 @@ const Home: React.FC = () => {
     }));
     setSlideshow(slideshowData);
   };
-
 
   const handleNavigateToProfile = () => {
     navigation.navigate("Profile"); // ชื่อหน้าของ Tab Profile ที่ตั้งไว้
@@ -135,20 +125,30 @@ const Home: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      setIsLoading(true)
-      try{
-      loadUser();
-      fetchData();
-      fetchSlideshow();
-      } finally {
-        // setTimeout(() => {
-        setIsLoading(false)
-        // }, 500);
-      }
+      let isActive = true;
+      // 👉 reset slideshow scroll
+
+      const loadAll = async () => {
+        setIsLoading(true);
+        try {
+          await loadUser();
+          await fetchData();
+          await fetchSlideshow();
+
+          scrollX.value = 0; // Reset scroll position
+          setActivityIndex(0);
+        } finally {
+          if (isActive) setIsLoading(false);
+        }
+      };
+
+      loadAll();
+
+      return () => {
+        isActive = false; // cleanup
+      };
     }, [])
   );
-
-  useEffect(() => {}, [authState?.authenticated]);
 
   // Handle manual scroll detection
   const handleUserScroll = (event: any) => {
@@ -166,19 +166,14 @@ const Home: React.FC = () => {
 
     timerRef.current = setTimeout(() => {
       setScrolling(false);
-      // setIsAutoPlay(true); // Resume autoplay after scrolling stops
+      setIsAutoPlay(true); // Resume autoplay after scrolling stops
     }, 1000); // Delay for 1 second after the last scroll
   };
-
-  const TABBAR_HEIGHT = 30;
 
   return (
     <Fragment>
       <SafeAreaView edges={["top"]} className="flex-1 bg-white relative">
-        <FocusAwareStatusBar
-          barStyle="dark-content"
-          backgroundColor="transparent"
-        />
+        <StatusBar backgroundColor="transparent" style="dark" />
         <View
           className="items-center justify-between flex-row bg-white rounded-3xl p-4 mx-3"
           style={styles.header}
@@ -218,7 +213,9 @@ const Home: React.FC = () => {
                   includeFontPadding: false,
                 }}
               >
-                {`${userInfo.users_firstname} ${userInfo.users_lastname}`}
+                {userInfo?.users_firstname && userInfo?.users_lastname
+                  ? `${userInfo.users_firstname} ${userInfo.users_lastname}`
+                  : "Loading..."}
               </Text>
             </View>
           </View>
@@ -235,7 +232,7 @@ const Home: React.FC = () => {
           </View>
         </View>
 
-        { isLoading ? (
+        {isLoading ? (
           <Loader />
         ) : Object.entries(groupEventsByDate(events)).length === 0 ? (
           <View className="flex-1 justify-center items-center">
@@ -256,7 +253,9 @@ const Home: React.FC = () => {
             renderItem={({ item }) => {
               if (item.type === "slideshow") {
                 return (
-                  <View style={{ marginTop: Platform.OS === "ios" ? 100 : 120 }}>
+                  <View
+                    style={{ marginTop: Platform.OS === "ios" ? 100 : 120 }}
+                  >
                     <View className="pt-5 bg-white rounded-b-3xl">
                       <Text
                         className={`text-left pl-7 
@@ -317,10 +316,12 @@ const Home: React.FC = () => {
                           return (
                             <View key={date} className="mb-3">
                               <Text
-                                className={`text-lg font-Poppins-Base text-black ${index === 0 ? "mt-0" : "mt-4"
-                                  } px-5`}
+                                className={`text-lg font-Poppins-Base text-black ${
+                                  index === 0 ? "mt-0" : "mt-4"
+                                } px-5`}
                                 style={{
-                                  fontSize: Platform.OS === "ios" ? wp("4") : wp("3.2"),
+                                  fontSize:
+                                    Platform.OS === "ios" ? wp("4") : wp("3.2"),
                                   textTransform: "capitalize",
                                   includeFontPadding: false,
                                   textAlign: "left",
@@ -328,7 +329,20 @@ const Home: React.FC = () => {
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
                               >
-                                {formatDate(date, false, false, true).date}<Text className="font-Poppins-Regular opacity-60"> / {formatDate(date, false, true, false, "daysOfWeek").date}</Text> 
+                                {formatDate(date, false, false, true).date}
+                                <Text className="font-Poppins-Regular opacity-60">
+                                  {" "}
+                                  /{" "}
+                                  {
+                                    formatDate(
+                                      date,
+                                      false,
+                                      true,
+                                      false,
+                                      "daysOfWeek"
+                                    ).date
+                                  }
+                                </Text>
                               </Text>
                               <EventCard
                                 key={date}
@@ -342,56 +356,94 @@ const Home: React.FC = () => {
                     </View>
                     <View
                       style={{
-                        borderBottomColor: 'black',
+                        borderBottomColor: "black",
                         borderBottomWidth: StyleSheet.hairlineWidth,
                         width: "90%",
                         margin: "auto",
-                        opacity: 0.3
+                        opacity: 0.3,
                       }}
                     />
                   </Fragment>
                 );
               } else if (item.type === "tags") {
                 const groupedEvents = groupEventsByTag(events);
-                console.log("groupedEvents" + groupedEvents)
                 return (
                   <Fragment key={item.type}>
                     <View className="mb-4">
-                    {Object.entries(groupedEvents).map(
-                      ([tag, grouped], index) => {
-                        const eventsArray = Array.isArray(grouped)
-                          ? grouped.events
-                          : [];
-                        return (
-                          <View className="p-3 mt-4 mx-3">
-                            <TouchableOpacity
+                      {Object.entries(groupedEvents).map(
+                        ([tag, grouped], index) => {
+                          const eventsArray = Array.isArray(grouped.events)
+                            ? grouped.events
+                            : [];
+                          return (
+                            <View
+                              className="p-3 mt-4 mx-3"
                               key={tag + events + index}
-                              onPress={() => navigateToEventTag(tag, grouped.tag_id)}>
-                              <View className="flex-row justify-between my-2 items-center">
-                                <View>
-                                <Text className="font-Poppins-Regular text-xs">Events for you</Text>
-                                <Text className="font-Poppins-Base font-semibold" style={{fontSize: Platform.OS === "ios" ? wp("4") : wp("3.2")}}>{tag}</Text>
-                                </View>
-                                <Ionicons name="chevron-forward" size={26} color="#000000" />
-                              </View>
-                              <View className="flex-row w-full">
-                                {grouped.events.map((item, index) => (
-                                  <View
-                                    key={tag + index}
-                                    style={{ width: index === 0 || index === 3 ? '25%' : '25%', padding: 1}}
-                                  >
-                                    <Image source={{ uri: item.image }} className={ index === 0 && eventsArray.length === index+ 1 ? "h-36 w-full rounded-lg" : index === 0 ? "h-36 w-full rounded-l-lg" : eventsArray.length === index+ 1 ? "h-36 w-full rounded-r-lg" : "h-36 w-full"}  />
+                            >
+                              <TouchableOpacity
+                                onPress={() =>
+                                  navigateToEventTag(tag, grouped.tag_id)
+                                }
+                              >
+                                <View className="flex-row justify-between my-2 items-center">
+                                  <View>
+                                    <Text className="font-Poppins-Regular text-xs">
+                                      Events for you
+                                    </Text>
+                                    <Text
+                                      className="font-Poppins-Base font-semibold"
+                                      style={{
+                                        fontSize:
+                                          Platform.OS === "ios"
+                                            ? wp("4")
+                                            : wp("3.2"),
+                                      }}
+                                    >
+                                      {tag}
+                                    </Text>
                                   </View>
-                                ))}
-                              </View>
-                            </TouchableOpacity>
-                          </View>
-                        );
-                      }
-                    )}
+                                  <Ionicons
+                                    name="chevron-forward"
+                                    size={26}
+                                    color="#000000"
+                                  />
+                                </View>
+                                <View className="flex-row w-full">
+                                  {grouped.events.map((item, index) => (
+                                    <View
+                                      key={tag + index}
+                                      style={{
+                                        width:
+                                          index === 0 || index === 3
+                                            ? "25%"
+                                            : "25%",
+                                        padding: 1,
+                                      }}
+                                    >
+                                      <Image
+                                        source={{ uri: item.image }}
+                                        className={
+                                          index === 0 &&
+                                          eventsArray.length === index + 1
+                                            ? "h-36 w-full rounded-lg"
+                                            : index === 0
+                                            ? "h-36 w-full rounded-l-lg"
+                                            : index === eventsArray.length - 1
+                                            ? "h-36 w-full rounded-r-lg  "
+                                            : "h-36 w-full"
+                                        }
+                                      />
+                                    </View>
+                                  ))}
+                                </View>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        }
+                      )}
                     </View>
                   </Fragment>
-                )
+                );
               }
               return null;
             }}

@@ -48,7 +48,6 @@ const EventCard: React.FC<EventCardProps> = ({
   setIsSearched,
   isLoading,
 }) => {
-  const screenWidth = Dimensions.get("window").width;
   const { navigateToEventDetail } = useNavigateToEventDetail();
   const handleEventStatus = (event: Event) => {
     const currentDate = new Date();

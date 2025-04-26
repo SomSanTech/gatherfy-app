@@ -53,7 +53,6 @@ export const saveUserProfile = async (
 
     let urlToFetch = `${API_BASE_URL}/api${url}`;
 
-    console.log("urlToFetch", urlToFetch);
 
     const response = await fetch(urlToFetch, {
       method,
@@ -99,11 +98,6 @@ export const resetPassword = async (
     }
 
     let urlToFetch = `${API_BASE_URL}${url}`;
-
-    console.log("urlToFetch", urlToFetch);
-    console.log("data", data);
-    console.log("method", method);
-    console.log("token", token);
 
     const response = await fetch(urlToFetch, {
       method,

@@ -60,39 +60,6 @@ const ScanQrContact = () => {
     setSelectedContact(null);
   };
 
-  // const barcodeScanned = async ({ data }: { data: string }) => {
-  //   if (scanning) {
-  //     return;
-  //   }
-  //   setScanning(true);
-  //   setScannedValue(data);
-
-  //   if (data) {
-  //     const token = await SecureStore.getItemAsync("my-jwt");
-
-  //     const response = await scanTokenByQRCode(
-  //       token,
-  //       data,
-  //       "api/v1/saveContact",
-  //       "POST"
-  //     );
-  //     console.log("Get response: " + (await response.status));
-
-  //     if (!response || response.status !== 200) {
-  //       Alert.alert("Token invalid");
-  //       throw new Error("Save contact failed! Please try again.");
-  //     }
-  //     setApiResponse("API call successful!");
-
-  //     Alert.alert("Success", "Contact saved successfully!");
-  //     setContact(response);
-  //     openModal(response);
-  //   }
-
-  //   setTimeout(() => {
-  //     setScanning(false);
-  //   }, 2000);
-  // };
   const barcodeScanned = async ({ data }: { data: string }) => {
     if (scanning) {
       return;

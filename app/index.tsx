@@ -47,7 +47,6 @@ export default function App() {
 
   useEffect(() => {
     if (authState?.authenticated === true && authState.verifyEmail === true) {
-      console.log("Redirecting to /home");
       router.replace("/(tabs)/home");
     }
   }, []);

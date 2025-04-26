@@ -1,7 +1,5 @@
 import React, { Fragment, useState, useEffect, useMemo } from "react";
-import {
-  StyleSheet,
-} from "react-native";
+import { StyleSheet } from "react-native";
 import { getEvent } from "@/composables/getEvent";
 import { getTag } from "@/composables/getTag";
 import SearchInput from "@/components/SearchInput";
@@ -32,17 +30,22 @@ const Search = () => {
 
   // ฟังก์ชันจัดการการเลือก tag
   const handleTagPress = (tagTitle: string) => {
-    // Update the selected tags based on whether the tag is already selected
-    setSelectedTags((prevSelectedTags) => {
-      const newSelectedTags = prevSelectedTags.includes(tagTitle)
-        ? prevSelectedTags.filter((tag) => tag !== tagTitle)
-        : [...prevSelectedTags, tagTitle];
+    if (tagTitle === "Clear") {
+      setTag("");
+      setSelectedTags([]);
+      return;
+    } else {
+      setSelectedTags((prevSelectedTags) => {
+        const newSelectedTags = prevSelectedTags.includes(tagTitle)
+          ? prevSelectedTags.filter((tag) => tag !== tagTitle)
+          : [...prevSelectedTags, tagTitle];
 
-      // After updating selected tags, set the tag string accordingly
-      setTag(newSelectedTags.join(","));
+        // After updating selected tags, set the tag string accordingly
+        setTag(newSelectedTags.join(","));
 
-      return newSelectedTags; // Return the updated list of selected tags
-    });
+        return newSelectedTags; // Return the updated list of selected tags
+      });
+    }
   };
 
   const sorting = (type: string) => {
@@ -81,7 +84,7 @@ const Search = () => {
           value={search}
           onChangeText={setSearch} // ส่งฟังก์ชัน setSearch ไปยัง SearchInput
           onSearchSubmit={handleSearchSubmit} // ส่งฟังก์ชัน handleSearchSubmit ไปยัง SearchInput
-        /> 
+        />
         <CustomBottomSheet
           ref={bottomSheetRef}
           title="Add filters"
@@ -91,13 +94,14 @@ const Search = () => {
           tags={tags}
           selectedTags={selectedTags}
           handleTagPress={handleTagPress} // ฟังก์ชันสำหรับเลือก tag
+          setSelectedTags={setSelectedTags} // ฟังก์ชันสำหรับเปลี่ยน selectedTags
           handleSearchSubmit={handleSearchSubmit}
           date={date ?? ""}
           countResult={countResult}
           search={search}
           isSearched={isSearched}
           setIsSearched={setIsSearched}
-          isLoading={true}
+          isLoading={isLoading}
         />
       </SafeAreaView>
     </Fragment>

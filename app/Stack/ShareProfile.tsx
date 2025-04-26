@@ -59,7 +59,6 @@ const ShareProfile: React.FC<ProfileProps> = ({ route }) => {
         "Post"
       );
 
-      console.log("qrResponse" + qrResponse);
       if (!qrResponse) {
         setError("Please try again later");
         return;

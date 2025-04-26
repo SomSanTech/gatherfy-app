@@ -22,7 +22,7 @@ import * as SecureStore from "expo-secure-store";
 import { useNavigation } from "@react-navigation/native";
 import SearchInput from "@/components/SearchInput";
 import { RefreshControl } from "react-native-gesture-handler";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import { Colors } from "@/constants/Colors";
 import DefaultProfile from "@/assets/images/default-profile.svg";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useCameraPermissions } from "expo-camera";

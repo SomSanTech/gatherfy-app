@@ -34,12 +34,12 @@ interface Event {
 }
 
 interface FavEvent {
-  favoriteId: number,
-  eventId: number,
-  name: string,
-  slug: string,
-  image: string,
-  createdAt: string
+  favoriteId: number;
+  eventId: number;
+  name: string;
+  slug: string;
+  image: string;
+  createdAt: string;
 }
 
 interface FavoriteCardProps {
@@ -63,8 +63,6 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
   const { navigateToEventDetail } = useNavigateToEventDetail();
 
   useEffect(() => {
-
-
     if (page === "search") {
       if (search && isSearched) {
         setIsSearched && setIsSearched(true);
@@ -85,52 +83,54 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
         paddingBottom: 20,
         marginTop: 10,
         width: "100%",
-        flexWrap: "wrap"
+        flexWrap: "wrap",
       }}
       renderItem={({ item, index }) => (
         <TouchableOpacity
           key={item.slug}
           onPress={() => navigateToEventDetail(item.slug)}
           className="items-center justify-center"
-          style={[styles.favCardContainer, {height: Platform.OS === "ios" ? wp(50) : wp(50)}]}
+          style={[
+            styles.favCardContainer,
+            { height: Platform.OS === "ios" ? wp(50) : wp(50) },
+          ]}
         >
-            <View style={styles.favoriteContainer}>
-              <ImageBackground
-                className="w-full h-full object-contain"
-                style={styles.imageBackground}
-                source={{
-                  uri: item.image,
-                }}
+          <View style={styles.favoriteContainer}>
+            <ImageBackground
+              className="w-full h-full object-contain"
+              style={styles.imageBackground}
+              source={{
+                uri: item.image,
+              }}
+            >
+              <LinearGradient
+                colors={[
+                  "transparent",
+                  "rgba(255,255,255,0)",
+                  "rgba(0,0,0,0.85)",
+                ]}
+                locations={
+                  Platform.OS === "android" ? [0, 0.4, 0.85] : [0.3, 0, 1]
+                }
+                style={styles.linearBackground}
               >
-                <LinearGradient
-                  colors={[
-                    "transparent",
-                    "rgba(255,255,255,0)",
-                    "rgba(0,0,0,0.85)",
-                  ]}
-                  locations={
-                    Platform.OS === "android" ? [0, 0.4, 0.85] : [0.3, 0]
-                  }
-                  style={styles.linearBackground}
-                >
-                  <View style={styles.favBox} className="absolute top-3 right-3">
-                  <FavoriteFill width={18} height={18} color={'#D71515'} />
-                  </View>
-                  <Text
+                <View style={styles.favBox} className="absolute top-3 right-3">
+                  <FavoriteFill width={18} height={18} color={"#D71515"} />
+                </View>
+                <Text
                   numberOfLines={2}
-                    className="text-white text-base font-Poppins-SemiBold bottom-5 text-left mx-4"
-                    style={styles.favText}
-                  >
-                    {item.name}
-                  </Text>
-                </LinearGradient>
-              </ImageBackground>
-            </View>
-
+                  className="text-white text-base font-Poppins-SemiBold bottom-5 text-left mx-4"
+                  style={styles.favText}
+                >
+                  {item.name}
+                </Text>
+              </LinearGradient>
+            </ImageBackground>
+          </View>
         </TouchableOpacity>
       )}
       ListEmptyComponent={
-         events ? (
+        events ? (
           <View
             style={{
               flex: 1,
@@ -143,7 +143,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
               Can't Find Events You're Looking For
             </Text>
           </View>
-        ): null
+        ) : null
       }
     />
   );
@@ -152,14 +152,14 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
 const styles = StyleSheet.create({
   favCardContainer: {
     width: "48%",
-    margin: '1%',
+    margin: "1%",
   },
-  favoriteContainer:{
+  favoriteContainer: {
     width: "100%",
     height: "100%",
   },
   imageBackground: {
-    overflow: 'hidden',
+    overflow: "hidden",
     borderRadius: 10,
   },
   linearBackground: {
@@ -172,14 +172,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     borderRadius: 10,
   },
-  favBox:{
+  favBox: {
     backgroundColor: "#fff",
     padding: 5,
-    borderRadius: 5
+    borderRadius: 5,
   },
   favText: {
-    lineHeight: 24
-  }
+    lineHeight: 24,
+  },
 });
 
 export default FavoriteCard;

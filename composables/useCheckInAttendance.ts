@@ -55,9 +55,7 @@ export const scanTokenByQRCode = async (
     }
 
     let urlToFetch = `${API_BASE_URL}/${url}`;
-    console.log("URL to fetch:", urlToFetch);
-    console.log("Token:", token);
-    
+
 
     const response = await fetch(urlToFetch, {
       method,

@@ -41,7 +41,6 @@ const FavoriteEvent = () => {
     const token = await SecureStore.getItemAsync("my-jwt");
     try{
       const response = await fetchFavortite(token);
-      console.log(response)
       setIsLoading(false);
       setFavorites(response);
     } catch (error) {

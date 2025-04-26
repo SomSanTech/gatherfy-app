@@ -51,19 +51,10 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
 
   const validateTicket = () => {
     const currentDate = new Date();
-    const startDate = new Date(item.start_date);
-    const endDate = new Date(item.end_date);
-    const regis = new Date(item.regisDate);
-    console.log(currentDate.toString())
-    console.log(regisDate)
     const formatDateRegis =  formatDate(regisDate, true, false, false).date
     const formatDateCurrent =  formatDate(currentDate.toString(), true, false, false).date
-    console.log("formatDateCurrent " +formatDateCurrent)
-    console.log("formatDateRegis" +formatDateRegis)
     const formatEndTime =  formatDate(end_date, true, false, false).time
     const formatCurrentTime =  formatDate(currentDate.toString(), true, false, false).time
-    console.log("formatEndTime " +formatEndTime)
-    console.log("formatCurrentTime" +formatCurrentTime)
     if (formatDateCurrent < formatDateRegis) {
       setCloseTicket(true);
     } else if (formatDateCurrent > formatDateRegis) {

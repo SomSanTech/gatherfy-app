@@ -40,7 +40,7 @@ interface EventDetail {
   eventId: string;
   slug: string;
   name: string;
-  date: string;
+  date:  DateStatus[];
   detail: string;
   start_date: string;
   end_date: string;
@@ -52,6 +52,10 @@ interface EventDetail {
   location: string;
   map: string;
   status: string;
+}
+
+interface DateStatus {
+  [date: string]: string | boolean; // key เป็น string (เช่น "2025-04-26"), value เป็น string ("available")
 }
 
 const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
@@ -80,20 +84,17 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   };
 
   const getEventDateList = () => {
-    const dateList: string[] = []; // declare fresh each time
+    // const dateList: string[] = []; // declare fresh each time
     const startDate = new Date(eventDetail.start_date).getTime()
     const endDate = new Date(eventDetail.end_date).getTime()
-    const diff = Math.ceil((endDate-startDate)/864e5)
-    for(let i = 0; i < diff; i++){
-      const date = new Date(startDate + (864e5 * i))
-      const format = dayjs(date).format('YYYY-MM-DDTHH:mm:ss');
-      dateList.push(format)
-    }
-    const formattedList = dateList.map(date => ({
-      label: dayjs(date).format('dddd, DD MMMM YYYY'), // or a prettier format
-      value:date
-    }));
-    setRegistrationDateList(formattedList)
+
+    const list = eventDetail.date.map(item => {
+      let [[date, status]] = Object.entries(item);
+      const startTime = dayjs(startDate).format('HH:mm:ss');
+      date = date + "T" + startTime
+      return { label: dayjs(date).format('dddd, DD MMMM YYYY'), value: date, status };
+    })
+    setRegistrationDateList(list)
   }
   const validateTimeRegister = async () => {
     const currentDate = new Date();
@@ -158,12 +159,15 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
           }
         })
       };
-      fetchRegistrationAndFavorite();
-      validateTimeRegister();
-      fetchDataDetailAsync();
-      getUsersInfo();
-      getEventDateList();
 
+      const fetchData = async () => {
+        await fetchRegistrationAndFavorite();
+        await validateTimeRegister();
+        await fetchDataDetailAsync();
+        await getUsersInfo();
+        await getEventDateList();
+      }
+      fetchData()
       // Only call countViewById when eventDetail.eventId is available
       if (eventDetail.eventId) {
         countViewById(`/api/v1/countView/${eventDetail.eventId}`);
@@ -192,7 +196,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
         {isLoading ? (
           <Loader />
         ) : (
-          <KeyboardAwareScrollView>
+          <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.imageContainer}>
               <ImageBackground
                 className="w-full h-full"
@@ -201,7 +205,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                   uri: eventDetail.image,
                 }}
               >
-                <TouchableOpacity className="top-4 left-3" onPress={() => navigateToGoBack()}>
+                <TouchableOpacity className="top-4 left-3 pr-3" onPress={() => navigateToGoBack()}>
                   <Icon name="chevron-back" size={Platform.OS === "ios" ? 26 : 30} color="#000000" />
                 </TouchableOpacity>
                 <Image
@@ -309,39 +313,44 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
               </View>
               <View style={styles.modalDetail} className="">
                 <Text style={styles.mapTitle}>Location</Text>
-                <WebView
-                  scalesPageToFit={true}
-                  bounces={false}
-                  javaScriptEnabled
-                  style={styles.map}
-                  automaticallyAdjustContentInsets={false}
-                  source={{
-                    html: `
-              <!DOCTYPE html>
-              <html>
-                <head>
-                  <style>
-                    html, body {
-                      margin: 0;
-                      padding: 0;
-                      width: 100%;
-                      height: 100%;
-                    }
-                    iframe {
-                      border: 0;
-                      border-radius: 50px;
-                      width: 100%;
-                      height: 100%;
-                    }
-                  </style>
-                </head>
-                <body>
-                  ${eventDetail.map}
-                </body>
-              </html>
-            `,
-                  }}
-                />
+                <View style={{ borderRadius: 20, overflow: "hidden", flex: 1 }}>
+                  <WebView
+                    scalesPageToFit={false} // ปิดการ zoom อัตโนมัติของ WebView
+                    bounces={false}
+                    javaScriptEnabled
+                    scrollEnabled={false} // ปิดการ scroll
+                    style={styles.map}
+                    automaticallyAdjustContentInsets={false}
+                    source={{
+                      html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+          <style>
+            html, body {
+              margin: 0;
+              padding: 0;
+              overflow: hidden; /* ปิด scroll */
+              width: 100%;
+              height: 100%;
+              zoom: 1.05;
+            }
+            iframe {
+              border: 0;
+              width: 100%;
+              height: 100%;
+            }
+          </style>
+        </head>
+        <body>
+          ${eventDetail.map}
+        </body>
+      </html>
+    `,
+                    }}
+                  />
+                </View>
               </View>
             </View>
           </KeyboardAwareScrollView>
@@ -358,10 +367,8 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
         startTime={startTime}
         endTime={endTime}
         eventId={eventDetail.eventId}
-        user={usersInfo}
         setConfirmRegister={setConfirmRegister}
         registrationDateList={registrationDateList}
-        defaultValue={registrationDateList[0]}
       />
     </Fragment>
   );
