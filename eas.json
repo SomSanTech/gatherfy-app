@@ -1,21 +1,31 @@
 {
+  "cli": {
+    "version": ">= 13.4.2",
+    "appVersionSource": "remote"
+  },
   "build": {
-    "preview": {
+    "development": {
+      // "developmentClient": true,
+      // "distribution": "internal"
       "android": {
         "buildType": "apk"
-      }
+      },
+      "environment": "development"
     },
-    "preview2": {
-      "android": {
-        "gradleCommand": ":app:assembleRelease"
-      }
-    },
-    "preview3": {
-      "developmentClient": true
-    },
-    "preview4": {
+    "preview": {
       "distribution": "internal"
     },
+    "production": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "ENVFILE": ".env"
+      },
+      "environment": "production"
+    }
+  },
+  "submit": {
     "production": {}
   }
 }

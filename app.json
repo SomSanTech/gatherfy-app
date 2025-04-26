@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "gatherfy",
+    "scheme": "somsantechgatherfy",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -14,10 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.somsantech.gatherfy",
       "config": {
         "usesNonExemptEncryption": false
-      }
+      },
+      "bundleIdentifier": "com.somsantech.gatherfy"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,13 +25,16 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [
-        "INTERNET",
+        "android.permission.INTERNET",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
       "useCleartextTraffic": true,
-      "package": "com.somsantech.gatherfy",
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "com.somsantech.gatherfy"
     },
     "web": {
       "bundler": "metro",
@@ -74,17 +77,26 @@
       "typedRoutes": true
     },
     "sdkVersion": "52.0.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "newArchEnabled": true,
     "extra": {
       "apiBaseUrl": "https://capstone24.sit.kmutt.ac.th/us1",
-      // "apiBaseUrl": "http://cp24us1.sit.kmutt.ac.th:543",
       "router": {
         "origin": false
       },
       "eas": {
         "projectId": "bfa809f4-13dd-4c4a-bf54-175cde940b3b"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/bfa809f4-13dd-4c4a-bf54-175cde940b3b"
     }
   }
 }

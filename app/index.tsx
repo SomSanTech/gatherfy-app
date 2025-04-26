@@ -3,6 +3,7 @@ import "react-native-gesture-handler";
 import TabNav from "./(tabs)/_layout";
 
 import { useCallback, useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import Entypo from "@expo/vector-icons/Entypo";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
@@ -20,6 +21,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   ImageBackground,
+  Modal,
+  TouchableWithoutFeedback,
 } from "react-native";
 
 import React from "react";
@@ -36,25 +39,11 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-// import {
-//   GoogleSignin,
-//   GoogleSigninButton,
-//   statusCodes,
-// } from "@react-native-google-signin/google-signin";
-// import { signInGoogle } from "@/composables/signinGoogle";
-import { IOS_CLIENT_ID, WEB_CLIENT_ID } from "@/app/files";
-
-// GoogleSignin.configure({
-//   webClientId: WEB_CLIENT_ID, // client ID of type WEB for your server. Required to get the `idToken` on the user object, and for offline access.
-//   scopes: ["https://www.googleapis.com/auth/drive.readonly"], // what API you want to access on behalf of the user, default is email and profile
-//   offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
-//   forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
-//   iosClientId: IOS_CLIENT_ID, // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
-//   profileImageSize: 120, // [iOS] The desired height (and width) of the profile image. Defaults to 120px
-// });
 
 export default function App() {
-  const { authState } = useAuth();
+  const { authState, onLoginGoogle } = useAuth();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     if (authState?.authenticated === true && authState.verifyEmail === true) {
@@ -111,17 +100,17 @@ export default function App() {
                     }
                   />
                 </Animated.View>
-                {/* <Animated.View
+                <Animated.View
                   entering={FadeInDown.delay(600).duration(400).springify()}
                 >
                   <CustomButton
                     title="Continue with Google"
-                    handlePress={() => router.push("/signIn")}
+                    handlePress={onLoginGoogle || (() => {})}
                     containerStyles={styles.button}
                     textStyle={styles.buttonText}
                     IconComponent={<Google width={20} height={20} />}
                   />
-                </Animated.View> */}
+                </Animated.View>
               </View>
               <View
                 style={{
@@ -140,31 +129,12 @@ export default function App() {
                     </Link>
                   </Text>
                 </Animated.View>
-                {/* <Animated.View
-                  entering={FadeInDown.delay(1200).duration(400).springify()}
-                >
-                  <TouchableOpacity
-                    onPress={() => router.push("/otpScreen")}
-                    style={{
-                      position: "absolute",
-                      top: 10,
-                      right: 20,
-                      padding: 5,
-                    }}
-                  >
-                    <Ionicons
-                      name="close-circle-outline"
-                      size={30}
-                      color={Colors.black}
-                      style={{ opacity: 0.5 }}
-                    />
-                  </TouchableOpacity>
-                </Animated.View> */}
               </View>
             </View>
           </LinearGradient>
         </View>
       </ImageBackground>
+     
     </>
   );
 }
@@ -240,6 +210,66 @@ const styles = StyleSheet.create({
     fontSize: wp(2.9),
     fontFamily: "Poppins-SemiBold",
     lineHeight: 24,
+    includeFontPadding: false,
+  },
+
+  modalContainer: {
+    flex: 1,
+    padding: 8,
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    paddingBottom: 10,
+    borderRadius: 15,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontFamily: "Poppins-Bold",
+    includeFontPadding: false,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  modalContentList: {
+    flexDirection: "row", // จัดเรียงปุ่มในแนวนอน
+    justifyContent: "space-around", // จัดระยะห่างระหว่างปุ่ม
+    width: "100%",
+    borderBottomColor: "#ccc",
+    marginBottom: 10,
+  },
+  optionButtonContainer: {
+    flexDirection: "row", // จัดเรียงปุ่มในแนวนอน
+    justifyContent: "space-around", // จัดระยะห่างระหว่างปุ่ม
+    width: "100%", // ให้ container กว้าง 100% ของหน้าจอ
+  },
+  optionButton: {
+    padding: 30,
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    flex: 1, // ใช้ flex เพื่อให้ปุ่มขยายได้
+    marginHorizontal: 5, // ให้มีช่องว่างระหว่างปุ่ม
+    marginTop: 10, // ให้มีช่องว่างระหว่างปุ่ม
+    justifyContent: "center", // จัดให้ข้อความอยู่ตรงกลาง
+  },
+  optionText: {
+    fontSize: 16,
+    textAlign: "center",
+    fontFamily: "Poppins-Regular",
+    includeFontPadding: false,
+  },
+  cancelButton: {
+    padding: 15,
+    alignItems: "center",
+  },
+  cancelText: {
+    fontSize: 16,
+    color: Colors.black,
+    fontFamily: "Poppins-Regular",
     includeFontPadding: false,
   },
 });

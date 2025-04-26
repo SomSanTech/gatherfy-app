@@ -1,6 +1,8 @@
 node_modules/
 .expo/
 dist/
+.vscode/
+.idea/
 npm-debug.*
 *.jks
 *.p8
@@ -8,9 +10,11 @@ npm-debug.*
 *.key
 *.mobileprovision
 *.orig.*
+/android
+/ios
 web-build/
 ios/build/
-.env
+.env*
 
 # macOS
 .DS_Store

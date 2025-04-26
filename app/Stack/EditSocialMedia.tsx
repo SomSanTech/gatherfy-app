@@ -24,7 +24,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { Dropdown } from "react-native-element-dropdown";
 
 import Animated, {
   FadeInDown,
@@ -105,11 +104,10 @@ const EditSocialMedia = () => {
     });
   };
 
-
   // const saveSocialMedia = async () => {
   //   try {
   //     const token = await SecureStore.getItemAsync("my-jwt");
-  
+
   //     // กรองเฉพาะข้อมูลที่ไม่ว่าง และ trim ค่าที่ป้อนเข้ามา
   //     const socialMediaData = socialLinks
   //       .map((item) => ({
@@ -118,10 +116,10 @@ const EditSocialMedia = () => {
   //         socialLink: item.link.trim(),
   //       }))
   //       .filter((item) => item.socialPlatform && item.socialLink); // กรองเฉพาะข้อมูลที่ไม่ว่าง
-  
+
   //     // ส่งข้อมูลไปยัง backend
   //     const result = await saveSocialMediaData(token, socialMediaData, "PUT");
-  
+
   //     if (
   //       typeof result === "object" &&
   //       "message" in result &&
@@ -139,7 +137,7 @@ const EditSocialMedia = () => {
   const saveSocialMedia = async () => {
     try {
       const token = await SecureStore.getItemAsync("my-jwt");
-  
+
       // ✅ กรองข้อมูลที่ไม่ว่าง
       const socialMediaData = socialLinks
         .map((item) => ({
@@ -148,10 +146,10 @@ const EditSocialMedia = () => {
           socialLink: item.link.trim(),
         }))
         .filter((item) => item.socialPlatform && item.socialLink);
-  
+
       // ✅ ส่งข้อมูลไป backend
       const result = await saveSocialMediaData(token, socialMediaData, "PUT");
-  
+
       if (Array.isArray(result) && result.length > 0) {
         Alert.alert("Success", "Social media saved successfully");
         console.log("Saved social media:", result); // ✅ Log response array
@@ -162,7 +160,6 @@ const EditSocialMedia = () => {
       console.error("Error saving social media:", error);
     }
   };
-  
 
   useEffect(() => {
     loadSocialMedia();
@@ -317,11 +314,12 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: Colors.primary,
-    marginHorizontal: 15,
+    marginHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 10,
+    marginBottom: 10,
   },
   saveButtonText: {
     color: "#fff",

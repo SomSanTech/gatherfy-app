@@ -123,7 +123,10 @@ const Profile = () => {
                 </View>
               </View>
             ) : (
-              <DefaultProfile className="w-52 h-52 rounded-full mx-auto mt-10" />
+              <Image
+                source={require("@/assets/icons/person-fill-icon.png")}
+                className="opacity-60 w-52 h-52 rounded-full mx-auto mt-10"
+              />
             )}
             <Text className="text-center mt-8 font-Poppins-Regular text-xl text-black">
               {userInfo.users_firstname} {userInfo.users_lastname}

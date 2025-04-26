@@ -35,17 +35,8 @@ import formatDate from "@/utils/formatDate";
 import { genderOptions } from "@/utils/genderOptions";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "@/app/context/AuthContext";
-import Constants from "expo-constants";
 import { useFetchDelete, useFetchUpload } from "@/composables/useFetchFile";
 import { Colors } from "@/constants/Colors";
-
-const API_BASE_URL =
-  Constants.expoConfig?.extra?.apiBaseUrl ||
-  "https://capstone24.sit.kmutt.ac.th";
-
-const API_MINIO_URL2 =
-  Constants.expoConfig?.extra?.apiMinioUrl2 ||
-  "http://cp24us1.sit.kmutt.ac.th:7070/profiles/";
 
 const EditProfile = () => {
   const { updateProfile } = useAuth();
@@ -131,99 +122,6 @@ const EditProfile = () => {
     setModalVisible(false);
   };
 
-  // const handleSaveProfile = async () => {
-  //   try {
-  //     const missingFields = [];
-
-  //     if (!firstname) missingFields.push("Firstname");
-  //     if (!lastname) missingFields.push("Lastname");
-  //     if (!username) missingFields.push("Username");
-  //     if (!email) missingFields.push("Email");
-  //     if (!phone) missingFields.push("Phone");
-  //     if (!dateOfBirth) missingFields.push("Birthday");
-  //     if (!userGender) missingFields.push("Gender");
-
-  //     if (missingFields.length > 0) {
-  //       Alert.alert(
-  //         "Missing Fields",
-  //         `Please fill in ${missingFields.join(", ")}`
-  //       );
-  //       return;
-  //     }
-
-  //     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  //     if (email && !emailRegex.test(email)) {
-  //       Alert.alert("Invalid Email", "Please enter a valid email address.");
-  //       return;
-  //     }
-
-  //     let newImageFileName = currentImage; // ค่าดีฟอลต์เป็นรูปเดิม
-
-  //     if (selectedImage) {
-  //       const token = await SecureStore.getItemAsync("my-jwt");
-
-  //       // ลบรูปเก่าถ้ามี
-  //       if (currentImage) {
-  //         const currentImageName = currentImage.split("/").pop(); // แยกชื่อไฟล์จาก URL
-  //         console.log("Deleting old image:", currentImageName);
-  //         await useFetchDelete(
-  //           `v1/files/delete/${currentImageName}?bucket=profiles`,
-  //           token
-  //         );
-  //       }
-
-  //       console.log("Uploading new image:", selectedImage.uri);
-
-  //       // อัปโหลดรูปใหม่
-  //       const response = await useFetchUpload(
-  //         "v1/files/upload",
-  //         selectedImage,
-  //         "profiles",
-  //         token
-  //       );
-
-  //       setUploadImageName(response.fileName); // ตั้งชื่อไฟล์ใหม่จาก API
-
-  //       // ตรวจสอบว่าอัปโหลดสำเร็จ
-  //       if (response?.error) {
-  //         console.error("Upload failed:", response.error);
-  //         Alert.alert("Upload Failed", "Failed to upload profile image.");
-  //         return;
-  //       }
-
-  //     }
-
-  //     // ส่งข้อมูลไปอัปเดต
-  //     if (updateProfile) {
-  //       console.log("New uploaded image filename:", uploadImageName);
-  //       const result = await updateProfile(
-  //         username,
-  //         firstname,
-  //         lastname,
-  //         email,
-  //         phone,
-  //         uploadImageName || "", // Ensure it is always a string
-  //         dateOfBirth,
-  //         userGender || ""
-  //       );
-
-  //       if (result.error) {
-  //         Alert.alert("Error", result.msg);
-  //       } else {
-  //         console.log(
-  //           "Profile updated successfully with image:",
-  //           newImageFileName
-  //         );
-  //         Alert.alert("Success", "Profile updated successfully");
-  //         setCurrentImage(newImageFileName); // อัปเดต state ของรูปภาพใหม่
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating profile:", error);
-  //     Alert.alert("Error", "Something went wrong while updating profile.");
-  //   }
-  // };
-
   const handleSaveProfile = async () => {
     try {
       const missingFields = [];
@@ -240,7 +138,7 @@ const EditProfile = () => {
       if (missingFields.length > 0) {
         Alert.alert(
           "Missing Fields",
-          `Please fill in ${missingFields.join(", ")}`
+          `Please fill ${missingFields.join(", ")}`
         );
         return;
       }
@@ -363,9 +261,12 @@ const EditProfile = () => {
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
             >
-              <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <TouchableOpacity
+                onPress={() => setModalVisible(true)}
+                className="bg-gray-200"
+              >
                 <View style={styles.imageProfile}>
-                  {userInfo?.auth_provider === "system" ? (
+                  {currentImage ? (
                     <>
                       {selectedImage?.uri || currentImage ? (
                         <ImageBackground
@@ -390,11 +291,17 @@ const EditProfile = () => {
                           ></LinearGradient>
                         </ImageBackground>
                       ) : (
-                        <DefaultProfile className=" rounded-full mx-auto " />
+                        <Image
+                          source={require("@/assets/icons/user-edit-icon.png")}
+                          className="opacity-30 w-28 h-28 m-auto"
+                        />
                       )}
                     </>
                   ) : (
-                    <DefaultProfile className="w-52 h-52 rounded-full mx-auto mt-10" />
+                    <Image
+                      source={require("@/assets/icons/user-edit-icon.png")}
+                      className="opacity-30 w-28 h-28 m-auto"
+                    />
                   )}
                 </View>
 
@@ -452,7 +359,6 @@ const EditProfile = () => {
                       maxLength={40}
                       onChangeText={setEmail}
                       style={styles.disabledInputField}
-                      
                       keyboardType="email-address"
                       autoCapitalize="none"
                     />
@@ -618,7 +524,9 @@ const EditProfile = () => {
                   onPress={handleSaveProfile}
                   className="bg-primary p-3 rounded-lg items-center mb-3"
                 >
-                  <Text className="text-white" style={styles.buttonSave}>Save Changes</Text>
+                  <Text className="text-white" style={styles.buttonSave}>
+                    Save Changes
+                  </Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -810,7 +718,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   checkboxContainer: {
-    width: wp("32%"), // ทำให้มี 2 อันต่อแถว (แบ่งพื้นที่ 48% ของแต่ละอัน)
+    width: wp("30%"), // ทำให้มี 2 อันต่อแถว (แบ่งพื้นที่ 48% ของแต่ละอัน)
     marginBottom: 18,
     borderWidth: 0,
   },
@@ -849,6 +757,11 @@ const styles = StyleSheet.create({
     bottom: 20,
     right: 20,
     zIndex: 10, // เพื่อให้แน่ใจว่าอยู่เหนือภาพ
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 2,
   },
   modalContainer: {
     flex: 1,
