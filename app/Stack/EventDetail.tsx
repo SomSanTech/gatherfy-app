@@ -40,7 +40,7 @@ interface EventDetail {
   eventId: string;
   slug: string;
   name: string;
-  date: string;
+  date:  DateStatus[];
   detail: string;
   start_date: string;
   end_date: string;
@@ -52,6 +52,10 @@ interface EventDetail {
   location: string;
   map: string;
   status: string;
+}
+
+interface DateStatus {
+  [date: string]: string | boolean; // key เป็น string (เช่น "2025-04-26"), value เป็น string ("available")
 }
 
 const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
@@ -80,20 +84,28 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   };
 
   const getEventDateList = () => {
-    const dateList: string[] = []; // declare fresh each time
+    // const dateList: string[] = []; // declare fresh each time
     const startDate = new Date(eventDetail.start_date).getTime()
     const endDate = new Date(eventDetail.end_date).getTime()
-    const diff = Math.ceil((endDate-startDate)/864e5)
-    for(let i = 0; i < diff; i++){
-      const date = new Date(startDate + (864e5 * i))
-      const format = dayjs(date).format('YYYY-MM-DDTHH:mm:ss');
-      dateList.push(format)
-    }
-    const formattedList = dateList.map(date => ({
-      label: dayjs(date).format('dddd, DD MMMM YYYY'), // or a prettier format
-      value:date
-    }));
-    setRegistrationDateList(formattedList)
+    // const diff = Math.ceil((endDate-startDate)/864e5)
+    // for(let i = 0; i < diff; i++){
+    //   const date = new Date(startDate + (864e5 * i))
+    //   const format = dayjs(date).format('YYYY-MM-DDTHH:mm:ss');
+    //   dateList.push(format)
+    // }
+    // const formattedList = dateList.map(date => ({
+    //   label: dayjs(date).format('dddd, DD MMMM YYYY'), // or a prettier format
+    //   value:date
+    // }));
+    // setRegistrationDateList(formattedList)
+    console.log("registrationDateList: " + eventDetail.date)
+    const list = eventDetail.date.map(item => {
+      let [[date, status]] = Object.entries(item);
+      const startTime = dayjs(startDate).format('HH:mm:ss');
+      date = date + "T" + startTime
+      return { label: dayjs(date).format('dddd, DD MMMM YYYY'), value: date, status };
+    })
+    setRegistrationDateList(list)
   }
   const validateTimeRegister = async () => {
     const currentDate = new Date();
@@ -158,12 +170,15 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
           }
         })
       };
-      fetchRegistrationAndFavorite();
-      validateTimeRegister();
-      fetchDataDetailAsync();
-      getUsersInfo();
-      getEventDateList();
 
+      const fetchData = async () => {
+        await fetchRegistrationAndFavorite();
+        await validateTimeRegister();
+        await fetchDataDetailAsync();
+        await getUsersInfo();
+        await getEventDateList();
+      }
+      fetchData()
       // Only call countViewById when eventDetail.eventId is available
       if (eventDetail.eventId) {
         countViewById(`/api/v1/countView/${eventDetail.eventId}`);
@@ -361,7 +376,6 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
         user={usersInfo}
         setConfirmRegister={setConfirmRegister}
         registrationDateList={registrationDateList}
-        defaultValue={registrationDateList[0]}
       />
     </Fragment>
   );

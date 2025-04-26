@@ -24,6 +24,7 @@ export const getEvent = async (
     }
 
     let url = `${API_BASE_URL}/api/v1/events`;
+    let urlv2 = `${API_BASE_URL}/api/v2/events`;
 
     if (page === "home") {
       url = `${url}?sort=date_desc`;
@@ -102,9 +103,9 @@ export const getEvent = async (
     if (page === "detail") {
       console.log("Fetching detail with slug:", slug);
 
-      url += `/${slug}`;
-      const response = await fetch(url);
-      console.log("Fetching detail from URL:", url);
+      urlv2 += `/${slug}`;
+      const response = await fetch(urlv2);
+      console.log("Fetching detail from URL:", urlv2);
 
       const data = await response.json();
       return data;
