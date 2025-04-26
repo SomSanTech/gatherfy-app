@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     fontFamily: "Poppins-Regular",
-    fontSize: wp("3.6%"),
+    fontSize: Platform.OS === "ios" ? wp("3.6%") : wp("3%"),
     lineHeight: 22,
     height: 45,
     // borderColor: "gray",

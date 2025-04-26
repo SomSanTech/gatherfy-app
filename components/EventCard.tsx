@@ -7,13 +7,17 @@ import {
   Dimensions,
   StyleSheet,
   ImageBackground,
+  Platform,
 } from "react-native";
 import useNavigateToEventDetail from "@/composables/navigateToEventDetail";
 import formatDate from "@/utils/formatDate";
 import Calendar from "../assets/icons/Calendar.svg"
 import Location from "../assets/icons/Location.svg"
 import Time from "../assets/icons/Time.svg"
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 interface Event {
   slug: string;
   name: string;
@@ -54,7 +58,7 @@ const EventCard: React.FC<EventCardProps> = ({
     if (currentDate < startDate) {
       return "SOON"
     } else if (event.status !== 'full' && currentDate > endDate) {
-      return" ClOSED";
+      return" CLOSED";
     } else if (event.status === 'full') {
       return"FULL";
     } else {
@@ -94,7 +98,7 @@ const EventCard: React.FC<EventCardProps> = ({
             },
           ]}
         >
-          <View className=" bg-white p-4 h-52 rounded-lg flex-row">
+          <View className="bg-white p-4 rounded-lg flex-row" style={{ height: Platform.OS === "ios" ? 220 : 260 }}>
             <View className="w-[39%] mr-4">
               <ImageBackground
                 source={{ uri: item.image }}
@@ -102,7 +106,7 @@ const EventCard: React.FC<EventCardProps> = ({
               >
                 { page === 'tag' ? (
                 <View style={styles.statusBox} className="absolute top-3 left-3">
-                <Text className="font-bold text-white" style={{fontSize: 9}}>
+                <Text className="font-Poppins-SemiBold text-white" style={{fontSize: 9, includeFontPadding: false}}>
                   { handleEventStatus(item) }
                   </Text>
               </View>
@@ -112,8 +116,8 @@ const EventCard: React.FC<EventCardProps> = ({
             <View className="flex-1 justify-between pb-5 overflow-hidden">
               <View>
                 <Text
-                  className="text-xl w-full text-black font-Poppins-SemiBold"
-                  style={{ maxWidth: "100%" }}
+                  className="w-full text-black font-Poppins-SemiBold"
+                  style={{fontSize: Platform.OS === "ios" ? wp("4.3") : wp("3.4"), maxWidth: "100%" }}
                   numberOfLines={2}
                   ellipsizeMode="tail"
                 >
@@ -126,7 +130,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 </Text>
 
                 <View style={[styles.detailContainer]}>
-                  <Calendar width={18} height={18} color="#4B5563" strokeWidth={10}/>
+                  <Calendar width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" strokeWidth={10}/>
                   <Text
                     style={[styles.detail]}
                     numberOfLines={1}
@@ -137,7 +141,7 @@ const EventCard: React.FC<EventCardProps> = ({
                   </Text>
                 </View>
                 <View style={[styles.detailContainer]}>
-                  <Time width={18} height={18} color="#4B5563" />
+                  <Time width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" />
                   <Text
                     style={[styles.detail]}
                     numberOfLines={1}
@@ -148,7 +152,7 @@ const EventCard: React.FC<EventCardProps> = ({
                   </Text>
                 </View>
                 <View style={[styles.detailContainer]}>
-                  <Location width={18} height={18} color="#4B5563" />
+                  <Location width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" />
                   <Text
                     style={[styles.detail]}
                     numberOfLines={1}
@@ -203,7 +207,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   detailTag: {
-    fontSize: 15,
+    fontSize: Platform.OS === "ios" ? 15 : 14,
     lineHeight: 20,
     color: "#4B5563",
     fontFamily: "Poppins-Regular",
@@ -215,6 +219,7 @@ const styles = StyleSheet.create({
     width: "90%",
     marginLeft: 5,
     fontFamily: "Poppins-Regular",
+    includeFontPadding: false
   },
   statusBox:{
     backgroundColor: "#ea2929",

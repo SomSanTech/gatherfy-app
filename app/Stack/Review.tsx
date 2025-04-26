@@ -203,7 +203,7 @@ const Review: React.FC<ReviewProps> = ({ route }) => {
         <TouchableOpacity onPress={() => navigation.goBack()} className="w-6 ml-2">
           <Icon name="chevron-back" size={26} color="#000000" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Event Feedback</Text>
+        <Text className="text-xl font-Poppins-SemiBold">Event Feedback</Text>
         <View className="w-6"></View>
       </View>
       <KeyboardAvoidingView
@@ -304,20 +304,20 @@ const styles = StyleSheet.create({
   },
   numberQuestion: {
     fontSize: wp("3%"), // ขนาด font เป็น 5% ของหน้าจอ
-    fontFamily: "Poppins-Light",
+    fontFamily: "Poppins-Base",
     marginBottom: 1,
     includeFontPadding: false,
     color: Colors.gray,
   },
   question: {
-    fontSize: wp("4.5%"), // ขนาด font เป็น 5% ของหน้าจอ
+    fontSize: Platform.OS === "ios" ? wp("4.5%") : wp("3.5%"), // ขนาด font เป็น 5% ของหน้าจอ
     fontFamily: "Poppins-SemiBold",
     marginBottom: 4,
     includeFontPadding: false,
     color: Colors.primary,
   },
   giveRatingtext: {
-    fontSize: wp("4%"), // ขนาด font เป็น 5% ของหน้าจอ
+    fontSize: Platform.OS === "ios" ? wp("4%") : wp("3.5%"), // ขนาด font เป็น 5% ของหน้าจอ
     fontFamily: "Poppins-Regular",
     marginVertical: 14,
     textAlign: "center",
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     color: "#9e9e9e",
   },
   inputField: {
-    fontSize: wp("3.5%"), // ขนาด font เป็น 5% ของหน้าจอ
+    fontSize: Platform.OS === "ios" ? wp("3.5%") : wp("3%"), // ขนาด font เป็น 5% ของหน้าจอ
     fontFamily: "Poppins-Regular",
     includeFontPadding: false,
   },
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#ffffff",
-    fontSize: wp("4%"),
+    fontSize: 16,
     fontFamily: "Poppins-SemiBold",
     includeFontPadding: false,
     textAlign: "center",

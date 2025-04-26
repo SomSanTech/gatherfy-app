@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold", // เปลี่ยนฟอนต์ที่ต้องการ
     fontSize: 16,
     color: "#D71515", // กำหนดสีข้อความหากต้องการ
+    includeFontPadding: false
   },
   customHeader: {
     fontSize: 20,

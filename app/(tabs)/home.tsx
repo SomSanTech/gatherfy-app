@@ -211,7 +211,7 @@ const Home: React.FC = () => {
                 className="text-2xl font-Poppins-SemiBold text-black"
                 style={{
                   textTransform: "capitalize",
-                  fontSize: wp("4.4"),
+                  fontSize: Platform.OS === "ios" ? wp("4.4") : wp("4"),
                   includeFontPadding: false,
                 }}
               >
@@ -253,14 +253,14 @@ const Home: React.FC = () => {
             renderItem={({ item }) => {
               if (item.type === "slideshow") {
                 return (
-                  <View style={{ marginTop: Platform.OS === "ios" ? 100 : 95 }}>
+                  <View style={{ marginTop: Platform.OS === "ios" ? 100 : 120 }}>
                     <View className="pt-5 bg-white rounded-b-3xl">
                       <Text
                         className={`text-left pl-7 
                         font-Poppins-SemiBold  mb-2 text-black`}
                         style={{
                           includeFontPadding: false,
-                          fontSize: wp("4.5"),
+                          fontSize: Platform.OS === "ios" ? wp("4.5") : wp("4"),
                         }}
                       >
                         Recommended Events
@@ -306,12 +306,6 @@ const Home: React.FC = () => {
                 return (
                   <Fragment key={item.type}>
                     <View className="py-8 mx-3 rounded-2xl">
-                      {/* <Text
-                        className="font-Poppins-Regular text-2xl py-3 pt-0 text-primary text-center"
-                        style={{ fontSize: wp("4.8") }}
-                      >
-                        - Explore by date -
-                      </Text> */}
                       {Object.entries(groupedEvents).map(
                         ([date, eventsOnDate], index) => {
                           const eventsArray = Array.isArray(eventsOnDate)
@@ -323,7 +317,7 @@ const Home: React.FC = () => {
                                 className={`text-lg font-Poppins-Base text-black ${index === 0 ? "mt-0" : "mt-4"
                                   } px-5`}
                                 style={{
-                                  fontSize: wp("3.8"),
+                                  fontSize: Platform.OS === "ios" ? wp("4") : wp("3.2"),
                                   textTransform: "capitalize",
                                   includeFontPadding: false,
                                   textAlign: "left",
@@ -361,25 +355,24 @@ const Home: React.FC = () => {
                   <Fragment key={item.type}>
                     <View className="mb-4">
                     {Object.entries(groupedEvents).map(
-                      ([tag, events], index) => {
-                        const eventsArray = Array.isArray(events)
-                          ? events
+                      ([tag, grouped], index) => {
+                        const eventsArray = Array.isArray(grouped)
+                          ? grouped.events
                           : [];
-                        <h2>{tag}</h2>
                         return (
                           <View className="p-3 mt-4 mx-3">
                             <TouchableOpacity
-                              key={tag + "_"+ events + index}
-                              onPress={() => navigateToEventTag(tag)}>
+                              key={tag + events + index}
+                              onPress={() => navigateToEventTag(tag, grouped.tag_id)}>
                               <View className="flex-row justify-between my-2 items-center">
                                 <View>
-                                <Text className="mb-1">Events for you</Text>
-                                <Text className="text-base font-semibold">{tag}</Text>
+                                <Text className="font-Poppins-Regular text-xs">Events for you</Text>
+                                <Text className="font-Poppins-Base font-semibold" style={{fontSize: Platform.OS === "ios" ? wp("4") : wp("3.2")}}>{tag}</Text>
                                 </View>
                                 <Ionicons name="chevron-forward" size={26} color="#000000" />
                               </View>
                               <View className="flex-row w-full">
-                                {eventsArray.map((item, index) => (
+                                {grouped.events.map((item, index) => (
                                   <View
                                     key={tag + index}
                                     style={{ width: index === 0 || index === 3 ? '25%' : '25%', padding: 1}}

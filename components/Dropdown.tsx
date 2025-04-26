@@ -65,17 +65,21 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
         }} // เปลี่ยนฟอนต์ของ placeholder
         selectedTextStyle={{
           color: "black",
-          lineHeight: 24,
           marginTop: 2,
+          includeFontPadding: false,
+          paddingHorizontal: 4
         }}
         itemTextStyle={{
           color: "black",
           lineHeight: 17,
           marginTop: 2,
+          includeFontPadding: false,
+          fontSize: 16
         }}
-        itemContainerStyle={{ backgroundColor: "white"}}
+        itemContainerStyle={{ backgroundColor: "white" }}
         value={selectedSort}
         fontFamily="Poppins-Regular"
+        containerStyle={{ borderRadius: 10, maxHeight: 220, overflow: "hidden" }}
         onChange={(item) => handleSortChange(item.value)}
       />
     </View>

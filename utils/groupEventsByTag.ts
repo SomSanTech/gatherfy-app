@@ -7,19 +7,30 @@ const groupEventsByTag = (events: any[] = []) => {  // เพิ่มค่า 
       throw new Error("Expected an array of events");
     }
 
-    const grouped: { [key: string]: any[] } = {};
     const groupedByTags = {};
+    const grouped: { 
+      [key: string]: { 
+        tag_id: number; 
+        tag_title: string; 
+        events: any[]; 
+      } 
+    } = {};
 
     events.forEach((event) => {
-      event.tags.forEach(tag =>{
+      event.tags.forEach((tag: { tag_id: number; tag_title: string }) =>{
         if (!grouped[tag.tag_title]) {
-          grouped[tag.tag_title] = [];
-          if(grouped[tag.tag_title].length <= 3){
-            grouped[tag.tag_title].push(event);
+          grouped[tag.tag_title] = {
+            tag_id: tag.tag_id,
+            tag_title: tag.tag_title,
+            events: []
+          };
+          if(grouped[tag.tag_title].events.length <= 3){
+            grouped[tag.tag_title].events.push(event);
           }        
-        } else{
-          if(grouped[tag.tag_title].length <= 3){
-            grouped[tag.tag_title].push(event);
+        } 
+        else{
+          if(grouped[tag.tag_title].events.length <= 3){
+            grouped[tag.tag_title].events.push(event);
           }
         }
       })

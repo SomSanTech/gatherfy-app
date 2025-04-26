@@ -16,6 +16,8 @@ import {
 import { Colors } from "@/constants/Colors";
 import TicketCard from "@/components/TicketCard";
 import { useFocusEffect } from "@react-navigation/native";
+import Loader from "@/components/Loader";
+import * as SecureStore from "expo-secure-store";
 
 
 interface Ticket {
@@ -85,9 +87,7 @@ const Ticket = () => {
           <Text className="text-xl font-Poppins-SemiBold" style={styles.header}>Tickets</Text>
 
           {isLoading ? (
-            <View style={styles.loaderContainer}>
-              <ActivityIndicator size="large" color={Colors.primary} />
-            </View>
+            <Loader />
           ) : error ? (
             <Text style={styles.error}>{error}</Text>
           ) : (
@@ -100,7 +100,7 @@ const Ticket = () => {
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingTop: 5, paddingBottom: 30 }}
-              ListEmptyComponent={<Text style={styles.noTickets}>No tickets available.</Text>}
+              ListEmptyComponent={<Text style={styles.noTickets}>You have not registered for any events.</Text>}
               refreshControl={
                 <RefreshControl
                   refreshing={refreshing}
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
     backgroundColor: "#ffffff",
   },
   header: {
@@ -135,6 +135,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   noTickets: {
+    marginTop: "50%",
+    marginHorizontal: 15,
     fontSize: 16,
     fontFamily: "Poppins-Regular",
     textAlign: "center",

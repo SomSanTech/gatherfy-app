@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp, useNavigation } from "@react-navigation/native";
@@ -20,6 +21,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import Icon from "react-native-vector-icons/Ionicons";
+import formatDate from "@/utils/formatDate";
 // ดึงขนาดหน้าจอ
 const { width, height } = Dimensions.get("window");
 
@@ -47,6 +49,7 @@ interface EventDetail {
 const TicketDetail: React.FC<TicketDetailProps> = ({ route }) => {
   const { eventId } = route.params || {};
   const { slug } = route.params;
+  const { regisDate } = route.params;
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -157,11 +160,11 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ route }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.ticketContainer}>
         <View style={styles.ticketBox}>
-          <View className="items-center justify-between flex-row mb-4">
-            <TouchableOpacity onPress={() => navigation.goBack()} className="">
-              <Icon name="chevron-back" size={26} color="#000000" />
-            </TouchableOpacity>
-            <Text className="text-3xl font-Poppins-Bold text-center">
+          <TouchableOpacity onPress={() => navigation.goBack()} className="absolute top-7 left-5">
+            <Icon name="chevron-back" size={26} color="#000000" />
+          </TouchableOpacity>
+          <View className="items-center justify-between flex-row mb-4 mx-auto">
+            <Text className="text-xl font-Poppins-SemiBold text-center">
              - Ticket -
             </Text>
             <View className="w-6"></View>
@@ -176,12 +179,12 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ route }) => {
               <View>
                 <View className="items-center">
                   <Text style={styles.headerDetailText}>Date</Text>
-                  <Text style={styles.detailText}>{getFormattedDate()}</Text>
+                  <Text style={styles.detailText}>{regisDate}</Text>
                 </View>
               </View>
               <View className="items-center">
                 <Text style={styles.headerDetailText}>Time</Text>
-                <Text style={styles.detailText}>{getFormattedTime()}</Text>
+                <Text style={styles.detailText}>{formatDate(eventDetail.start_date, true, false, false).time}</Text>
               </View>
             </View>
 
@@ -200,8 +203,7 @@ const TicketDetail: React.FC<TicketDetailProps> = ({ route }) => {
           <View style={styles.dottedLineContainer}>
             <View style={styles.leftCircle} />
             <Text style={styles.dottedLine}>
-              - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-              - - -
+              - - - - - - - - - - - - - - - - - - - - - - - - - - 
             </Text>
             <View style={styles.rightCircle} />
           </View>
@@ -247,7 +249,7 @@ const styles = StyleSheet.create({
   },
   ticketContainer: {
     alignSelf: "center",
-    height: height * 0.8,
+    height: Platform.OS === "ios" ? height * 0.8 : height * 0.85 ,
     width: width * 0.9,
     marginTop: width * 0.1,
     paddingBottom: width * 0.1,
@@ -267,15 +269,16 @@ const styles = StyleSheet.create({
   headerDetailText: {
     textAlign: "center",
     color: Colors.primary,
-    fontFamily: "Poppins-Regular",
+    fontFamily: "Poppins-Base",
     includeFontPadding: false,
-    fontSize: wp("3.6%"),
+    fontSize: Platform.OS === "ios" ? wp("4%") : wp("3.3%"),
   },
   detailText: {
     textAlign: "center",
-    fontFamily: "Poppins-Regular",
+    fontFamily: "Poppins-Base",
     color: "black",
-    fontSize: wp("4.8%"),
+    fontSize: Platform.OS === "ios" ? wp("4.5%") : wp("3.5%"),
+    includeFontPadding: false,
   },
   dottedLineContainer: {
     flexDirection: "row",
@@ -305,12 +308,12 @@ const styles = StyleSheet.create({
   dottedLine: {
     position: "absolute",
     top: "59%",
-    width: "110%",
+    width: "100%",
     textAlign: "center",
-    color: "black",
-    fontSize: width * 0.035,
+    color: "#8888",
+    fontSize: width * 0.04,
+    marginTop: Platform.OS === "ios" ? 4 : 0
   },
-
   ticketBody: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -321,7 +324,7 @@ const styles = StyleSheet.create({
 
   qrContainer: {
     alignItems: "center",
-    marginTop: hp("1.5%"),
+    marginTop: hp("3%"),
   },
 
   timerContainer: {
@@ -329,9 +332,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   timerText: {
-    fontFamily: "Poppins-SemiBold",
+    fontFamily: "Poppins-Base",
     color: "red",
-    fontSize: width * 0.04,
+    fontSize: Platform.OS === "ios" ? 16 : 16,
+    includeFontPadding: false,
   },
   errorText: {
     color: "red",

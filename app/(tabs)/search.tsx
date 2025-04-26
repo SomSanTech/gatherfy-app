@@ -56,8 +56,6 @@ const Search = () => {
   };
 
   const fetchEventData = async () => {
-    console.log(date);
-
     const data = await getEvent("search", search, undefined, tag, date, sortBy);
 
     setEvents(data); // อัปเดต events ที่กรองแล้ว

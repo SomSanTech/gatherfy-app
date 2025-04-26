@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Image, StyleSheet, ImageBackground } from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet, ImageBackground, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -28,6 +28,7 @@ import {
 } from "react-native-responsive-screen";
 import { addFavortite, fetchFavortite, removeFavortite } from "@/composables/useFetchFavorite";
 import Loader from "@/components/Loader";
+import dayjs from "dayjs";
 
 type EventDetailRouteProp = RouteProp<RootStackParamList, "EventDetail">;
 
@@ -70,12 +71,30 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const [confirmRegister, setConfirmRegister] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const { navigateToEventTag } = useNavigateToEventTag();
+  const [registrationDateList, setRegistrationDateList] = useState<any>([])
+
 
   const fetchDataDetailAsync = async () => {
     const response = await getEvent("detail", undefined, slug);
     setEventDetail(response);
   };
 
+  const getEventDateList = () => {
+    const dateList: string[] = []; // declare fresh each time
+    const startDate = new Date(eventDetail.start_date).getTime()
+    const endDate = new Date(eventDetail.end_date).getTime()
+    const diff = Math.ceil((endDate-startDate)/864e5)
+    for(let i = 0; i < diff; i++){
+      const date = new Date(startDate + (864e5 * i))
+      const format = dayjs(date).format('YYYY-MM-DDTHH:mm:ss');
+      dateList.push(format)
+    }
+    const formattedList = dateList.map(date => ({
+      label: dayjs(date).format('dddd, DD MMMM YYYY'), // or a prettier format
+      value:date
+    }));
+    setRegistrationDateList(formattedList)
+  }
   const validateTimeRegister = async () => {
     const currentDate = new Date();
     const startDate = new Date(eventDetail.ticket_start_date);
@@ -143,6 +162,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
       validateTimeRegister();
       fetchDataDetailAsync();
       getUsersInfo();
+      getEventDateList();
 
       // Only call countViewById when eventDetail.eventId is available
       if (eventDetail.eventId) {
@@ -181,8 +201,8 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                   uri: eventDetail.image,
                 }}
               >
-                <TouchableOpacity className="absolute top-4 left-2" onPress={() => navigateToGoBack()}>
-                  <Icon name="chevron-back" size={26} color="#000000" />
+                <TouchableOpacity className="top-4 left-3" onPress={() => navigateToGoBack()}>
+                  <Icon name="chevron-back" size={Platform.OS === "ios" ? 26 : 30} color="#000000" />
                 </TouchableOpacity>
                 <Image
                   source={{ uri: eventDetail.image }}
@@ -207,12 +227,12 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
               </View>
               <Text style={styles.eventName}>{eventDetail.name}</Text>
               <View className="flex-row mt-2">
-                <Text className=""><Text className="opacity-50">Organized by</Text> {eventDetail.owner}</Text>
+                <Text className="font-Poppins-Regular text-sm"><Text className="opacity-50">Organized by</Text> {eventDetail.owner}</Text>
               </View>
               <View style={styles.eventDetail} className="">
-                <View className="flex-row">
-                  <Calendar width={18} height={18} color="#4B5563" strokeWidth={10}/>
-                  <Text className="font-semibold mx-2">
+                <View className="flex-row items-center">
+                  <Calendar width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" strokeWidth={10}/>
+                  <Text className="font-Poppins-Base mx-2"  style={{includeFontPadding: false}}>
                     {startDate}{" "}
                     {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
                       <Text>- {endDate}</Text>
@@ -221,15 +241,15 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                     )}
                   </Text>
                 </View>
-                <View className="flex-row">
-                  <Time width={18} height={18} color="#4B5563" strokeWidth={10}/>
-                  <Text className="font-semibold mx-2">
+                <View className="flex-row items-center">
+                  <Time width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" strokeWidth={10}/>
+                  <Text className="font-Poppins-Base mx-2" style={{includeFontPadding: false}}>
                     {startTime} - {endTime}
                   </Text>
                 </View>
-                <View className="flex-row">
-                  <Location width={18} height={18} color="#4B5563" strokeWidth={10}/>
-                  <Text className="font-semibold mx-2">
+                <View className="flex-row items-center">
+                  <Location width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" strokeWidth={10}  />
+                  <Text className="font-Poppins-Base mx-2"  style={{includeFontPadding: false}}>
                     {eventDetail.location}
                   </Text>
                 </View>
@@ -258,7 +278,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                 <View style={{ width: '52%' }}>
                   {isRegistered ? (
                     <CustomButton
-                      title="Registered"
+                      title="You Registered"
                       containerStyles={styles.registerButton}
                       textStyle={styles.registerButtonText}
                       handlePress={() => { }}
@@ -330,7 +350,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
       <Popup
         visible={isPopupVisible}
         onClose={() => setPopupVisible(false)}
-        title="Registration"
+        title="Reserve your seat now"
         eventName={eventDetail.name}
         eventLocation={eventDetail.location}
         startDate={startDate}
@@ -340,6 +360,8 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
         eventId={eventDetail.eventId}
         user={usersInfo}
         setConfirmRegister={setConfirmRegister}
+        registrationDateList={registrationDateList}
+        defaultValue={registrationDateList[0]}
       />
     </Fragment>
   );
@@ -364,9 +386,10 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   eventName: {
-    fontSize: 22,
+    // fontSize: 22,
     includeFontPadding: false,
     fontFamily: "Poppins-Bold",
+    fontSize: Platform.OS === "ios" ? wp(5) : wp(4),
   },
   tagsContainer: {
     flexDirection: "row",
@@ -396,7 +419,7 @@ const styles = StyleSheet.create({
   tagText: {
     includeFontPadding: false,
     fontFamily: "Poppins-SemiBold",
-    fontSize: wp(3),
+    fontSize: Platform.OS === "ios" ? wp(3) : wp(2.5),
     color: "#333",
   },
   registerButton: {
@@ -406,10 +429,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderColor: "#D71515",
     borderWidth: 1,
+    includeFontPadding: false,
   },
   registerButtonText: {
     color: "#FFFFFF",
     fontFamily: "Poppins-SemiBold",
+    includeFontPadding: false,
   },
   registerButtonDisabled: {
     backgroundColor: "#CCCCCC",
@@ -422,6 +447,7 @@ const styles = StyleSheet.create({
   registerButtonTextDisabled: {
     color: "#808080",
     fontFamily: "Poppins-SemiBold",
+    includeFontPadding: false,
   },
   descriptionTitle: {
     fontSize: 18,
@@ -487,7 +513,8 @@ const styles = StyleSheet.create({
   },
   alreadyFavButtonText: {
     color: "#D71515",
-    fontFamily: "Poppins",
+    fontFamily: "Poppins-Base",
+    includeFontPadding: false
   },
 });
 

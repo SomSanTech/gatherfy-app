@@ -17,12 +17,6 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 
-const mockFavoriteEvents = [
-  { id: "1", name: "Music Festival 2025" },
-  { id: "2", name: "Art & Craft Expo" },
-  { id: "3", name: "Startup Pitch Night" },
-];
-
 interface FavEvent {
   favoriteId: number,
   eventId: number,
@@ -62,12 +56,12 @@ const FavoriteEvent = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View className="items-center justify-between flex-row py-4">
+      <TouchableOpacity onPress={() => navigateToGoBack()} className="">
         <View className="flex-row items-center justify-center">
-          <TouchableOpacity onPress={() => navigateToGoBack()} className="">
             <Icon name="chevron-back" size={26} color="#000000" />
-          </TouchableOpacity>
           <Text className="text-xl font-Poppins-SemiBold ml-3">Favorite Events</Text>
         </View>
+        </TouchableOpacity>
       </View>
       <FavoriteCard events={favorites} page="favorites" />
     </SafeAreaView>

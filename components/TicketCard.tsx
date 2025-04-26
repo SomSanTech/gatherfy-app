@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Pressable,
+  Platform,
 } from "react-native";
 import { Button } from "react-native-elements";
 import Svg, { Path } from "react-native-svg";
@@ -30,6 +31,7 @@ interface Ticket {
   start_date: string;
   end_date: string;
   location: string;
+  regisDate: string;
 }
 interface TicketProps {
   item: Ticket;
@@ -40,28 +42,39 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
   const { navigateToReview } = useNavigateToReview();
   const [rotate, setRotate] = useState(false);
   const [closeTicket, setCloseTicket] = useState(false);
-  const [closeTicketText, setCloseTicketText] = useState("");
 
   const { navigateToEventDetail } = useNavigateToEventDetail();
   const { navigateToTicketDetail } = useNavigateToTicketDetail();
   const reviewedStrings = reviewed.map((id) => id.toString());
 
-  const { eventId, name, image, slug, start_date, end_date, location } = item;
+  const { eventId, name, image, slug, start_date, end_date, location, regisDate } = item;
 
   const validateTicket = () => {
     const currentDate = new Date();
     const startDate = new Date(item.start_date);
     const endDate = new Date(item.end_date);
-    if (currentDate < startDate) {
+    const regis = new Date(item.regisDate);
+    console.log(currentDate.toString())
+    console.log(regisDate)
+    const formatDateRegis =  formatDate(regisDate, true, false, false).date
+    const formatDateCurrent =  formatDate(currentDate.toString(), true, false, false).date
+    console.log("formatDateCurrent " +formatDateCurrent)
+    console.log("formatDateRegis" +formatDateRegis)
+    const formatEndTime =  formatDate(end_date, true, false, false).time
+    const formatCurrentTime =  formatDate(currentDate.toString(), true, false, false).time
+    console.log("formatEndTime " +formatEndTime)
+    console.log("formatCurrentTime" +formatCurrentTime)
+    if (formatDateCurrent < formatDateRegis) {
       setCloseTicket(true);
-      setCloseTicketText("Event not started");
-    } else if (currentDate > endDate) {
+    } else if (formatDateCurrent > formatDateRegis) {
       setCloseTicket(true);
-      setCloseTicketText("Event ended");
-    } else {
+    } 
+    else if (formatDateCurrent === formatDateRegis && formatCurrentTime > formatEndTime) {
+      setCloseTicket(true);
+    } 
+    else if (formatDateCurrent === formatDateRegis && formatCurrentTime < formatEndTime) {
       setCloseTicket(false);
-      setCloseTicketText("View Ticket");
-    }
+    } 
   };
 
   useEffect(() => {
@@ -80,7 +93,7 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
         style={styles.ticketContainer}
         onPress={() => navigateToEventDetail(slug)}
       >
-        <View className="flex-row w-full h-52">
+        <View className="flex-row w-full" style={{ height: Platform.OS === "ios" ? 200 : 230 }}>
           <View
             className="w-[34%] p-3 h-full relative bg-white justify-center"
             style={{ borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }}
@@ -104,7 +117,7 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
                       fontSize: wp("3%"),
                     }}
                     classNameContainerStyle="flex-row w-full px-3 py-1 bg-white justify-center items-center border border-[#d8d8d8] rounded-lg"
-                    classNameTextStyle="font-Poppins-Bold text-regular text-center text-[#d8d8d8] ml-1"
+                    classNameTextStyle="font-Poppins-SemiBold text-regular text-center text-[#d8d8d8] ml-1"
                     IconComponent={
                       <Ionicons
                         name="checkmark-circle-outline"
@@ -118,13 +131,13 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
                   <CustomButton
                     title="Review"
                     handlePress={() => navigateToReview(eventId)}
-                    containerStyles={{}}
+                    containerStyles={{ }}
                     textStyle={{
                       includeFontPadding: false,
-                      fontSize: wp("3.5%"),
+                      fontSize: Platform.OS === 'ios' ? wp("3.5%") : wp("2.8%"),
                     }}
                     classNameContainerStyle="flex-row w-full px-2 py-1 bg-white justify-center items-center border border-black rounded-lg"
-                    classNameTextStyle="font-Poppins-Bold text-regular text-center text-black ml-1"
+                    classNameTextStyle="font-Poppins-Base text-center text-black ml-1"
                     IconComponent={
                       <Ionicons
                         name="star-half-outline"
@@ -150,7 +163,7 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
             <Text
               style={styles.ticketTitle}
               numberOfLines={3}
-              className="text-xl font-Poppins-Bold"
+              className="text-xl font-Poppins-SemiBold"
             >
               {name}
             </Text>
@@ -158,20 +171,19 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
               <Text
                 style={styles.ticketDetail}
                 numberOfLines={2}
-                className="font-Poppins-Regular"
+                className="font-Poppins-Base"
               >
-                {formatDate(start_date, true, false, false).date} -{" "}
-                {formatDate(end_date, true, false, false).date}
+                {formatDate(regisDate, true, false, false).date}
               </Text>
               <Text
                 style={styles.ticketDetail}
                 numberOfLines={2}
-                className="font-Poppins-Regular"
+                className="font-Poppins-Base"
               >
                 {formatDate(start_date, true, false, false).time} -{" "}
                 {formatDate(end_date, true, false, false).time}
               </Text>
-              <Text style={styles.ticketDetail} numberOfLines={1}>
+              <Text style={styles.ticketDetail} className="font-Poppins-Base" numberOfLines={1}>
                 {location}
               </Text>
             </View>
@@ -179,10 +191,10 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
           <TouchableOpacity
             style={styles.footerTicket}
             onPress={() => {
-              navigateToTicketDetail(eventId, slug);
+              navigateToTicketDetail(eventId, slug, formatDate(regisDate, true, false, false).date);
             }}
             disabled={closeTicket}
-            className={`w-[13%] ${closeTicket ? 'bg-gray-200' : 'bg-primary'}`}
+            className={`w-[13%] ${closeTicket ? 'bg-[#E4E4E4]' : 'bg-primary'}`}
           >
             <View style={styles.dashedLineContainer}>
               {Array.from({ length: 25 }).map((_, index) => (
@@ -197,7 +209,8 @@ const TicketCard: React.FC<TicketProps> = ({ item, reviewed }) => {
               ]}
               className="font-Poppins-SemiBold text-white"
             >
-              {closeTicketText}
+              {/* {closeTicketText} */}
+              View Ticket
             </Text>
           </TouchableOpacity>
           <View
@@ -216,18 +229,19 @@ const styles = StyleSheet.create({
   container: {
     padding: 5,
     marginBottom: 20,
+    overflow: "visible"
   },
   ticketContainer: {
     position: "relative",
     borderRadius: 10,
     overflow: "visible",
     shadowColor: "#000000",
-    borderWidth: 1,
+    // borderWidth: 1,
     shadowOffset: {
       width: 0,
-      height: 0,
+      height: 2,
     },
-    shadowOpacity: 0.17,
+    shadowOpacity: 0.20,
     shadowRadius: 5,
     elevation: 7,
   },
@@ -238,11 +252,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   ticketTitle: {
-    fontSize: wp("4.5"),
+    fontSize: Platform.OS === "ios" ? wp("4") : wp("3.2") ,
     color: "#000",
+    includeFontPadding: false,
+    lineHeight: 22
   },
   ticketDetail: {
-    fontSize: wp("2.8"),
+    fontSize: Platform.OS === "ios" ? wp("3.1") : wp("2.6"),
     color: "#000",
     includeFontPadding: false,
     marginBottom: 3,
@@ -256,16 +272,16 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 10,
   },
   footerTicketText: {
-    position: "absolute",
-    top: "44%", // ย้ายข้อความขึ้นไปตรงกลาง
-    right: "-44%", // ย้ายข้อความไปทางขวากลาง
-    width: wp("22%"), // กว้างเท่ากับข้อความ
+    // position: "absolute",
+    bottom: Platform.OS === "ios" ? "17%" : "20%", // ย้ายข้อความขึ้นไปตรงกลาง
+    // right: "-44%", // ย้ายข้อความไปทางขวากลาง
+    width: wp("40%"), // กว้างเท่ากับข้อความ
     transform: [
       { translateX: -wp("15%") }, // เลื่อนข้อความกลับไปครึ่งหนึ่งของความกว้างข้อความ
       { translateY: -hp("2.5%") }, // เลื่อนข้อความกลับไปครึ่งหนึ่งของความสูง
       { rotate: "270deg" }, // หมุนข้อความ
     ],
-    fontSize: wp("3.5"),
+    fontSize: Platform.OS === "ios" ? wp("3.5") : wp("2.5"),
   },
   dashedLineContainer: {
     position: "absolute",
@@ -284,6 +300,6 @@ const styles = StyleSheet.create({
   dash: {
     width: 1,
     height: 5, // ปรับขนาดจุด
-    backgroundColor: "#000",
+    backgroundColor: "#8888",
   },
 });

@@ -91,15 +91,15 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
       <View className=" px-4 py-4 space-y-3" style={styles.headerContainer}>
         <View className="items-center justify-between flex-row">
           <View className="flex-row items-center">
-            <TouchableOpacity onPress={() => navigation.goBack()} className="">
+            <TouchableOpacity onPress={() => navigation.goBack()} className="flex-row items-center">
               <Icon name="chevron-back" size={26} color="#000000" />
+              <Text
+                className="text-xl font-Poppins-SemiBold text-center ml-3"
+                style={styles.headerText}
+              >
+                {tag}
+              </Text>
             </TouchableOpacity>
-            <Text
-              className="text-xl font-Poppins-SemiBold text-center ml-3"
-              style={styles.headerText}
-            >
-              {tag}
-            </Text>
           </View>
           {subscribed ? (
             <TouchableOpacity

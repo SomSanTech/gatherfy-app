@@ -56,13 +56,13 @@ const ParallaxCarouselCard: React.FC<ParallaxCarouselCardProps> = ({
 
     if (currentDate < startDate) {
       setCloseRegister(true);
-      setCloseRegisterText("Coming Soon");
+      setCloseRegisterText("SOON");
     } else if (currentDate > endDate) {
       setCloseRegister(true);
-      setCloseRegisterText("Sale Close");
+      setCloseRegisterText("CLOSED");
     }else{
       setCloseRegister(false);
-      setCloseRegisterText("Register Now");
+      setCloseRegisterText("NOW");
     }
   }, [item.start_date, item.end_date]);
 

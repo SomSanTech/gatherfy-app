@@ -18,6 +18,10 @@ import CustomButton from "./CustomButton";
 import Favorite from "@/assets/icons/favorite-icon.svg";
 import FavoriteFill from "@/assets/icons/favorite-fill-icon.svg";
 import * as SecureStore from "expo-secure-store";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 interface Event {
   slug: string;
@@ -88,7 +92,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
           key={item.slug}
           onPress={() => navigateToEventDetail(item.slug)}
           className="items-center justify-center"
-          style={styles.favCardContainer}
+          style={[styles.favCardContainer, {height: Platform.OS === "ios" ? wp(50) : wp(50)}]}
         >
             <View style={styles.favoriteContainer}>
               <ImageBackground
@@ -114,7 +118,7 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
                   </View>
                   <Text
                   numberOfLines={2}
-                    className="text-white text-base font-semibold bottom-5 text-left mx-4"
+                    className="text-white text-base font-Poppins-SemiBold bottom-5 text-left mx-4"
                     style={styles.favText}
                   >
                     {item.name}
@@ -148,7 +152,6 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({
 const styles = StyleSheet.create({
   favCardContainer: {
     width: "48%",
-    height:200,
     margin: '1%',
   },
   favoriteContainer:{

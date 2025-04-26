@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Platform,
 } from "react-native";
 import React, { forwardRef, useCallback, useMemo } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -81,7 +82,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
 
   return (
     <GestureHandlerRootView style={styles.bottomModalContainer}>
-      <View className="m-0 p-0" style={{ flex: 1 }}>
+      <View className="m-0" style={{ flex: 1 }}>
         <View className="flex-row justify-between items-center mx-5 mt-1 pb-4">
           {props.countResult > 0 && (
             <Text className="text-sm text-searchText font-Poppins-Regular">
@@ -99,9 +100,9 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
                 <Image
                   source={icons.filter}
                   style={{ width: 18, height: 18 }}
-                  className="mr-1 my-auto"
+                  className="mr-2 my-auto"
                 />
-                <Text className="font-Poppins-Regular text-sm"> Filter</Text>
+                <Text className="font-Poppins-Regular text-sm">Filter</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -165,7 +166,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>((props, ref) => {
                         textDecorationLine: "none",
                         padding: 0,
                         color: "#000000",
-                        fontSize: wp("3.3%"),
+                        fontSize: Platform.OS === "ios" ? wp("3.3%") : wp("3%"),
                       }}
                     />
                   </View>
@@ -286,6 +287,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#FFFFFF",
     fontFamily: "Poppins-SemiBold",
+    includeFontPadding: false
   },
 });
 
