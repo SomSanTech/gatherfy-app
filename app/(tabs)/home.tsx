@@ -38,11 +38,15 @@ import { useNavigation } from "@react-navigation/native";
 import groupEventsByDate from "@/utils/groupEventsByDate";
 import formatDate from "@/utils/formatDate";
 import { Icon } from "react-native-elements";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import { useAuth } from "@/app/context/AuthContext";
 import { fetchUserProfile } from "@/composables/useFetchUserProfile";
 import DefaultProfile from "@/assets/images/default-profile.svg";
 import { useFocusEffect } from "expo-router";
 import { Item_width } from "@/components/parallax-carousel/ParallaxCarouselCard";
+import groupEventsByTag from "@/utils/groupEventsByTag";
+import useNavigateToEventTag from "@/composables/navigateToEventTag";
+import Loader from "@/components/Loader";
 
 interface SlideshowData {
   id: string;
@@ -53,7 +57,6 @@ interface SlideshowData {
   slug: string;
 }
 
-const mockupUserName = "MABELZ SUCHADA SONPAN";
 const OFFSET = 45; // Define OFFSET with an appropriate value
 
 const Home: React.FC = () => {
@@ -69,6 +72,9 @@ const Home: React.FC = () => {
   const [isAutoPlay, setIsAutoPlay] = useState(true); // Autoplay state
   const [scrolling, setScrolling] = useState(false); // Detect if scrolling manually
   const timerRef = useRef<NodeJS.Timeout | null>(null); // Use useRef to store the timer
+  const { navigateToEventTag } = useNavigateToEventTag();
+  const { navigateToEventDetail } = useNavigateToEventDetail();
+  const navigation = useNavigation<any>();
 
   function FocusAwareStatusBar(props: StatusBarProps) {
     const isFocused = useIsFocused();
@@ -78,8 +84,8 @@ const Home: React.FC = () => {
 
   const fetchData = async () => {
     const data = await getEvent("home");
-    setIsLoading(false);
     setEvents(data);
+    groupEventsByTag(events)
   };
 
   const fetchSlideshow = async () => {
@@ -97,9 +103,6 @@ const Home: React.FC = () => {
     setSlideshow(slideshowData);
   };
 
-  const { navigateToEventDetail } = useNavigateToEventDetail();
-
-  const navigation = useNavigation<any>();
 
   const handleNavigateToProfile = () => {
     navigation.navigate("Profile"); // ชื่อหน้าของ Tab Profile ที่ตั้งไว้
@@ -132,9 +135,16 @@ const Home: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
+      setIsLoading(true)
+      try{
       loadUser();
       fetchData();
       fetchSlideshow();
+      } finally {
+        // setTimeout(() => {
+        setIsLoading(false)
+        // }, 500);
+      }
     }, [])
   );
 
@@ -156,7 +166,7 @@ const Home: React.FC = () => {
 
     timerRef.current = setTimeout(() => {
       setScrolling(false);
-      setIsAutoPlay(true); // Resume autoplay after scrolling stops
+      // setIsAutoPlay(true); // Resume autoplay after scrolling stops
     }, 1000); // Delay for 1 second after the last scroll
   };
 
@@ -204,7 +214,7 @@ const Home: React.FC = () => {
                 className="text-2xl font-Poppins-SemiBold text-black"
                 style={{
                   textTransform: "capitalize",
-                  fontSize: wp("4.4"),
+                  fontSize: Platform.OS === "ios" ? wp("4.4") : wp("4"),
                   includeFontPadding: false,
                 }}
               >
@@ -225,12 +235,8 @@ const Home: React.FC = () => {
           </View>
         </View>
 
-        {isLoading ? (
-          <View className="flex-1 justify-center items-center">
-            <Text className="text-3xl font-Poppins-Regular text-black mx-4 my-5 text-center ">
-              Loading events...
-            </Text>
-          </View>
+        { isLoading ? (
+          <Loader />
         ) : Object.entries(groupEventsByDate(events)).length === 0 ? (
           <View className="flex-1 justify-center items-center">
             <Image
@@ -244,20 +250,20 @@ const Home: React.FC = () => {
           </View>
         ) : (
           <FlatList
-            data={[{ type: "slideshow" }, { type: "events" }]}
+            data={[{ type: "slideshow" }, { type: "events" }, { type: "tags" }]}
             keyExtractor={(item, index) => index.toString()}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => {
               if (item.type === "slideshow") {
                 return (
-                  <View style={{ marginTop: Platform.OS === "ios" ? 85 : 95 }}>
+                  <View style={{ marginTop: Platform.OS === "ios" ? 100 : 120 }}>
                     <View className="pt-5 bg-white rounded-b-3xl">
                       <Text
                         className={`text-left pl-7 
                         font-Poppins-SemiBold  mb-2 text-black`}
                         style={{
                           includeFontPadding: false,
-                          fontSize: wp("4.5"),
+                          fontSize: Platform.OS === "ios" ? wp("4.5") : wp("4"),
                         }}
                       >
                         Recommended Events
@@ -302,13 +308,7 @@ const Home: React.FC = () => {
                 const groupedEvents = groupEventsByDate(events); // Group events by date
                 return (
                   <Fragment key={item.type}>
-                    <View className="py-8 mx-3 bg-gray-300 rounded-2xl mb-5">
-                      <Text
-                        className="font-Poppins-Regular text-2xl py-3 pt-0 text-primary text-center"
-                        style={{ fontSize: wp("4.8") }}
-                      >
-                        - Explore by date -
-                      </Text>
+                    <View className="py-8 mx-3 rounded-2xl">
                       {Object.entries(groupedEvents).map(
                         ([date, eventsOnDate], index) => {
                           const eventsArray = Array.isArray(eventsOnDate)
@@ -317,19 +317,18 @@ const Home: React.FC = () => {
                           return (
                             <View key={date} className="mb-3">
                               <Text
-                                className={`text-lg font-Poppins-Regular text-black mb-3 ${
-                                  index === 0 ? "mt-0" : "mt-4"
-                                } px-5`}
+                                className={`text-lg font-Poppins-Base text-black ${index === 0 ? "mt-0" : "mt-4"
+                                  } px-5`}
                                 style={{
-                                  fontSize: wp("3.8"),
+                                  fontSize: Platform.OS === "ios" ? wp("4") : wp("3.2"),
                                   textTransform: "capitalize",
                                   includeFontPadding: false,
-                                  textAlign: "center",
+                                  textAlign: "left",
                                 }}
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
                               >
-                                - {formatDate(date, false, false, true).date} -
+                                {formatDate(date, false, false, true).date}<Text className="font-Poppins-Regular opacity-60"> / {formatDate(date, false, true, false, "daysOfWeek").date}</Text> 
                               </Text>
                               <EventCard
                                 key={date}
@@ -341,8 +340,58 @@ const Home: React.FC = () => {
                         }
                       )}
                     </View>
+                    <View
+                      style={{
+                        borderBottomColor: 'black',
+                        borderBottomWidth: StyleSheet.hairlineWidth,
+                        width: "90%",
+                        margin: "auto",
+                        opacity: 0.3
+                      }}
+                    />
                   </Fragment>
                 );
+              } else if (item.type === "tags") {
+                const groupedEvents = groupEventsByTag(events);
+                console.log("groupedEvents" + groupedEvents)
+                return (
+                  <Fragment key={item.type}>
+                    <View className="mb-4">
+                    {Object.entries(groupedEvents).map(
+                      ([tag, grouped], index) => {
+                        const eventsArray = Array.isArray(grouped)
+                          ? grouped.events
+                          : [];
+                        return (
+                          <View className="p-3 mt-4 mx-3">
+                            <TouchableOpacity
+                              key={tag + events + index}
+                              onPress={() => navigateToEventTag(tag, grouped.tag_id)}>
+                              <View className="flex-row justify-between my-2 items-center">
+                                <View>
+                                <Text className="font-Poppins-Regular text-xs">Events for you</Text>
+                                <Text className="font-Poppins-Base font-semibold" style={{fontSize: Platform.OS === "ios" ? wp("4") : wp("3.2")}}>{tag}</Text>
+                                </View>
+                                <Ionicons name="chevron-forward" size={26} color="#000000" />
+                              </View>
+                              <View className="flex-row w-full">
+                                {grouped.events.map((item, index) => (
+                                  <View
+                                    key={tag + index}
+                                    style={{ width: index === 0 || index === 3 ? '25%' : '25%', padding: 1}}
+                                  >
+                                    <Image source={{ uri: item.image }} className={ index === 0 && eventsArray.length === index+ 1 ? "h-36 w-full rounded-lg" : index === 0 ? "h-36 w-full rounded-l-lg" : eventsArray.length === index+ 1 ? "h-36 w-full rounded-r-lg" : "h-36 w-full"}  />
+                                  </View>
+                                ))}
+                              </View>
+                            </TouchableOpacity>
+                          </View>
+                        );
+                      }
+                    )}
+                    </View>
+                  </Fragment>
+                )
               }
               return null;
             }}

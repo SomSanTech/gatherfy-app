@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import * as SecureStore from "expo-secure-store";
-import { fetchContact } from "@/composables/useFetchContact";
+import { fetchContact } from "@/composables/usefetchContact";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 

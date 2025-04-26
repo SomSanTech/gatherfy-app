@@ -40,7 +40,7 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
       undefined
     );
     setEvents(data); // Update events after filtering
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   const loadSubscribed = async () => {
@@ -78,8 +78,12 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
   };
 
   useEffect(() => {
-    loadSubscribed();
-    fetchEventData();
+    try{
+      loadSubscribed();
+      fetchEventData();
+    }finally{
+      setIsLoading(false);
+    }
   }, []);
 
   return (
@@ -87,15 +91,15 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
       <View className=" px-4 py-4 space-y-3" style={styles.headerContainer}>
         <View className="items-center justify-between flex-row">
           <View className="flex-row items-center">
-            <TouchableOpacity onPress={() => navigation.goBack()} className="">
+            <TouchableOpacity onPress={() => navigation.goBack()} className="flex-row items-center">
               <Icon name="chevron-back" size={26} color="#000000" />
+              <Text
+                className="text-xl font-Poppins-SemiBold text-center ml-3"
+                style={styles.headerText}
+              >
+                {tag}
+              </Text>
             </TouchableOpacity>
-            <Text
-              className="text-xl font-Poppins-Bold text-center ml-5"
-              style={styles.headerText}
-            >
-              {tag}
-            </Text>
           </View>
           {subscribed ? (
             <TouchableOpacity
@@ -115,7 +119,7 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
               style={styles.subscribeButton}
               onPress={() => handleChangeSubscribed()}
             >
-              <NotificationAdd />
+              <NotificationAdd width={21} height={21} />
               <Text style={styles.subscribeButtonText}>Subscribe</Text>
             </TouchableOpacity>
           )}
@@ -126,7 +130,7 @@ const EventTag: React.FC<EventDetailProps> = ({ route }) => {
           <Text style={styles.loadingText}>Loading...</Text>
         </View>
       ) : (
-        <View className="m-0 p-0" style={{ flex: 1 }}>
+        <View className="mx-3 p-0" style={{ flex: 1 }}>
           <EventCard events={events} page="tag" />
         </View>
       )}
@@ -144,10 +148,6 @@ const styles = StyleSheet.create({
   headerContainer: {
     padding: 15,
     position: "relative",
-    shadowColor: "#000", // สีของเงา
-    shadowOffset: { width: 0, height: 8 }, // เงาเฉพาะด้านล่าง
-    shadowOpacity: 0.1, // ความโปร่งแสงของเงา
-    shadowRadius: 5, // ความเบลอของเงา
     elevation: 2, // สำหรับ Android
     backgroundColor: "#ffffff", // พื้นหลังของ View
   },
@@ -158,15 +158,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 5,
-    paddingRight: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    // paddingRight: 8,
     backgroundColor: "#f1f1f1",
-    borderRadius: 8,
+    borderRadius: 18,
   },
   subscribeButtonText: {
     includeFontPadding: false,
     fontSize: 14.2,
-    fontFamily: "Poppins-Bold",
+    fontFamily: "Poppins-SemiBold",
     color: "#000000",
     marginLeft: 5,
   },

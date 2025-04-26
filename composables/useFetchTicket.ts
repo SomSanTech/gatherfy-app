@@ -20,7 +20,7 @@ export const useFetchTicketWithAuth = async (
     }
 
     let urlToFetch = `${API_BASE_URL}/api/${url}`;
-
+    console.log(urlToFetch)
     const response = await fetch(urlToFetch, {
       method: method,
       headers: {
@@ -30,7 +30,7 @@ export const useFetchTicketWithAuth = async (
     });
     if (!response.ok) {
       console.error(`Error: ${response.status} - ${response.statusText}`);
-      return `Error: ${response.status} - ${response.statusText}`;
+      return [];
     }
     return await response.json();
   } catch (error) {
@@ -56,7 +56,7 @@ export const fetchReviewedTickets = async (token:any) => {
       },
     });
     if (!response.ok) {
-      console.error(`Error: ${response.status} - ${response.statusText}`);
+      // console.error(`Error: ${response.status} - ${response.statusText}`);
       return `Error: ${response.status} - ${response.statusText}`;
     }
     return await response.json();

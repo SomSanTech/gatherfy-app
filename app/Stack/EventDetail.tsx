@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, Image, StyleSheet, ImageBackground, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -16,10 +16,19 @@ import { RootStackParamList } from "@/rootStack/RootStackParamList";
 import useNavigateToGoBack from "@/composables/navigateToGoBack";
 import { Colors } from "@/constants/Colors";
 import useNavigateToEventTag from "@/composables/navigateToEventTag";
+import Favorite from "@/assets/icons/favorite-icon.svg";
+import FavoriteFill from "@/assets/icons/favorite-fill-icon.svg";
+import Calendar from "../../assets/icons/Calendar.svg"
+import Location from "../../assets/icons/Location.svg"
+import Time from "../../assets/icons/Time.svg"
+
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { addFavortite, fetchFavortite, removeFavortite } from "@/composables/useFetchFavorite";
+import Loader from "@/components/Loader";
+import dayjs from "dayjs";
 
 type EventDetailRouteProp = RouteProp<RootStackParamList, "EventDetail">;
 
@@ -42,6 +51,7 @@ interface EventDetail {
   owner: string;
   location: string;
   map: string;
+  status: string;
 }
 
 const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
@@ -52,19 +62,39 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     {} as EventDetail
   );
   const [isRegistered, setIsRegistered] = useState<boolean>(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [favoriteId, setFavoriteId] = useState<number | null>();
   const [closeRegister, setCloseRegister] = useState<boolean>(false);
   const [closeRegisterText, setCloseRegisterText] =
     useState<string>("Register Event");
   const [usersInfo, setUsersInfo] = useState<any>([]);
   const [confirmRegister, setConfirmRegister] = useState<boolean>(false);
-
+  const [isLoading, setIsLoading] = useState(true);
   const { navigateToEventTag } = useNavigateToEventTag();
+  const [registrationDateList, setRegistrationDateList] = useState<any>([])
+
 
   const fetchDataDetailAsync = async () => {
     const response = await getEvent("detail", undefined, slug);
     setEventDetail(response);
   };
 
+  const getEventDateList = () => {
+    const dateList: string[] = []; // declare fresh each time
+    const startDate = new Date(eventDetail.start_date).getTime()
+    const endDate = new Date(eventDetail.end_date).getTime()
+    const diff = Math.ceil((endDate-startDate)/864e5)
+    for(let i = 0; i < diff; i++){
+      const date = new Date(startDate + (864e5 * i))
+      const format = dayjs(date).format('YYYY-MM-DDTHH:mm:ss');
+      dateList.push(format)
+    }
+    const formattedList = dateList.map(date => ({
+      label: dayjs(date).format('dddd, DD MMMM YYYY'), // or a prettier format
+      value:date
+    }));
+    setRegistrationDateList(formattedList)
+  }
   const validateTimeRegister = async () => {
     const currentDate = new Date();
     const startDate = new Date(eventDetail.ticket_start_date);
@@ -73,12 +103,15 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     if (currentDate < startDate) {
       setCloseRegister(true);
       setCloseRegisterText("Coming Soon");
-    } else if (currentDate > endDate) {
+    } else if (eventDetail.status !== 'full' && currentDate > endDate) {
       setCloseRegister(true);
-      setCloseRegisterText("Sale Close");
+      setCloseRegisterText("Registration Closed");
+    } else if (eventDetail.status === 'full') {
+      setCloseRegister(true);
+      setCloseRegisterText("Registration Full");
     } else {
       setCloseRegister(false);
-      setCloseRegisterText("Register Event");
+      setCloseRegisterText("Join Event");
     }
   };
 
@@ -88,30 +121,57 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     setUsersInfo(response);
   };
 
-  useEffect(() => {
-    setConfirmRegister(false);
-    console.log("confirmRegister", confirmRegister);
-
-    const fetchRegistration = async () => {
-      const token = await SecureStore.getItemAsync("my-jwt");
-      const response = await useFetchTicketWithAuth("v1/tickets", "GET", token);
-      setIsRegistered(
-        response.some(
-          (ticket: { slug: string }) => ticket.slug === eventDetail.slug
-        )
-      );
+  const handleAddToFavorite = async (eventId: string) => {
+    const token = await SecureStore.getItemAsync("my-jwt");
+    console.log(eventId)
+    const favortiteBody = {
+      eventId: eventId,
     };
+    const response = await addFavortite(token, favortiteBody)
+    setIsFavorite(true)
+    setFavoriteId(response.favoriteId)
+  }
 
-    fetchRegistration();
-    validateTimeRegister();
-    fetchDataDetailAsync();
-    getUsersInfo();
+  const handleRemoveFavorite = async (eventId: any) => {
+    const token = await SecureStore.getItemAsync("my-jwt");
+    await removeFavortite(token, eventId)
+    setIsFavorite(false)
+    setFavoriteId(null)
+  }
 
-    // Only call countViewById when eventDetail.eventId is available
-    if (eventDetail.eventId) {
-      countViewById(`/api/v1/countView/${eventDetail.eventId}`);
+  useEffect(() => {
+    setIsLoading(true)
+    try {
+      const fetchRegistrationAndFavorite = async () => {
+        const token = await SecureStore.getItemAsync("my-jwt");
+        const response = await useFetchTicketWithAuth("v1/tickets", "GET", token);
+        setIsRegistered(
+          response.some(
+            (ticket: { slug: string }) => ticket.slug === eventDetail.slug
+          )
+        );
+        const favResponse = await fetchFavortite(token);
+        favResponse.forEach((fav: any) => {
+          if (fav.eventId === eventDetail.eventId) {
+            setIsFavorite(true)
+            setFavoriteId(fav.favoriteId)
+          }
+        })
+      };
+      fetchRegistrationAndFavorite();
+      validateTimeRegister();
+      fetchDataDetailAsync();
+      getUsersInfo();
+      getEventDateList();
+
+      // Only call countViewById when eventDetail.eventId is available
+      if (eventDetail.eventId) {
+        countViewById(`/api/v1/countView/${eventDetail.eventId}`);
+      }
+    } finally {
+        setIsLoading(false)        
     }
-  }, [eventDetail.slug, confirmRegister, eventDetail.eventId]); // Add eventDetail.eventId to the dependency array
+  }, [eventDetail.slug, confirmRegister, eventDetail.eventId, isFavorite]); // Add eventDetail.eventId to the dependency array
 
   const startDate = eventDetail.start_date
     ? formatDate(eventDetail.start_date, true, true, true).date
@@ -129,141 +189,168 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   return (
     <Fragment>
       <SafeAreaView edges={["top"]} className="flex-1 bg-white">
-        <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => navigateToGoBack()}>
-            <Icon name="chevron-back" size={26} color="#000000" />
-          </TouchableOpacity>
-          <Text style={styles.headerText}>Event Detail</Text>
-        </View>
-        <KeyboardAwareScrollView>
-          <View style={styles.imageContainer}>
-            <Image
-              source={{ uri: eventDetail.image }}
-              style={styles.image}
-              resizeMode="contain"
-            />
-          </View>
-          <View style={styles.detailContainer}>
-            <Text style={styles.eventName}>{eventDetail.name}</Text>
-            {/* <View style={styles.tagsContainer}>
-              {eventDetail.tags?.length > 0 && (
-                <Text style={styles.tagsText}>
-                  {eventDetail.tags.map((tag) => tag.tag_title).join(", ")}
-                </Text>
-              )}
-            </View> */}
-            <View style={styles.tagsContainer}>
-              {eventDetail.tags?.map((tag) => (
-                <TouchableOpacity
-                  key={tag.tag_id}
-                  style={styles.tagBox}
-                  onPress={() => navigateToEventTag(tag.tag_title, tag.tag_id)}
-                >
-                  <View style={styles.tagTextContainer}>
-                    <Text style={styles.tagText}>{tag.tag_title}</Text>
-                  </View>
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <KeyboardAwareScrollView>
+            <View style={styles.imageContainer}>
+              <ImageBackground
+                className="w-full h-full"
+                blurRadius={40}
+                source={{
+                  uri: eventDetail.image,
+                }}
+              >
+                <TouchableOpacity className="top-4 left-3" onPress={() => navigateToGoBack()}>
+                  <Icon name="chevron-back" size={Platform.OS === "ios" ? 26 : 30} color="#000000" />
                 </TouchableOpacity>
-              ))}
-            </View>
-            <View style={styles.dateContainer}>
-              <Icon name="calendar-outline" size={20} color="#000000" />
-              <Text style={styles.dateText}>
-                {startDate}{" "}
-                {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
-                  <Text>- {endDate}</Text>
-                ) : (
-                  <Text>No end date</Text>
-                )}
-              </Text>
-            </View>
-            <View style={styles.timeContainer}>
-              <Icon name="time-outline" size={20} color="#000000" />
-              <Text style={styles.timeText}>
-                {startTime} - {endTime}
-              </Text>
-            </View>
-            <View style={styles.locationContainer}>
-              <Icon name="map-outline" size={20} color="#000000" />
-              <Text style={styles.locationText}>{eventDetail.location}</Text>
-            </View>
-            <View style={styles.registerButtonContainer}>
-              {isRegistered ? (
-                <CustomButton
-                  title="Already Registered"
-                  containerStyles={styles.registerButtonDisabled}
-                  textStyle={styles.registerButtonTextDisabled}
-                  handlePress={() => {}}
-                  disabled={true}
+                <Image
+                  source={{ uri: eventDetail.image }}
+                  style={styles.image}
+                  resizeMode="contain"
                 />
-              ) : (
-                <CustomButton
-                  title={closeRegisterText}
-                  containerStyles={
-                    closeRegister
-                      ? styles.registerButtonDisabled
-                      : styles.registerButton
-                  }
-                  textStyle={
-                    closeRegister
-                      ? styles.registerButtonTextDisabled
-                      : styles.registerButtonText
-                  }
-                  handlePress={() => setPopupVisible(true)}
-                  disabled={closeRegister}
-                />
-              )}
+              </ImageBackground>
             </View>
-          </View>
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.descriptionTitle}>Description</Text>
-            <Text style={styles.descriptionText}>{eventDetail.detail}</Text>
-          </View>
-          <View style={styles.mapContainer}>
-            <Text style={styles.mapTitle}>Event Location</Text>
-            <WebView
-              scalesPageToFit={true}
-              bounces={false}
-              javaScriptEnabled
-              style={styles.map}
-              automaticallyAdjustContentInsets={false}
-              source={{
-                html: `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <style>
-                  html, body {
-                    margin: 0;
-                    padding: 0;
-                    width: 100%;
-                    height: 100%;
+            <View style={styles.detailContainer}>
+              <View style={styles.tagsContainer}>
+                {eventDetail.tags?.map((tag) => (
+                  <TouchableOpacity
+                    key={tag.tag_id}
+                    style={styles.tagBox}
+                    onPress={() => navigateToEventTag(tag.tag_title, tag.tag_id)}
+                  >
+                    <View style={styles.tagTextContainer}>
+                      <Text style={styles.tagText}>{tag.tag_title}</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <Text style={styles.eventName}>{eventDetail.name}</Text>
+              <View className="flex-row mt-2">
+                <Text className="font-Poppins-Regular text-sm"><Text className="opacity-50">Organized by</Text> {eventDetail.owner}</Text>
+              </View>
+              <View style={styles.eventDetail} className="">
+                <View className="flex-row items-center">
+                  <Calendar width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" strokeWidth={10}/>
+                  <Text className="font-Poppins-Base mx-2"  style={{includeFontPadding: false}}>
+                    {startDate}{" "}
+                    {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
+                      <Text>- {endDate}</Text>
+                    ) : (
+                      <Text>No end date</Text>
+                    )}
+                  </Text>
+                </View>
+                <View className="flex-row items-center">
+                  <Time width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" strokeWidth={10}/>
+                  <Text className="font-Poppins-Base mx-2" style={{includeFontPadding: false}}>
+                    {startTime} - {endTime}
+                  </Text>
+                </View>
+                <View className="flex-row items-center">
+                  <Location width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" strokeWidth={10}  />
+                  <Text className="font-Poppins-Base mx-2"  style={{includeFontPadding: false}}>
+                    {eventDetail.location}
+                  </Text>
+                </View>
+              </View>
+              <View className="flex-row w-[98%] self-center justify-between bg-transparent mt-4">
+                <View style={{ width: '46%' }}>
+                  {isFavorite ? (
+                    <CustomButton
+                      title="Favorited"
+                      IconComponent={<FavoriteFill width={20} height={20} color={'#D71515'} />}
+                      containerStyles={styles.alreadyFavButton}
+                      textStyle={styles.alreadyFavButtonText}
+                      handlePress={() => { handleRemoveFavorite(eventDetail.eventId) }}
+                      disabled={false} />
+                  ) : (
+                    <CustomButton
+                      title="Add to Favorites"
+                      IconComponent={<Favorite width={20} height={20} color={'black'} />}
+                      containerStyles={styles.favButton}
+                      textStyle={styles.favButtonText}
+                      handlePress={() => { handleAddToFavorite(eventDetail.eventId) }}
+                      disabled={false} />
+                  )
                   }
-                  iframe {
-                    border: 0;
-                    border-radius: 50px;
-                    width: 100%;
-                    height: 100%;
-                  }
-                </style>
-              </head>
-              <body>
-                ${eventDetail.map}
-              </body>
-            </html>
-          `,
-              }}
-            />
-          </View>
-          <View style={styles.organizerContainer}>
-            <Text style={styles.organizerText}>Organized by</Text>
-            <Text style={styles.organizerName}>{eventDetail.owner}</Text>
-          </View>
-        </KeyboardAwareScrollView>
+                </View>
+                <View style={{ width: '52%' }}>
+                  {isRegistered ? (
+                    <CustomButton
+                      title="You Registered"
+                      containerStyles={styles.registerButton}
+                      textStyle={styles.registerButtonText}
+                      handlePress={() => { }}
+                      disabled={true}
+                    />
+                  ) : (
+                    <CustomButton
+                      title={closeRegisterText}
+                      containerStyles={
+                        closeRegister
+                          ? styles.registerButtonDisabled
+                          : styles.registerButton
+                      }
+                      textStyle={
+                        closeRegister
+                          ? styles.registerButtonTextDisabled
+                          : styles.registerButtonText
+                      }
+                      handlePress={() => setPopupVisible(true)}
+                      disabled={closeRegister}
+                    />
+                  )}
+                </View>
+              </View>
+              <View style={styles.modalDetail} className="">
+                <Text style={styles.descriptionTitle}>About</Text>
+                <Text style={styles.descriptionText}>{eventDetail.detail}</Text>
+              </View>
+              <View style={styles.modalDetail} className="">
+                <Text style={styles.mapTitle}>Location</Text>
+                <WebView
+                  scalesPageToFit={true}
+                  bounces={false}
+                  javaScriptEnabled
+                  style={styles.map}
+                  automaticallyAdjustContentInsets={false}
+                  source={{
+                    html: `
+              <!DOCTYPE html>
+              <html>
+                <head>
+                  <style>
+                    html, body {
+                      margin: 0;
+                      padding: 0;
+                      width: 100%;
+                      height: 100%;
+                    }
+                    iframe {
+                      border: 0;
+                      border-radius: 50px;
+                      width: 100%;
+                      height: 100%;
+                    }
+                  </style>
+                </head>
+                <body>
+                  ${eventDetail.map}
+                </body>
+              </html>
+            `,
+                  }}
+                />
+              </View>
+            </View>
+          </KeyboardAwareScrollView>
+        )}
       </SafeAreaView>
       <Popup
         visible={isPopupVisible}
         onClose={() => setPopupVisible(false)}
-        title="Registration"
+        title="Reserve your seat now"
         eventName={eventDetail.name}
         eventLocation={eventDetail.location}
         startDate={startDate}
@@ -273,56 +360,42 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
         eventId={eventDetail.eventId}
         user={usersInfo}
         setConfirmRegister={setConfirmRegister}
+        registrationDateList={registrationDateList}
+        defaultValue={registrationDateList[0]}
       />
     </Fragment>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 15,
-    backgroundColor: "#ffffff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
-  },
-  headerText: {
-    includeFontPadding: false,
-    fontSize: 18,
-    fontFamily: "Poppins-Bold",
-    marginLeft: 10,
-  },
   imageContainer: {
     width: "100%",
-    height: 220,
+    height: 420,
   },
   image: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 10,
+    width: "90%",
+    height: "90%",
+    margin: "auto",
+    objectFit: "contain",
   },
   detailContainer: {
     padding: 15,
     paddingVertical: 20,
-    backgroundColor: "#f5f5f5",
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     marginBottom: 25,
   },
   eventName: {
-    fontSize: 24,
+    // fontSize: 22,
     includeFontPadding: false,
     fontFamily: "Poppins-Bold",
+    fontSize: Platform.OS === "ios" ? wp(5) : wp(4),
   },
   tagsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginTop: 10,
+    marginTop: 1,
     marginBottom: 15,
   },
   tagBox: {
@@ -331,8 +404,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 10,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
     shadowRadius: 3.84,
     elevation: 3,
   },
@@ -346,64 +419,35 @@ const styles = StyleSheet.create({
   tagText: {
     includeFontPadding: false,
     fontFamily: "Poppins-SemiBold",
-    fontSize: wp(3),
+    fontSize: Platform.OS === "ios" ? wp(3) : wp(2.5),
     color: "#333",
-  },
-  tagIconContainer: {
-    paddingHorizontal: 7,
-  },
-  dateContainer: {
-    flexDirection: "row",
-    marginBottom: 10,
-  },
-  dateText: {
-    fontSize: 16,
-    fontFamily: "Poppins-Regular",
-    marginLeft: 10,
-  },
-  timeContainer: {
-    flexDirection: "row",
-    marginBottom: 10,
-  },
-  timeText: {
-    fontSize: 16,
-    fontFamily: "Poppins-Regular",
-    marginLeft: 10,
-  },
-  locationContainer: {
-    flexDirection: "row",
-    marginBottom: 20,
-  },
-  locationText: {
-    fontSize: 16,
-    fontFamily: "Poppins-Regular",
-    marginLeft: 10,
-  },
-  registerButtonContainer: {
-    marginBottom: 15,
   },
   registerButton: {
     backgroundColor: "#D71515",
     paddingVertical: 12,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: "center",
+    borderColor: "#D71515",
+    borderWidth: 1,
+    includeFontPadding: false,
   },
   registerButtonText: {
     color: "#FFFFFF",
     fontFamily: "Poppins-SemiBold",
+    includeFontPadding: false,
   },
   registerButtonDisabled: {
     backgroundColor: "#CCCCCC",
     paddingVertical: 12,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: "center",
+    borderColor: "#CCCCCC",
+    borderWidth: 1,
   },
   registerButtonTextDisabled: {
-    color: "#FFFFFF",
+    color: "#808080",
     fontFamily: "Poppins-SemiBold",
-  },
-  descriptionContainer: {
-    paddingHorizontal: 15,
+    includeFontPadding: false,
   },
   descriptionTitle: {
     fontSize: 18,
@@ -415,10 +459,6 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
     lineHeight: 24,
   },
-  mapContainer: {
-    marginTop: 20,
-    paddingHorizontal: 15,
-  },
   mapTitle: {
     fontSize: 18,
     fontFamily: "Poppins-SemiBold",
@@ -429,20 +469,52 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#f5f5f5",
   },
-  organizerContainer: {
-    paddingHorizontal: 15,
+  modalDetail: {
     marginTop: 20,
-    marginBottom: 20,
+    paddingHorizontal: 5,
+    paddingVertical: 18,
+    borderRadius: 20,
+    gap: 10,
+    borderColor: '#ECECEC',
   },
-  organizerText: {
-    fontSize: 14,
-    fontFamily: "Poppins-Light",
-    textAlign: "center",
+  eventDetail: {
+    marginTop: 20,
+    paddingHorizontal: 5,
+    paddingVertical: 18,
+    borderRadius: 20,
+    gap: 10,
+    borderColor: '#ECECEC',
   },
-  organizerName: {
-    fontSize: 20,
-    fontFamily: "Poppins-SemiBold",
-    textAlign: "center",
+  favButton: {
+    backgroundColor: "#fff",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    borderColor: "#000",
+    borderWidth: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 4
+  },
+  favButtonText: {
+    color: "#000",
+    fontFamily: "Poppins",
+  },
+  alreadyFavButton: {
+    backgroundColor: "#fff",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    borderColor: "#D71515",
+    borderWidth: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 4
+  },
+  alreadyFavButtonText: {
+    color: "#D71515",
+    fontFamily: "Poppins-Base",
+    includeFontPadding: false
   },
 });
 

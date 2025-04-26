@@ -57,7 +57,6 @@ const Tag = () => {
                   style={styles.tagButton}
                   onPress={() => navigateToEventTag(tag.tag_title , tag.tag_id)}
                 >
-                  <View></View>
                   <Text style={styles.tagText} numberOfLines={1}>{tag.tag_title}</Text>
                   <View
                     style={[styles.tagLine, { backgroundColor: tag.tag_code }]}

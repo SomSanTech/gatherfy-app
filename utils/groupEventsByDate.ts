@@ -20,8 +20,9 @@ const groupEventsByDate = (events: any[] = []) => {  // เพิ่มค่า
 
     // จัดเรียงวันที่ และจำกัดไว้แค่ 3 วัน
     return Object.entries(grouped)
-      .sort(([dateB], [dateA]) => dayjs(dateA).unix() - dayjs(dateB).unix())
-      .slice(0, 3)
+      .filter(([date]) => dayjs(date).isSame(dayjs(), 'day') || dayjs(date).isAfter(dayjs(), 'day')) // Only today or after
+      .sort(([dateA], [dateB]) => dayjs(dateA).unix() - dayjs(dateB).unix()) // Sort from present to future
+      .slice(0, 4)
       .reduce((acc, [date, events]) => {
         acc[date] = events;
         return acc;

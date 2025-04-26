@@ -1,19 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
   StyleSheet,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import * as NavigationBar from "expo-navigation-bar";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-import { Button } from "@rneui/base";
-
 interface SortingDropdownProps {
   sorting: (value: string) => void;
 }
@@ -32,6 +23,7 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
   };
 
   const sortingOptions = [
+    { label: "Relevance", value: "" },
     { label: "Newest", value: "date_desc" },
     { label: "Oldest", value: "date_asc" },
     { label: "A-Z", value: "name_asc" },
@@ -46,6 +38,7 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
         // ตั้งค่าให้ปุ่มใน Navigation Bar เป็นสีอ่อน (หากพื้นหลังเป็นสีเข้ม)
         await NavigationBar.setButtonStyleAsync("dark");
         NavigationBar.setBorderColorAsync("#ffffff");
+        setSelectedSort("")
       } catch (error) {
         console.error("Error configuring Navigation Bar:", error);
       }
@@ -72,27 +65,23 @@ const SortingDropdown = ({ sorting }: SortingDropdownProps) => {
         }} // เปลี่ยนฟอนต์ของ placeholder
         selectedTextStyle={{
           color: "black",
-          lineHeight: 24,
           marginTop: 2,
+          includeFontPadding: false,
+          paddingHorizontal: 4
         }}
         itemTextStyle={{
           color: "black",
-          lineHeight: 24,
+          lineHeight: 17,
           marginTop: 2,
+          includeFontPadding: false,
+          fontSize: 16
         }}
         itemContainerStyle={{ backgroundColor: "white" }}
         value={selectedSort}
         fontFamily="Poppins-Regular"
+        containerStyle={{ borderRadius: 10, maxHeight: 220, overflow: "hidden" }}
         onChange={(item) => handleSortChange(item.value)}
       />
-      <View className="items-end">
-        <TouchableOpacity
-          onPress={handleClear}
-          style={styles.buttonClearContainer}
-        >
-          <Text style={styles.buttonText}>Clear</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -135,7 +124,6 @@ const DropdownComponent: React.FC<DropdownProps> = ({
         color: "black",
         fontFamily: "Poppins-Regular",
         lineHeight: 24,
-        fontSize: wp(3),
         includeFontPadding: false,
       }}
       selectedTextProps={{ numberOfLines: 1 }}
@@ -151,26 +139,13 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   dropdown: {
-    height: "100%",
+    height: "120%",
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
     backgroundColor: "white",
-  },
-  buttonClearContainer: {
-    width: 70,
-    backgroundColor: "transparent",
-    marginTop: 15,
-    borderRadius: 10,
-    padding: 2,
-  },
-  buttonText: {
-    fontFamily: "Poppins-SemiBold",
-    textAlign: "center",
-    fontSize: 14,
-    lineHeight: 24,
-    color: "black",
+    width: "100%"
   },
 });
 

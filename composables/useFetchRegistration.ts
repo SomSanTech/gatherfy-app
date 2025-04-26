@@ -16,6 +16,7 @@ export const useFetchRegistration = async (body: any , token: any) => {
     }
 
     let url = `${API_BASE_URL}/api/v2/registrations`;
+    console.log(url)
 
     const response = await fetch(url, {
       method: "POST",

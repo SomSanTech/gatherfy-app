@@ -5,14 +5,16 @@ import {
   Text,
   StyleSheet,
   Alert,
-  TouchableOpacity,
   TouchableHighlight,
-  TextInput,
   Animated,
+  Platform,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
 import { useFetchRegistration } from "@/composables/useFetchRegistration";
 import * as SecureStore from "expo-secure-store";
+import Calendar from "../assets/icons/Calendar.svg"
+import Location from "../assets/icons/Location.svg"
+import Time from "../assets/icons/Time.svg"
+import { Dropdown } from "react-native-element-dropdown";
 
 type PopupProps = {
   visible: boolean;
@@ -33,6 +35,8 @@ type PopupProps = {
     password: string;
   };
   setConfirmRegister: (value: boolean) => void;
+  registrationDateList: { label: string; value: string }[];
+  defaultValue: { label: string; value: string }
 };
 
 const Popup: React.FC<PopupProps> = ({
@@ -48,12 +52,17 @@ const Popup: React.FC<PopupProps> = ({
   user,
   eventId,
   setConfirmRegister,
+  registrationDateList,
+  defaultValue
 }) => {
   const [password, setPassword] = useState<string>(""); // State สำหรับเก็บ password
   const [isPasswordValid, setIsPasswordValid] = useState<boolean>(true); // State สำหรับตรวจสอบ password
   const [errorText, setErrorText] = useState<string>(""); // State สำหรับเก็บข้อความแสดง error
   const [isPasswordVisible, setIsPasswordVisible] = useState(false); // สถานะการแสดงรหัสผ่าน
   const [fadeAnim] = useState(new Animated.Value(0)); // ค่าเริ่มต้นที่ 0 คือ ซ่อนโมดัล
+  const [selectedDate, setSelectedDate] = useState<{ label: string; value: string }>(); // สถานะการแสดงรหัสผ่าน
+  const [isSelectedDate, setIsSelectedDate] = useState(false); // สถานะการแสดงรหัสผ่าน
+
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -64,6 +73,7 @@ const Popup: React.FC<PopupProps> = ({
     setPassword("");
     setErrorText("");
     setIsPasswordVisible(false);
+    setIsSelectedDate(false)
 
     // เริ่มแอนิเมชันให้โมดัลค่อยๆ จางไป
     Animated.timing(fadeAnim, {
@@ -79,29 +89,32 @@ const Popup: React.FC<PopupProps> = ({
   };
 
   const handleSubmit = async () => {
-    setConfirmRegister(true);
     // สร้างค่าที่ต้องการในออบเจกต์ชั่วคราว
-    const registrationBody = {
-      eventId: eventId,
-      userId: user.users_id,
-      status: "Awaiting Check-in",
-    };
-
-    const token = await SecureStore.getItemAsync("my-jwt"); 
-
-    console.log("Registration Body:", registrationBody);
-    
-    try {
-      const response = await useFetchRegistration(registrationBody , token);
-      if (response?.status === "Awaiting Check-in") {
-        Alert.alert("Success", "Registration successful.");
-        onClose();
+    if(isSelectedDate){
+      const registrationBody = {
+        eventId: eventId,
+        regisDate: selectedDate?.value
+      };
+      console.log(registrationBody)
+      const token = await SecureStore.getItemAsync("my-jwt");  
+      try {
+        const response = await useFetchRegistration(registrationBody, token);
+        if (response?.status === "Awaiting Check-in") {
+          Alert.alert("Success", "Registration successful.");
+          onClose();
+        }
+        setConfirmRegister(true);
+      } catch (error) {
+        console.error("Error during registration:", error);
+        Alert.alert("Error", "Registration failed. Please try again.");
       }
-    } catch (error) {
-      console.error("Error during registration:", error);
-      Alert.alert("Error", "Registration failed. Please try again.");
     }
   };
+
+  const handleSelectedDate = (dateItem: any) => {
+    setSelectedDate(dateItem)
+    setIsSelectedDate(true)
+  }
 
   useEffect(() => {
     if (visible) {
@@ -130,7 +143,7 @@ const Popup: React.FC<PopupProps> = ({
     <Modal transparent={true} visible={visible} onRequestClose={onClose}>
       <Animated.View style={[styles.overlay, { opacity: fadeAnim }]}>
         <View style={styles.popupContainer}>
-          {title === "Registration" ? (
+          {title === "Reserve your seat now" ? (
             <View>
               <View style={{ marginHorizontal: 20 }}>
                 <Text style={styles.title}>{title}</Text>
@@ -138,7 +151,7 @@ const Popup: React.FC<PopupProps> = ({
                   <Text style={styles.eventName}>{eventName}</Text>
                 </View>
                 <View className="mb-2 flex-row items-center">
-                  <Icon name="calendar-outline" size={19} color="#000000" />
+                  <Calendar width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#000" strokeWidth={10} />
                   <Text className="ml-2" style={styles.eventDetail}>
                     {startDate}{" "}
                     {endDate ? (
@@ -149,37 +162,49 @@ const Popup: React.FC<PopupProps> = ({
                   </Text>
                 </View>
                 <View className="mb-2 flex-row items-center">
-                  <Icon name="time-outline" size={19} color="#000000" />
+                  <Time width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#000" strokeWidth={10} />
                   <Text style={styles.eventDetail}>
                     {startTime} - {endTime}
                   </Text>
                 </View>
-                <View className="mb-2 flex-row items-center">
-                  <Icon name="map-outline" size={20} color="#000000" />
+                <View className="mb-2 flex-row items-start">
+                  <Location width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#000" strokeWidth={10} style={{marginTop:4}} />
                   <Text style={styles.eventDetail}>{eventLocation}</Text>
                 </View>
-                {user && (
-                  <View className="flex-row items-center">
-                    <Icon
-                      name="person-circle-outline"
-                      size={20}
-                      color="#000000"
-                    />
-                    <Text style={styles.userName}>
-                      <Text>{user.username} </Text>
-                      <Text style={styles.email}>{user.users_email}</Text>
-                    </Text>
-                  </View>
-                )}
+                <Text className="my-2 font-Poppins-Base text-xs">Please confirm a registration date to continue.</Text>
+                <Dropdown
+                  style={styles.dropdown}
+                  data={registrationDateList}
+                  labelField="label"
+                  valueField="value"
+                  onChange={(item) => handleSelectedDate(item)}
+                  placeholder={defaultValue?.label}
+                  placeholderStyle={{
+                    color: "gray",
+                    includeFontPadding: false,
+                    padding: 4,
+                    fontSize: Platform.OS === "ios" ? 16 : 14,
+                    fontFamily: "Poppins-Regular",
+                  }}
+                  selectedTextStyle={{
+                    color: "black",
+                    fontFamily: "Poppins-Base",
+                    includeFontPadding: false,
+                    fontSize: Platform.OS === "ios" ? 16 : 14
+                  }}
+                  itemTextStyle={{
+                    color: "black",
+                    fontFamily: "Poppins-Regular",
+                    // lineHeight: 18,
+                    includeFontPadding: false,
+                    fontSize: Platform.OS === "ios" ? 16 : 14
+                  }}
+                  selectedTextProps={{ numberOfLines: 1 }}
+                  itemContainerStyle={{ backgroundColor: "white" }}
+                  containerStyle={{ borderRadius: 10, maxHeight: 180, overflow: "hidden" }}
+                  renderLeftIcon={() => (<Calendar width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" style={{ marginRight: 6 }} />)}
+                />
               </View>
-
-              <TouchableHighlight
-                style={styles.submitTextContainer}
-                onPress={handleSubmit}
-                underlayColor="#DDDDDD"
-              >
-                <Text style={styles.submitText}>Confirm Registration</Text>
-              </TouchableHighlight>
             </View>
           ) : (
             <View>
@@ -189,15 +214,27 @@ const Popup: React.FC<PopupProps> = ({
               </Text>
             </View>
           )}
-        </View>
-        <View style={styles.popupContainer2}>
-          <TouchableHighlight
-            style={styles.cancelTextContainer}
-            onPress={handleCancel}
-            underlayColor="#DDDDDD"
-          >
-            <Text style={styles.cancelText}>Cancel</Text>
-          </TouchableHighlight>
+          <View className="flex-row self-center justify-between bg-transparent mt-4 w-[90%]">
+            <View style={{ width: "49%" }}>
+              <TouchableHighlight
+                style={styles.cancelTextContainer}
+                onPress={handleCancel}
+                underlayColor="#DDDDDD"
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableHighlight>
+            </View>
+            <View style={{ width: "49%" }}>
+              <TouchableHighlight
+                style={[styles.submitTextContainer, isSelectedDate ? "" : {opacity:0.8}]}
+                onPress={handleSubmit}
+                underlayColor="#DDDDDD"
+                disabled={ isSelectedDate ? false : true}
+              >
+                <Text style={styles.submitText}>Confirm</Text>
+              </TouchableHighlight>
+            </View>
+          </View>
         </View>
       </Animated.View>
     </Modal>
@@ -215,7 +252,7 @@ const styles = StyleSheet.create({
     width: "90%",
     backgroundColor: "white",
     borderRadius: 10,
-    paddingTop: 20,
+    paddingVertical: 30,
   },
   popupContainer2: {
     width: "90%",
@@ -224,35 +261,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 0,
   },
-  submitTextContainer: {
-    backgroundColor: "white",
-    alignItems: "center",
-    padding: 15,
-    marginTop: 20,
-    borderTopWidth: 0.3,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-  },
-  cancelTextContainer: {
-    backgroundColor: "white",
-    alignItems: "center",
-    borderRadius: 10,
-  },
-  submitText: {
-    fontSize: 19,
-    color: "black",
-    fontFamily: "Poppins-SemiBold",
-    textDecorationLine: "underline",
-  },
-  cancelText: {
-    fontSize: 18,
-    color: "black",
-    fontFamily: "Poppins-SemiBold",
-    textAlign: "center",
-    padding: 10,
-  },
   title: {
-    fontSize: 16,
+    fontSize: Platform.OS === "ios" ? 16 : 14,
     marginBottom: 10,
     fontFamily: "Poppins-Regular",
   },
@@ -262,29 +272,18 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
   },
   eventName: {
-    fontSize: 24,
+    fontSize: Platform.OS === "ios" ? 24 : 20,
     marginBottom: 10,
-    fontFamily: "Poppins-Bold",
+    fontFamily: "Poppins-SemiBold",
   },
   eventDetail: {
-    fontSize: 16,
+    fontSize: Platform.OS === "ios" ? 16 : 14,
     fontFamily: "Poppins-Regular",
     marginLeft: 8,
+    includeFontPadding: false
   },
   inputContainer: {
     position: "relative", // ใช้สำหรับจัดตำแหน่งของไอคอน
-  },
-  inputPassword: {
-    width: "100%",
-    minHeight: 40,
-    textAlignVertical: "top",
-    borderColor: "gray",
-    borderRadius: 5,
-    borderWidth: 1,
-    padding: 10,
-    paddingRight: 45, // ปรับระยะห่างของ input กับไอคอน
-    marginTop: 10,
-    fontFamily: "Poppins-Regular",
   },
   eyeIcon: {
     position: "absolute",
@@ -302,15 +301,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
   },
-  userName: {
-    marginLeft: 8,
-    fontSize: 16,
-    fontFamily: "Poppins-SemiBold",
+  dropdown: {
+    height: 42,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    backgroundColor: "white",
+    width: "100%",
+    marginVertical: 5
   },
-  email: {
-    fontSize: 16,
-    paddingLeft: 20,
-    fontFamily: "Poppins-Regular",
+  submitTextContainer: {
+    backgroundColor: "#D71515",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    borderColor: "#D71515",
+    borderWidth: 1,
+    includeFontPadding: false,
+  },
+  submitText: {
+    color: "#FFFFFF",
+    fontFamily: "Poppins-SemiBold",
+    includeFontPadding: false
+  },
+  cancelTextContainer: {
+    backgroundColor: "#CCCCCC",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    borderColor: "#CCCCCC",
+    borderWidth: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 4,
+  },
+  cancelText: {
+    color: "#626567",
+    fontFamily: "Poppins-SemiBold",
   },
 });
 
