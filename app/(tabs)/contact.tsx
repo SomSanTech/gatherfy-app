@@ -113,16 +113,15 @@ const Contact = () => {
     }
   };
 
-  const navigateToScanQrContact = () => {
-    if (permission?.granted === false) {
+  const navigateToScanQrContact = async () => {
+    const permissionResult = await requestPermission();
+    if (permissionResult?.granted === false) {
       Alert.alert(
         "Permission Required",
         "Please allow camera permission to scan QR code."
       );
-      requestPermission();
       return;
     }
-    requestPermission();
     navigation.navigate("ScanQrContact");
   };
 

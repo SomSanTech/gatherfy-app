@@ -115,10 +115,18 @@ const EmailNotificationSetting = () => {
         style={{ flex: 1 }}
       >
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={navigateToGoBack}>
+          <TouchableOpacity
+            onPress={navigateToGoBack}
+            className="flex-row items-center"
+          >
             <Icon name="chevron-back" size={26} color="#000000" />
+            <Text
+              className="text-xl font-Poppins-SemiBold text-center ml-3"
+              style={styles.headerText}
+            >
+              Email Notification Settings
+            </Text>
           </TouchableOpacity>
-          <Text style={styles.headerText}>Email Notification Settings</Text>
         </View>
         <TouchableWithoutFeedback>
           <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 15 }}>

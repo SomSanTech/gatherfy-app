@@ -1,5 +1,13 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Image, StyleSheet, ImageBackground, Platform } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ImageBackground,
+  Platform,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -18,15 +26,19 @@ import { Colors } from "@/constants/Colors";
 import useNavigateToEventTag from "@/composables/navigateToEventTag";
 import Favorite from "@/assets/icons/favorite-icon.svg";
 import FavoriteFill from "@/assets/icons/favorite-fill-icon.svg";
-import Calendar from "../../assets/icons/Calendar.svg"
-import Location from "../../assets/icons/Location.svg"
-import Time from "../../assets/icons/Time.svg"
+import Calendar from "../../assets/icons/Calendar.svg";
+import Location from "../../assets/icons/Location.svg";
+import Time from "../../assets/icons/Time.svg";
 
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { addFavortite, fetchFavortite, removeFavortite } from "@/composables/useFetchFavorite";
+import {
+  addFavortite,
+  fetchFavortite,
+  removeFavortite,
+} from "@/composables/useFetchFavorite";
 import Loader from "@/components/Loader";
 import dayjs from "dayjs";
 
@@ -40,7 +52,7 @@ interface EventDetail {
   eventId: string;
   slug: string;
   name: string;
-  date:  DateStatus[];
+  date: DateStatus[];
   detail: string;
   start_date: string;
   end_date: string;
@@ -75,8 +87,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
   const [confirmRegister, setConfirmRegister] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const { navigateToEventTag } = useNavigateToEventTag();
-  const [registrationDateList, setRegistrationDateList] = useState<any>([])
-
+  const [registrationDateList, setRegistrationDateList] = useState<any>([]);
 
   const fetchDataDetailAsync = async () => {
     const response = await getEvent("detail", undefined, slug);
@@ -85,17 +96,21 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
 
   const getEventDateList = () => {
     // const dateList: string[] = []; // declare fresh each time
-    const startDate = new Date(eventDetail.start_date).getTime()
-    const endDate = new Date(eventDetail.end_date).getTime()
+    const startDate = new Date(eventDetail.start_date).getTime();
+    const endDate = new Date(eventDetail.end_date).getTime();
 
-    const list = eventDetail.date.map(item => {
+    const list = eventDetail.date.map((item) => {
       let [[date, status]] = Object.entries(item);
-      const startTime = dayjs(startDate).format('HH:mm:ss');
-      date = date + "T" + startTime
-      return { label: dayjs(date).format('dddd, DD MMMM YYYY'), value: date, status };
-    })
-    setRegistrationDateList(list)
-  }
+      const startTime = dayjs(startDate).format("HH:mm:ss");
+      date = date + "T" + startTime;
+      return {
+        label: dayjs(date).format("dddd, DD MMMM YYYY"),
+        value: date,
+        status,
+      };
+    });
+    setRegistrationDateList(list);
+  };
   const validateTimeRegister = async () => {
     const currentDate = new Date();
     const startDate = new Date(eventDetail.ticket_start_date);
@@ -104,10 +119,10 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
     if (currentDate < startDate) {
       setCloseRegister(true);
       setCloseRegisterText("Coming Soon");
-    } else if (eventDetail.status !== 'full' && currentDate > endDate) {
+    } else if (eventDetail.status !== "full" && currentDate > endDate) {
       setCloseRegister(true);
       setCloseRegisterText("Registration Closed");
-    } else if (eventDetail.status === 'full') {
+    } else if (eventDetail.status === "full") {
       setCloseRegister(true);
       setCloseRegisterText("Registration Full");
     } else {
@@ -124,28 +139,32 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
 
   const handleAddToFavorite = async (eventId: string) => {
     const token = await SecureStore.getItemAsync("my-jwt");
-    console.log(eventId)
+    console.log(eventId);
     const favortiteBody = {
       eventId: eventId,
     };
-    const response = await addFavortite(token, favortiteBody)
-    setIsFavorite(true)
-    setFavoriteId(response.favoriteId)
-  }
+    const response = await addFavortite(token, favortiteBody);
+    setIsFavorite(true);
+    setFavoriteId(response.favoriteId);
+  };
 
   const handleRemoveFavorite = async (eventId: any) => {
     const token = await SecureStore.getItemAsync("my-jwt");
-    await removeFavortite(token, eventId)
-    setIsFavorite(false)
-    setFavoriteId(null)
-  }
+    await removeFavortite(token, eventId);
+    setIsFavorite(false);
+    setFavoriteId(null);
+  };
 
   useEffect(() => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const fetchRegistrationAndFavorite = async () => {
         const token = await SecureStore.getItemAsync("my-jwt");
-        const response = await useFetchTicketWithAuth("v1/tickets", "GET", token);
+        const response = await useFetchTicketWithAuth(
+          "v1/tickets",
+          "GET",
+          token
+        );
         setIsRegistered(
           response.some(
             (ticket: { slug: string }) => ticket.slug === eventDetail.slug
@@ -154,10 +173,10 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
         const favResponse = await fetchFavortite(token);
         favResponse.forEach((fav: any) => {
           if (fav.eventId === eventDetail.eventId) {
-            setIsFavorite(true)
-            setFavoriteId(fav.favoriteId)
+            setIsFavorite(true);
+            setFavoriteId(fav.favoriteId);
           }
-        })
+        });
       };
 
       const fetchData = async () => {
@@ -166,14 +185,14 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
         await fetchDataDetailAsync();
         await getUsersInfo();
         await getEventDateList();
-      }
-      fetchData()
+      };
+      fetchData();
       // Only call countViewById when eventDetail.eventId is available
       if (eventDetail.eventId) {
         countViewById(`/api/v1/countView/${eventDetail.eventId}`);
       }
     } finally {
-        setIsLoading(false)        
+      setIsLoading(false);
     }
   }, [eventDetail.slug, confirmRegister, eventDetail.eventId, isFavorite]); // Add eventDetail.eventId to the dependency array
 
@@ -205,8 +224,15 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                   uri: eventDetail.image,
                 }}
               >
-                <TouchableOpacity className="top-4 left-3 pr-3" onPress={() => navigateToGoBack()}>
-                  <Icon name="chevron-back" size={Platform.OS === "ios" ? 26 : 30} color="#000000" />
+                <TouchableOpacity
+                  className="top-4 left-1 pr-6 pl-2"
+                  onPress={() => navigateToGoBack()}
+                >
+                  <Icon
+                    name="chevron-back"
+                    size={Platform.OS === "ios" ? 26 : 30}
+                    color="#000000"
+                  />
                 </TouchableOpacity>
                 <Image
                   source={{ uri: eventDetail.image }}
@@ -221,7 +247,9 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                   <TouchableOpacity
                     key={tag.tag_id}
                     style={styles.tagBox}
-                    onPress={() => navigateToEventTag(tag.tag_title, tag.tag_id)}
+                    onPress={() =>
+                      navigateToEventTag(tag.tag_title, tag.tag_id)
+                    }
                   >
                     <View style={styles.tagTextContainer}>
                       <Text style={styles.tagText}>{tag.tag_title}</Text>
@@ -231,12 +259,23 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
               </View>
               <Text style={styles.eventName}>{eventDetail.name}</Text>
               <View className="flex-row mt-2">
-                <Text className="font-Poppins-Regular text-sm"><Text className="opacity-50">Organized by</Text> {eventDetail.owner}</Text>
+                <Text className="font-Poppins-Regular text-sm">
+                  <Text className="opacity-50">Organized by</Text>{" "}
+                  {eventDetail.owner}
+                </Text>
               </View>
               <View style={styles.eventDetail} className="">
                 <View className="flex-row items-center">
-                  <Calendar width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" strokeWidth={10}/>
-                  <Text className="font-Poppins-Base mx-2"  style={{includeFontPadding: false}}>
+                  <Calendar
+                    width={Platform.OS === "ios" ? 20 : 22}
+                    height={Platform.OS === "ios" ? 20 : 22}
+                    color="#4B5563"
+                    strokeWidth={10}
+                  />
+                  <Text
+                    className="font-Poppins-Base mx-2"
+                    style={{ includeFontPadding: false }}
+                  >
                     {startDate}{" "}
                     {eventDetail.end_date && eventDetail.end_date.length > 0 ? (
                       <Text>- {endDate}</Text>
@@ -246,46 +285,75 @@ const EventDetail: React.FC<EventDetailProps> = ({ route }) => {
                   </Text>
                 </View>
                 <View className="flex-row items-center">
-                  <Time width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" strokeWidth={10}/>
-                  <Text className="font-Poppins-Base mx-2" style={{includeFontPadding: false}}>
+                  <Time
+                    width={Platform.OS === "ios" ? 20 : 22}
+                    height={Platform.OS === "ios" ? 20 : 22}
+                    color="#4B5563"
+                    strokeWidth={10}
+                  />
+                  <Text
+                    className="font-Poppins-Base mx-2"
+                    style={{ includeFontPadding: false }}
+                  >
                     {startTime} - {endTime}
                   </Text>
                 </View>
                 <View className="flex-row items-center">
-                  <Location width={Platform.OS === "ios" ? 20 : 22} height={Platform.OS === "ios" ? 20 : 22} color="#4B5563" strokeWidth={10}  />
-                  <Text className="font-Poppins-Base mx-2"  style={{includeFontPadding: false}}>
+                  <Location
+                    width={Platform.OS === "ios" ? 20 : 22}
+                    height={Platform.OS === "ios" ? 20 : 22}
+                    color="#4B5563"
+                    strokeWidth={10}
+                  />
+                  <Text
+                    className="font-Poppins-Base mx-2"
+                    style={{ includeFontPadding: false }}
+                  >
                     {eventDetail.location}
                   </Text>
                 </View>
               </View>
               <View className="flex-row w-[98%] self-center justify-between bg-transparent mt-4">
-                <View style={{ width: '46%' }}>
+                <View style={{ width: "46%" }}>
                   {isFavorite ? (
                     <CustomButton
                       title="Favorited"
-                      IconComponent={<FavoriteFill width={20} height={20} color={'#D71515'} />}
+                      IconComponent={
+                        <FavoriteFill
+                          width={20}
+                          height={20}
+                          color={"#D71515"}
+                        />
+                      }
                       containerStyles={styles.alreadyFavButton}
                       textStyle={styles.alreadyFavButtonText}
-                      handlePress={() => { handleRemoveFavorite(eventDetail.eventId) }}
-                      disabled={false} />
+                      handlePress={() => {
+                        handleRemoveFavorite(eventDetail.eventId);
+                      }}
+                      disabled={false}
+                    />
                   ) : (
                     <CustomButton
                       title="Add to Favorites"
-                      IconComponent={<Favorite width={20} height={20} color={'black'} />}
+                      IconComponent={
+                        <Favorite width={20} height={20} color={"black"} />
+                      }
                       containerStyles={styles.favButton}
                       textStyle={styles.favButtonText}
-                      handlePress={() => { handleAddToFavorite(eventDetail.eventId) }}
-                      disabled={false} />
-                  )
-                  }
+                      handlePress={() => {
+                        handleAddToFavorite(eventDetail.eventId);
+                      }}
+                      disabled={false}
+                    />
+                  )}
                 </View>
-                <View style={{ width: '52%' }}>
+                <View style={{ width: "52%" }}>
                   {isRegistered ? (
                     <CustomButton
                       title="You Registered"
                       containerStyles={styles.registerButton}
                       textStyle={styles.registerButtonText}
-                      handlePress={() => { }}
+                      handlePress={() => {}}
                       disabled={true}
                     />
                   ) : (
@@ -482,7 +550,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     borderRadius: 20,
     gap: 10,
-    borderColor: '#ECECEC',
+    borderColor: "#ECECEC",
   },
   eventDetail: {
     marginTop: 20,
@@ -490,7 +558,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     borderRadius: 20,
     gap: 10,
-    borderColor: '#ECECEC',
+    borderColor: "#ECECEC",
   },
   favButton: {
     backgroundColor: "#fff",
@@ -501,7 +569,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: "row",
     justifyContent: "center",
-    gap: 4
+    gap: 4,
   },
   favButtonText: {
     color: "#000",
@@ -516,12 +584,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexDirection: "row",
     justifyContent: "center",
-    gap: 4
+    gap: 4,
   },
   alreadyFavButtonText: {
     color: "#D71515",
     fontFamily: "Poppins-Base",
-    includeFontPadding: false
+    includeFontPadding: false,
   },
 });
 

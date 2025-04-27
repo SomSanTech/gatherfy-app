@@ -59,13 +59,13 @@ const Profile = () => {
     setUserInfo(user);
   };
 
-  const navigateToScanQR = () => {
-    if (permission?.granted === false) {
+  const navigateToScanQR = async () => {
+    const permissionResult = await requestPermission();
+    if (permissionResult?.granted === false) {
       Alert.alert(
         "Permission Required",
         "Please allow camera permission to scan QR code."
       );
-      requestPermission();
       return;
     }
     if (userInfo.users_role === "Attendee") {

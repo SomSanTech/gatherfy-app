@@ -121,7 +121,6 @@ const ResetPassword = () => {
       return;
     }
 
-
     if (response.message === "Password updated successfully!") {
       Alert.alert("Success", response.message); // แสดงข้อความสำเร็จจาก backend
       navigateToGoBack();
@@ -143,10 +142,18 @@ const ResetPassword = () => {
         style={{ flex: 1 }}
       >
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={navigateToGoBack}>
+          <TouchableOpacity
+            onPress={navigateToGoBack}
+            className="flex-row items-center"
+          >
             <Icon name="chevron-back" size={26} color="#000000" />
+            <Text
+              className="text-xl font-Poppins-SemiBold text-center ml-3"
+              style={styles.headerText}
+            >
+              Change Password
+            </Text>
           </TouchableOpacity>
-          <Text style={styles.headerText}>Change Password</Text>
         </View>
         <TouchableWithoutFeedback>
           <ScrollView
