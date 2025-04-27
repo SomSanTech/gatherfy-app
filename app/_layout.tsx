@@ -86,6 +86,7 @@ export default function RootLayout() {
     "Poppins-Meduim-Italic": require("../assets/fonts/Poppins-MediumItalic.ttf"),
     "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
+    "League-Gothic": require("../assets/fonts/LeagueGothic-Regular.ttf"),
   });
 
   useEffect(() => {

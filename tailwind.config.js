@@ -23,7 +23,7 @@ module.exports = {
         'Poppins-Regular': ['Poppins-Regular', 'sans-serif'],
         'Poppins-SemiBold': ['Poppins-SemiBold', 'sans-serif'],
         'Poppins-Thin': ['Poppins-Thin', 'sans-serif'],
-
+        'League-Gothic': ['League-Gothic', 'sans-serif'],
       },
     },
   },
