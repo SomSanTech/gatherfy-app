@@ -4,6 +4,25 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
 ## Get started
 
+## Requirements for building the app
+
+- Please use **Java 17** for building the app.
+
+## Environment Setup
+
+Please create a `.env.local` file in your project root with the following content:
+
+```env
+# Environment: development
+
+ANDROID_HOME=$HOME/Library/Android/sdk
+PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+
+EXPO_PUBLIC_ANDROID_CLIENT_ID={YOUR_ANDROID_CLIENT_ID}
+EXPO_PUBLIC_IOS_CLIENT_ID={YOUR_IOS_CLIENT_ID}
+EXPO_PUBLIC_WEB_CLIENT_ID={YOUR_WEB_CLIENT_ID}
+
+
 1. Install dependencies
 
    ```bash
