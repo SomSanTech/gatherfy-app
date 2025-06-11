@@ -10,6 +10,14 @@
 >
 > ✅ You **must use Java version 17** to build this project.  
 > ❌ Other versions are not supported and will cause build errors.
+>
+> ## Path Folder Requirement
+> 
+> 🚫 **No spaces in the project path**:  
+> Folder names or paths with spaces (e.g., `~/My Projects/Gatherfy`) will cause Gradle build errors.  
+> 
+> ✅ Use a path like `~/Projects/GatherfyApp` instead.
+> 
 > ## Environment Setup (If run in local)
 >
 >Please create `.env.local` file in your project root with the following content:
