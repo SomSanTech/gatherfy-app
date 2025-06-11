@@ -20,7 +20,7 @@
 > 
 > ## Environment Setup (If run in local)
 >
->Please create `.env.local` file in your project root with the following content:
+> Create `.env.local` file in your project root with the following content:
 >
 >```env
 >ANDROID_HOME=$HOME/Library/Android/sdk
