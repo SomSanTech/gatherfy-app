@@ -15,8 +15,6 @@
 >Please create `.env.local` file in your project root with the following content:
 >
 >```env
-># Environment: development
->
 >ANDROID_HOME=$HOME/Library/Android/sdk
 >PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
 >
